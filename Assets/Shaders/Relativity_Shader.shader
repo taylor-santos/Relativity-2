@@ -38,14 +38,18 @@ Shader "Relativity/Relativity_Shader" {
         half _Tess;
 		half _Glossiness;
 		half _Metallic;
-		float _Coordinate_Time;
+			float _Coordinate_Time; //TODO: Remove
+		float _Observer_Time;
 		float _Proper_Time_Offset;
 		fixed4 _Color;
-		float4 _Proper_Velocity;
-		float4 _Observer_Proper_Velocity;
+			float4 _Proper_Velocity; //TODO: Remove
+		float4 _Velocity;
+			float4 _Observer_Proper_Velocity; //TODO: Remove
+		float4 _Observer_Velocity;
 		float4 _Observer_Position;
-		float4 _accelerations[100];
-		float4 _accel_positions[100];
+		float4 _accelerations[512];
+		float _durations[512];
+		float4 _accel_positions[512];
 
 		float4 tessFixed()
         {
@@ -67,6 +71,11 @@ Shader "Relativity/Relativity_Shader" {
 			return dot(v, v);
 		}
 
+		float alpha(float3 v){ 
+			//Reciprocal Lorentz Factor
+			return sqrt(1 - sqr_magnitude(v));
+		}
+
 		float get_temporal_component(float4 V)
 		{
 			return V.x;
@@ -82,11 +91,19 @@ Shader "Relativity/Relativity_Shader" {
 			return (sqrt(1.0/(1.0 + sqr_magnitude(a*t + u_0)))*sqrt(1.0 + sqr_magnitude(a*t + u_0))*log(dot(a, a*t + u_0) + length(a)*sqrt(1.0 + sqr_magnitude(a*t + u_0))) - sqrt(1.0/(1.0 + sqr_magnitude(u_0)))*sqrt(1.0 + sqr_magnitude(u_0))*log(dot(a, u_0) + length(a)*sqrt(1.0 + sqr_magnitude(u_0))))/length(a);
 		}
 
-		float3 proper_vel_add(float3 u, float3 v)
+		float get_observer_duration(float3 a, float3 u, float3 v, float t)
 		{
-			float Bu = 1.0/sqrt(1.0 + sqr_magnitude(u));
-			float Bv = 1.0/sqrt(1.0 + sqr_magnitude(v));
-			return u + v + u*(Bu/(1.0 + Bu)*dot(u, v) + (1.0 - Bv)/Bv);
+			//Given proper acceleration a, initial proper velocity u, observer velocity v, and coordinate duration t, solve for observer duration.
+			return (t*pow(sqr_magnitude(a),3.0/2)+sqrt(sqr_magnitude(a))*dot(a,v)*sqrt(1+sqr_magnitude(u))-sqrt(sqr_magnitude(a))*dot(a,v)*sqrt(1+pow(t,2)*sqr_magnitude(a)+2*t*dot(a,u)+sqr_magnitude(u))-(dot(a,u)*dot(a,v)-sqr_magnitude(a)*dot(u,v))*(log(dot(a,u)+sqrt(sqr_magnitude(a))*sqrt(1+sqr_magnitude(u)))-log(t*sqr_magnitude(a)+dot(a,u)+sqrt(sqr_magnitude(a))*sqrt(1+pow(t,2)*sqr_magnitude(a)+2*t*dot(a,u)+sqr_magnitude(u)))))/(pow(sqr_magnitude(a),3.0/2)*sqrt(1-sqr_magnitude(v)));
+		}
+
+		float3 add_velocity(float3 v, float3 u){
+			//Einstein Velocity Addition
+			if (sqr_magnitude(v) == 0)
+				return u;
+			if (sqr_magnitude(u) == 0)
+				return v;
+			return 1.0/(1 + dot(v, u))*(u*alpha(v) + v + (1 - alpha(v))*dot(v, u)/sqr_magnitude(v)*v);
 		}
 
 		float3 get_displacement(float3 a, float3 u_0, float t)
@@ -94,12 +111,12 @@ Shader "Relativity/Relativity_Shader" {
 			return (a*length(a)*(sqrt(1.0 + sqr_magnitude(a*t + u_0)) - sqrt(1.0 + sqr_magnitude(u_0))) - cross(cross(u_0, a), - a)*(log(dot(a, u_0) + length(a)*sqrt(1.0 + sqr_magnitude(u_0))) - log(sqr_magnitude(a)*t + dot(a, u_0) + length(a)*sqrt(1.0 + sqr_magnitude(a*t + u_0)))))/pow(length(a), 3);
 		}
 
-		float3 get_spacial_component(float4 V)
+		float3 get_spatial_component(float4 V)
 		{
 			return float3(V.y,V.z,V.w);
 		}
 
-		float4 combine_temporal_and_spacial(float t, float3 p)
+		float4 combine_temporal_and_spatial(float t, float3 p)
 		{
 			return float4(t, p);
 		}
@@ -130,119 +147,74 @@ Shader "Relativity/Relativity_Shader" {
 
 		void vert (inout appdata v)
 		{
-			float3 coordinate_proper_velocity = _Proper_Velocity.xyz;
-			float3 coordinate_velocity = coordinate_proper_velocity / sqrt(1.0 + sqr_magnitude(coordinate_proper_velocity));
-
-			float3 observer_proper_velocity = -_Observer_Proper_Velocity.xyz;
-			float3 observer_velocity = observer_proper_velocity / sqrt(1.0 + sqr_magnitude(observer_proper_velocity));
-
-			float3 current_proper_velocity = proper_vel_add(observer_proper_velocity, coordinate_proper_velocity);
-			float3 current_velocity = current_proper_velocity / sqrt(1.0 + sqr_magnitude(current_proper_velocity));
-
-			//coordinate_proper_velocity = current_proper_velocity;
-			//coordinate_velocity = current_velocity;
-
+			float4x4 object_coordinate_boost = lorentz_boost(-_Velocity.xyz); //Boost from object frame to coordinate frame
+			float4x4 coordinate_observer_boost = lorentz_boost(_Observer_Velocity.xyz); //Boost from coordinate frame to observer frame
 			float3 vertex_world_position = mul(unity_ObjectToWorld, v.vertex).xyz;
 			float3 object_world_position = mul(unity_ObjectToWorld, float4(0,0,0,1));
-
-			float4x4 boost = lorentz_boost(-coordinate_velocity); //Object -> coordinate
-			//float4x4 obs_boost = lorentz_boost(-observer_velocity); //Coordinate -> observer
-			float4 proper_starting_event = combine_temporal_and_spacial(-_Proper_Time_Offset, vertex_world_position);
-			float4 coordinate_current_event = mul(boost, proper_starting_event);
-			//float4 observer_current_event = mul(obs_boost, coordinate_current_event);
-
+			float4 starting_event_object = combine_temporal_and_spatial(-_Proper_Time_Offset, vertex_world_position); //Object will always be at (T,0,0,0) in its own frame.
+			float4 current_event_coordinate = mul(object_coordinate_boost, starting_event_object);
+			float4 current_event_observer = mul(coordinate_observer_boost, current_event_coordinate);
+			float3 current_object_velocity = _Velocity.xyz;
+			float3 proper_object_velocity = current_object_velocity / alpha(current_object_velocity);
+			float3 observer_object_velocity = add_velocity(-_Observer_Velocity.xyz, current_object_velocity);
 			float proper_time = 0;
-			float coordinate_time = _Coordinate_Time;
-
-			for (int i=0; i<100; ++i)
-			{
-				//if (get_temporal_component(observer_current_event) < coordinate_time)
-				if (get_temporal_component(coordinate_current_event) < coordinate_time)
-				{
-					float3 a = get_spacial_component(_accelerations[i]);
-					float proper_duration = get_temporal_component(_accelerations[i]);
-					if (length(a) > 0.0)
-					{
-						float3 pos = (object_world_position + _accel_positions[i].xyz) - vertex_world_position;
-						float L = dot(pos, a)/length(a);
-						if (L <= 1.0/length(a))
+			for (int i=0; i<512; ++i){
+				if (get_temporal_component(current_event_observer) < _Observer_Time){
+					float3 proper_acceleration = _accelerations[i].xyz;
+					float proper_duration = _durations[i];
+					float a = length(proper_acceleration);
+					if (a > 0){
+						float3 offset = (object_world_position + _accel_positions[i].xyz) - vertex_world_position;
+						float L = dot(offset, proper_acceleration)/a;
+						if (L <= 1.0/a)
 						{
-							float b = 1.0/(1.0 - length(a)*L);
-							a *= b;
+							float b = 1.0/(1.0 - a*L);
+							proper_acceleration *= b;
 							proper_duration /= b;
 						}else{
-							a = float3(0,0,0);
+							proper_acceleration = float3(0,0,0);
 							proper_duration = 0;
 						}
-						float3 u_0 = coordinate_proper_velocity;
-					
-						float coordinate_duration = get_duration(a, u_0, proper_duration);
-
-						float3 displacement = get_displacement(a, u_0, coordinate_duration);
-						float4 new_coordinate_event = coordinate_current_event + combine_temporal_and_spacial(coordinate_duration, displacement);
-						//float4 new_observer_event = mul(obs_boost, new_coordinate_event);
-						float3 new_proper_velocity = coordinate_proper_velocity + a*coordinate_duration;
-						//float3 new_current_proper_velocity = proper_vel_add(observer_proper_velocity, new_proper_velocity);
-						
-						//if (get_temporal_component(new_observer_event) > coordinate_time)
-						if (get_temporal_component(new_coordinate_event) > coordinate_time)
-						{
-							coordinate_duration = coordinate_time - get_temporal_component(coordinate_current_event);
-							proper_duration = get_proper_duration(a, u_0, coordinate_duration);
-							displacement = get_displacement(a, u_0, coordinate_duration);
-							new_coordinate_event = coordinate_current_event + combine_temporal_and_spacial(coordinate_duration, displacement);
-							//new_observer_event = mul(obs_boost, new_coordinate_event);
-							new_proper_velocity = coordinate_proper_velocity + a*coordinate_duration;
-							//new_current_proper_velocity = proper_vel_add(observer_proper_velocity, new_proper_velocity);
-						}
-						coordinate_proper_velocity = new_proper_velocity;
-						coordinate_velocity = coordinate_proper_velocity / sqrt(1.0 + sqr_magnitude(coordinate_proper_velocity));
-						proper_time += proper_duration;
-						coordinate_current_event = new_coordinate_event;
-						//observer_current_event = new_observer_event;
-						/*
-						if (get_temporal_component(new_observer_event) < coordinate_time)
-						{
-							coordinate_proper_velocity = new_proper_velocity;
-							coordinate_velocity = coordinate_proper_velocity / sqrt(1.0 + sqr_magnitude(coordinate_proper_velocity));
-							proper_time += proper_duration;
-							coordinate_current_event = new_coordinate_event;
-							observer_current_event = new_observer_event;
-						}else{
-							while (get_temporal_component(observer_current_event) < coordinate_time)
-							{
-								proper_duration = 0.1;
-								u_0 = coordinate_proper_velocity;
-								coordinate_duration = get_duration(a, u_0, proper_duration);
-								displacement = get_displacement(a, u_0, coordinate_duration);
-								coordinate_current_event += combine_temporal_and_spacial(coordinate_duration, displacement);
-								observer_current_event = mul(obs_boost, coordinate_current_event);
-								coordinate_proper_velocity += a*coordinate_duration;
-								proper_time += proper_duration;
+						float coordinate_duration = get_duration(proper_acceleration, proper_object_velocity, proper_duration);
+						float3 coordinate_displacement = get_displacement(proper_acceleration, proper_object_velocity, coordinate_duration);
+						float4 next_event_coordinate = current_event_coordinate + combine_temporal_and_spatial(coordinate_duration, coordinate_displacement);
+						float4 next_event_observer = mul(coordinate_observer_boost, next_event_coordinate);
+						if (get_temporal_component(next_event_observer) > _Observer_Time){
+							coordinate_duration = 0;
+							float observer_duration = 0;
+							for (int j=0; j<200; ++j){
+								float prev_duration = coordinate_duration;
+								float diff = _Observer_Time - get_temporal_component(current_event_observer) - observer_duration;
+								coordinate_duration += diff / 2;
+								float t = coordinate_duration;
+								observer_duration = get_observer_duration(proper_acceleration, proper_object_velocity, _Observer_Velocity.xyz, coordinate_duration);
 							}
-							break;
+							coordinate_displacement = get_displacement(proper_acceleration, proper_object_velocity, coordinate_duration);
+							next_event_coordinate = current_event_coordinate + combine_temporal_and_spatial(coordinate_duration, coordinate_displacement);
+							next_event_observer = mul(coordinate_observer_boost, next_event_coordinate);
 						}
-						*/				
+						proper_time += get_proper_duration(proper_acceleration, proper_object_velocity, coordinate_duration);
+						proper_object_velocity += proper_acceleration*coordinate_duration;
+						current_object_velocity = proper_object_velocity / sqrt(1.0 + sqr_magnitude(proper_object_velocity));
+						current_event_coordinate += combine_temporal_and_spatial(coordinate_duration, coordinate_displacement);
+						current_event_observer = mul(coordinate_observer_boost, current_event_coordinate);
+						observer_object_velocity = add_velocity(-_Observer_Velocity.xyz, current_object_velocity);
 					}else{
-						float coordinate_duration = proper_duration / sqrt(1.0 + sqr_magnitude(coordinate_proper_velocity));
-						float3 displacement = coordinate_velocity * coordinate_duration;
-						coordinate_current_event += combine_temporal_and_spacial(coordinate_duration, displacement);
+						float coordinate_duration = proper_duration / alpha(current_object_velocity);
+						float3 coordinate_displacement = current_object_velocity * coordinate_duration;
+						current_event_coordinate += combine_temporal_and_spatial(coordinate_duration, coordinate_displacement);
+						current_event_observer = mul(coordinate_observer_boost, current_event_coordinate);
+						observer_object_velocity = add_velocity(-_Observer_Velocity.xyz, current_object_velocity);
 						proper_time += proper_duration;
-						//float4 observer_prev_event = observer_current_event;
-						//observer_current_event = mul(obs_boost, coordinate_current_event);
 					}
 				}else{
 					break;
 				}
 			}
-			//current_proper_velocity = proper_vel_add(observer_proper_velocity, coordinate_proper_velocity);
-			//current_velocity = current_proper_velocity / sqrt(1.0 + sqr_magnitude(current_proper_velocity));
-			//proper_time += (coordinate_time - get_temporal_component(observer_current_event)) * sqrt(1.0 - sqr_magnitude(current_velocity));
-			//observer_current_event += (coordinate_time - get_temporal_component(observer_current_event)) * combine_temporal_and_spacial(1.0, current_velocity);
-			//v.vertex = mul(unity_WorldToObject, float4(get_spacial_component(observer_current_event), 1));
-			proper_time += (coordinate_time - get_temporal_component(coordinate_current_event)) * sqrt(1.0 - sqr_magnitude(coordinate_velocity));
-			coordinate_current_event += (coordinate_time - get_temporal_component(coordinate_current_event)) * combine_temporal_and_spacial(1.0, coordinate_velocity);
-			v.vertex = mul(unity_WorldToObject, float4(get_spacial_component(coordinate_current_event), 1));
+			observer_object_velocity = add_velocity(-_Observer_Velocity.xyz, current_object_velocity);
+			proper_time += (_Observer_Time - get_temporal_component(current_event_observer))*alpha(observer_object_velocity);
+			current_event_observer += (_Observer_Time - get_temporal_component(current_event_observer))*combine_temporal_and_spatial(1, observer_object_velocity);
+			v.vertex = mul(unity_WorldToObject, float4(get_spatial_component(current_event_observer), 1));
 		}
 		ENDCG
 	}

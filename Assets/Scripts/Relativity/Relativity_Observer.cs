@@ -6,7 +6,7 @@ public class Relativity_Observer : MonoBehaviour {
 	public bool FreezeTime = true;
 	public Vector3 velocity;
 	public Vector3 acceleration;
-	public double CoordinateTime = 0;
+	public float CoordinateTime = 0;
 	public List<Vector4> properAccelerations;
 	public float TimeScale = 1;
 	public KeyCode PauseKey = KeyCode.Space;
@@ -40,7 +40,7 @@ public class Relativity_Observer : MonoBehaviour {
 			Vector3 properVelocity = initialProperVelocity + (float)CoordinateTime * acceleration;
 			velocity = properVelocity / Mathf.Sqrt(1f + properVelocity.sqrMagnitude);
 		}
-		Shader.SetGlobalVector("_Observer_Proper_Velocity", velocity / Mathf.Sqrt(1f - velocity.sqrMagnitude));
+		
 		/*
 		if (Input.GetKeyDown(SlowTime))
 		{
@@ -54,7 +54,12 @@ public class Relativity_Observer : MonoBehaviour {
 		if (!FreezeTime){
 			CoordinateTime += Time.deltaTime * TimeScale;
 		}
-		Shader.SetGlobalFloat("_Coordinate_Time", (float)CoordinateTime);
+		
+	}
+
+	void FixedUpdate (){
+		Shader.SetGlobalVector("_Observer_Velocity", velocity);
+		Shader.SetGlobalFloat("_Observer_Time", CoordinateTime);
 	}
 
 	void OnGUI() {
