@@ -1,23 +1,25 @@
-// Upgrade NOTE: replaced '_Object2.0World' with 'unity_ObjectToWorld'
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
 
 Shader "Relativity/Relativity_Shader" {
 	Properties {
-		_Tess ("Tessellation", Range(1,64)) = 4
 		_Color ("Color", Color) = (1,1,1,1)
 		_MainTex ("Albedo (RGB)", 2D) = "white" {}
-		_Glossiness ("Smoothness", Range(0.0,1)) = 0.5
+		_Glossiness ("Smoothness", Range(0,1)) = 0.5
 		_Metallic ("Metallic", Range(0,1)) = 0
 	}
 	SubShader {
 		Tags { "RenderType"="Opaque" }
-		LOD 200
+		Tags { "ForceNoShadowCasting" = "True"}
+		LOD 100
 		
 		CGPROGRAM
 
-		#pragma surface surf Standard fullforwardshadows vertex:vert tessellate:tessFixed nolightmap
-		// Use shader model 3.0 target, to get nicer looking lighting
-		#pragma target 3.0
-		#include "Tessellation.cginc"
+		//#pragma surface surf Standard fullforwardshadows vertex:vert tessellate:tessFixed nolightmap
+		#pragma surface surf Standard fullforwardshadows vertex:vert nolightmap
+		// Use shader model 3 target, to get nicer looking lighting
+		//#pragma target 3
+		//#include "Tessellation.cginc"
+		#include "UnityCG.cginc"
 
 		
 
@@ -44,14 +46,9 @@ Shader "Relativity/Relativity_Shader" {
 		float4 _Velocity;
 		float4 _Observer_Velocity;
 		float4 _Observer_Position;
-		float4 _accelerations[512];
-		float _durations[512];
-		float4 _accel_positions[512];
-
-		float4 tessFixed()
-        {
-            return _Tess;
-        }
+		float4 _accelerations[32];
+		float _durations[32];
+		float4 _accel_positions[32];
         
 		void surf (Input IN, inout SurfaceOutputStandard o) {
 			// Albedo comes from a texture tinted by color
@@ -62,7 +59,6 @@ Shader "Relativity/Relativity_Shader" {
 			o.Smoothness = _Glossiness;
 			o.Alpha = c.a;
 		}
-		
 
 		float sqr_magnitude(float3 v);
 		float gamma(float3 v);
@@ -102,25 +98,25 @@ Shader "Relativity/Relativity_Shader" {
 			float4 current_event_observer = mul(coordinate_to_observer_boost, current_event_coordinate);
 			float3 observer_to_object_velocity = add_velocity(observer_to_coordinate_velocity, coordinate_to_object_velocity);
 			
-			float3 velocities[512];
+			float3 velocities[32];
 			int velocities_index = 0;
 			//velocities[velocities_index++] = coordinate_to_object_velocity;
 			velocities[velocities_index++] = velocity_to_proper(coordinate_to_object_velocity);
-			for (int i=0; i<512; ++i){
+			for (int i=0; i<32; ++i){
 				if (get_temporal_component(current_event_observer) < _Observer_Time){
 					float3 proper_acceleration = _accelerations[i].xyz;
 					float proper_duration = _durations[i];
 					float a = length(proper_acceleration);
 					float3 offset = (object_world_position + _accel_positions[i].xyz) - vertex_world_position;
 					float L = dot(offset, proper_acceleration)/a;
-					if (L <= 1.0/a)
+					if (L <= 1/a)
 					{
-						float b = 1.0/(1.0 - a*L);
+						float b = 1/(1 - a*L);
 						proper_acceleration *= b;
 						proper_duration /= b;
 					}else{
 						proper_acceleration = float3(0,0,0);
-						proper_duration = 0.0;
+						proper_duration = 0;
 					}
 					if (length(proper_acceleration) > 0){
 						float MCRF_duration = sinh(length(proper_acceleration) * proper_duration)/length(proper_acceleration);
@@ -157,14 +153,14 @@ Shader "Relativity/Relativity_Shader" {
 			}
 			coordinate_to_object_velocity = velocities[--velocities_index];
 			velocities_index--;
-			for (int i=velocities_index; i>=0; i--){
-				coordinate_to_object_velocity = add_proper_velocity(velocities[i], coordinate_to_object_velocity);
+			for (int j=velocities_index; j>=0; j--){
+				coordinate_to_object_velocity = add_proper_velocity(velocities[j], coordinate_to_object_velocity);
 			}
 			coordinate_to_object_velocity = proper_to_velocity(coordinate_to_object_velocity);
 			observer_to_object_velocity = add_velocity(observer_to_coordinate_velocity, coordinate_to_object_velocity);
-			current_event_observer += (_Observer_Time - get_temporal_component(current_event_observer))*combine_temporal_and_spatial(1.0, observer_to_object_velocity);
+			current_event_observer += (_Observer_Time - get_temporal_component(current_event_observer))*combine_temporal_and_spatial(1, observer_to_object_velocity);
 			float4 relative_event_observer = current_event_observer + combine_temporal_and_spatial(0, _Observer_Position);
-			v.vertex = mul(unity_WorldToObject, float4(get_spatial_component(relative_event_observer), 1.0));
+			v.vertex = mul(unity_WorldToObject, float4(get_spatial_component(relative_event_observer), 1));
 		}
 
 		float sqr_magnitude(float3 v){
@@ -172,46 +168,46 @@ Shader "Relativity/Relativity_Shader" {
 		}
 
 		float3 velocity_to_proper(float3 v){
-			return v / sqrt(1.0 - sqr_magnitude(v));
+			return v / sqrt(1 - sqr_magnitude(v));
 		}
 
 		float3 proper_to_velocity(float3 v){
-			return v / sqrt(1.0 + sqr_magnitude(v));
+			return v / sqrt(1 + sqr_magnitude(v));
 		}
 
 		float3 add_velocity(float3 v, float3 u){
 			//Einstein Velocity Addition
-			if (sqr_magnitude(v) == 0.0)
+			if (sqr_magnitude(v) == 0)
 				return u;
-			if (sqr_magnitude(u) == 0.0)
+			if (sqr_magnitude(u) == 0)
 				return v;
-			return 1.0/(1.0+dot(u, v))*(v + u*alpha(v) + gamma(v)/(1.0 + gamma(v))*dot(u, v)*v);
+			return 1/(1+dot(u, v))*(v + u*alpha(v) + gamma(v)/(1 + gamma(v))*dot(u, v)*v);
 		}
 
 		float3 add_proper_velocity(float3 v, float3 u){
-			float Bu = 1.0/sqrt(1.0 + sqr_magnitude(u));
-			float Bv = 1.0/sqrt(1.0 + sqr_magnitude(v));
-			return v+u+(Bv/(1.0+Bv)*dot(v,u) + (1.0-Bu)/Bu)*v;
+			float Bu = 1/sqrt(1 + sqr_magnitude(u));
+			float Bv = 1/sqrt(1 + sqr_magnitude(v));
+			return v+u+(Bv/(1+Bv)*dot(v,u) + (1-Bu)/Bu)*v;
 		}
 
 		float gamma(float3 v){
 			//Lorentz Factor
-			return 1.0/sqrt(1.0 - sqr_magnitude(v));
+			return 1/sqrt(1 - sqr_magnitude(v));
 		}
 
 		float alpha(float3 v){ 
 			//Reciprocal Lorentz Factor
-			return sqrt(1.0 - sqr_magnitude(v));
+			return sqrt(1 - sqr_magnitude(v));
 		}
 		/*
 		float sinh(float x)
 		{
-			return (pow(exp(1.0), x) - pow(exp(1.0), -x))/2.0;
+			return (pow(exp(1), x) - pow(exp(1), -x))/2;
 		}
 
 		float cosh(float x)
 		{
-			return (pow(exp(1.0), x) + pow(exp(1.0), -x))/2.0;
+			return (pow(exp(1), x) + pow(exp(1), -x))/2;
 		}
 
 		float tanh(float x)
@@ -221,37 +217,37 @@ Shader "Relativity/Relativity_Shader" {
 
 		float atanh(float x)
 		{
-			return (log(1.0 + x) - log(1.0 - x))/2.0;
+			return (log(1 + x) - log(1 - x))/2;
 		}
 
 		float acosh(float x)
 		{
-			return log(x + sqrt(pow(x,2.0) - 1.0));
+			return log(x + sqrt(pow(x,2) - 1));
 		}
 
 		float asinh(float x)
 		{
-			return log(x + sqrt(1.0 + pow(x,2.0)));
+			return log(x + sqrt(1 + pow(x,2)));
 		}
 		*/
 		float4x4 lorentz_boost(float3 v){
-			if (dot(v, v) == 0.0)
+			if (dot(v, v) == 0)
 			{
 				return float4x4(
-					1.0, 0.0, 0.0, 0.0,
-					0.0, 1.0, 0.0, 0.0,
-					0.0, 0.0, 1.0, 0.0,
-					0.0, 0.0, 0.0, 1.0
+					1, 0, 0, 0,
+					0, 1, 0, 0,
+					0, 0, 1, 0,
+					0, 0, 0, 1
 				);
 			}
 
-			float gamma = 1.0/sqrt(1.0 - dot(v, v));
+			float gamma = 1/sqrt(1 - dot(v, v));
 
 			float4x4 boost = float4x4(
 				gamma,       -v.x*gamma,                             -v.y*gamma,                             -v.z*gamma,
-				-v.x*gamma,  (gamma-1.0)*(v.x*v.x)/(dot(v, v)) + 1.0,  (gamma-1.0)*(v.x*v.y)/(dot(v, v)),      (gamma-1.0)*(v.x*v.z)/(dot(v, v)),
-				-v.y*gamma,  (gamma-1.0)*(v.y*v.x)/(dot(v, v)),      (gamma-1.0)*(v.y*v.y)/(dot(v, v)) + 1.0,  (gamma-1.0)*(v.y*v.z)/(dot(v, v)),
-				-v.z*gamma,  (gamma-1.0)*(v.z*v.x)/(dot(v, v)),      (gamma-1.0)*(v.z*v.y)/(dot(v, v)),      (gamma-1.0)*(v.z*v.z)/(dot(v, v)) + 1.0
+				-v.x*gamma,  (gamma-1)*(v.x*v.x)/(dot(v, v)) + 1,  (gamma-1)*(v.x*v.y)/(dot(v, v)),      (gamma-1)*(v.x*v.z)/(dot(v, v)),
+				-v.y*gamma,  (gamma-1)*(v.y*v.x)/(dot(v, v)),      (gamma-1)*(v.y*v.y)/(dot(v, v)) + 1,  (gamma-1)*(v.y*v.z)/(dot(v, v)),
+				-v.z*gamma,  (gamma-1)*(v.z*v.x)/(dot(v, v)),      (gamma-1)*(v.z*v.y)/(dot(v, v)),      (gamma-1)*(v.z*v.z)/(dot(v, v)) + 1
 			);
 
 			return boost;
@@ -288,14 +284,14 @@ Shader "Relativity/Relativity_Shader" {
 				*
 				(
 					sqrt(
-						1.0
+						1
 						+
-						pow(T, 2.0)
+						pow(T, 2)
 						*
 						sqr_magnitude(a)
 					)
 					-
-					1.0
+					1
 				)
 			)
 			/
@@ -333,11 +329,11 @@ Shader "Relativity/Relativity_Shader" {
 			float B44 = object_to_coordinate_boost[3][3];
 			
 			return
-			(1.0/((pow(ax, 2.0) + pow(ay, 2.0) + pow(az, 2.0))*sqrt(1.0 - pow(cVx, 2.0) - pow(cVy, 2.0) - pow(cVz, 2.0))))*((-az)*B14 + pow(ax, 2.0)*(currCoordT - currCoordX*cVx - currCoordY*cVy - currCoordZ*cVz + B11*MCRFTime - (B21*cVx + B31*cVy + B41*cVz)*MCRFTime) + 
-			pow(ay, 2.0)*(currCoordT - currCoordX*cVx - currCoordY*cVy - currCoordZ*cVz + B11*MCRFTime - (B21*cVx + B31*cVy + B41*cVz)*MCRFTime) + ax*(B12 - B22*cVx - B32*cVy - B42*cVz)*(-1.0 + sqrt(1.0 + (pow(ax, 2.0) + pow(ay, 2.0) + pow(az, 2.0))*pow(MCRFTime, 2.0))) + 
-			ay*(B13 - B23*cVx - B33*cVy - B43*cVz)*(-1.0 + sqrt(1.0 + (pow(ax, 2.0) + pow(ay, 2.0) + pow(az, 2.0))*pow(MCRFTime, 2.0))) + 
-			az*(B24*cVx + B34*cVy + B44*cVz + az*(currCoordT - currCoordX*cVx - currCoordY*cVy - currCoordZ*cVz + B11*MCRFTime - (B21*cVx + B31*cVy + B41*cVz)*MCRFTime) + B14*sqrt(1.0 + (pow(ax, 2.0) + pow(ay, 2.0) + pow(az, 2.0))*pow(MCRFTime, 2.0)) - 
-			(B24*cVx + B34*cVy + B44*cVz)*sqrt(1.0 + (pow(ax, 2.0) + pow(ay, 2.0) + pow(az, 2.0))*pow(MCRFTime, 2.0))));
+			(1/((pow(ax, 2) + pow(ay, 2) + pow(az, 2))*sqrt(1 - pow(cVx, 2) - pow(cVy, 2) - pow(cVz, 2))))*((-az)*B14 + pow(ax, 2)*(currCoordT - currCoordX*cVx - currCoordY*cVy - currCoordZ*cVz + B11*MCRFTime - (B21*cVx + B31*cVy + B41*cVz)*MCRFTime) + 
+			pow(ay, 2)*(currCoordT - currCoordX*cVx - currCoordY*cVy - currCoordZ*cVz + B11*MCRFTime - (B21*cVx + B31*cVy + B41*cVz)*MCRFTime) + ax*(B12 - B22*cVx - B32*cVy - B42*cVz)*(-1 + sqrt(1 + (pow(ax, 2) + pow(ay, 2) + pow(az, 2))*pow(MCRFTime, 2))) + 
+			ay*(B13 - B23*cVx - B33*cVy - B43*cVz)*(-1 + sqrt(1 + (pow(ax, 2) + pow(ay, 2) + pow(az, 2))*pow(MCRFTime, 2))) + 
+			az*(B24*cVx + B34*cVy + B44*cVz + az*(currCoordT - currCoordX*cVx - currCoordY*cVy - currCoordZ*cVz + B11*MCRFTime - (B21*cVx + B31*cVy + B41*cVz)*MCRFTime) + B14*sqrt(1 + (pow(ax, 2) + pow(ay, 2) + pow(az, 2))*pow(MCRFTime, 2)) - 
+			(B24*cVx + B34*cVy + B44*cVz)*sqrt(1 + (pow(ax, 2) + pow(ay, 2) + pow(az, 2))*pow(MCRFTime, 2))));
 		}
 
 		float get_MCRF_time(float3 a, float3 coordinate_velocity, float4x4 object_to_coordinate_boost, float4 current_event_coordinate, float observer_time){

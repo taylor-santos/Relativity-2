@@ -16,6 +16,7 @@ public class Relativity_Observer : MonoBehaviour {
 	public List<GameObject> charges;
 	public float LocalTime;
 	private Vector3 vel;
+	private Vector3 start_pos;
 	// Use this for initialization
 	void Start () {
 		GameObject[] objects = GameObject.FindObjectsOfType(typeof(GameObject)) as GameObject[];
@@ -30,6 +31,7 @@ public class Relativity_Observer : MonoBehaviour {
 		initialVelocity = velocity;
 		LocalTime = 0;
 		vel = velocity;
+		start_pos = transform.position;
 	}
 
 	void Update () {
@@ -43,7 +45,42 @@ public class Relativity_Observer : MonoBehaviour {
 			LocalTime += Time.deltaTime * TimeScale;
 
 		}
-		CoordinateTime = LocalTime;
+
+		float elapsed = 0;
+		CoordinateTime = 0;
+		velocity = Vector3.zero;
+		for (int i=0; i<accelerations.Count; ++i){
+			float duration = durations[i];
+			if (elapsed + duration < LocalTime){
+				float coordinate_duration = Sinh(accelerations[i].magnitude*duration)/accelerations[i].magnitude;
+				CoordinateTime += coordinate_duration;
+				velocity = add_velocity(velocity, accelerations[i]*coordinate_duration / Mathf.Sqrt(1f + (accelerations[i]*coordinate_duration).sqrMagnitude));
+				elapsed += duration;
+			}else if (elapsed < LocalTime){
+				duration = LocalTime-elapsed;
+				float coordinate_duration = Sinh(accelerations[i].magnitude*duration)/accelerations[i].magnitude;
+				CoordinateTime += coordinate_duration;
+				velocity = add_velocity(velocity, accelerations[i]*coordinate_duration / Mathf.Sqrt(1f + (accelerations[i]*coordinate_duration).sqrMagnitude));
+				elapsed += duration;
+			}
+			/*
+			if (elapsed + duration > LocalTime){
+				CoordinateTime = Sinh(accelerations[0].magnitude*LocalTime)/accelerations[0].magnitude;
+				velocity = accelerations[0]*CoordinateTime / Mathf.Sqrt(1f + (accelerations[0]*CoordinateTime).sqrMagnitude);
+				elapsed += LocalTime;
+			}else{
+				CoordinateTime = Sinh(accelerations[0].magnitude*duration)/accelerations[0].magnitude;
+				velocity = accelerations[0]*CoordinateTime / Mathf.Sqrt(1f + (accelerations[0]*CoordinateTime).sqrMagnitude);
+				elapsed += duration;
+			}
+			*/
+		}
+		CoordinateTime += (LocalTime - elapsed);
+		
+		//CoordinateTime = LocalTime;
+		//velocity = (transform.position - start_pos) / Time.deltaTime;
+		//start_pos = transform.position;
+
 		/*
 		float current_time = 0;
 		float duration = LocalTime < durations[0] ? LocalTime : durations[0];
