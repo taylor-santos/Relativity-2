@@ -12,11 +12,8 @@ public class Relativity_Observer : MonoBehaviour {
 	public KeyCode PauseKey = KeyCode.Space;
 	public KeyCode SlowTime = KeyCode.LeftArrow;
 	public KeyCode SpeedTime = KeyCode.RightArrow;
-	private Vector3 initialVelocity;
 	public List<GameObject> charges;
 	public float LocalTime;
-	private Vector3 vel;
-	private Vector3 start_pos;
 	// Use this for initialization
 	void Start () {
 		GameObject[] objects = GameObject.FindObjectsOfType(typeof(GameObject)) as GameObject[];
@@ -28,10 +25,6 @@ public class Relativity_Observer : MonoBehaviour {
 				charges.Add(obj);
 			}
 		}
-		initialVelocity = velocity;
-		LocalTime = 0;
-		vel = velocity;
-		start_pos = transform.position;
 	}
 
 	void Update () {
@@ -45,7 +38,7 @@ public class Relativity_Observer : MonoBehaviour {
 			LocalTime += Time.deltaTime * TimeScale;
 
 		}
-
+		/*
 		float elapsed = 0;
 		CoordinateTime = 0;
 		velocity = Vector3.zero;
@@ -63,19 +56,10 @@ public class Relativity_Observer : MonoBehaviour {
 				velocity = add_velocity(velocity, accelerations[i]*coordinate_duration / Mathf.Sqrt(1f + (accelerations[i]*coordinate_duration).sqrMagnitude));
 				elapsed += duration;
 			}
-			/*
-			if (elapsed + duration > LocalTime){
-				CoordinateTime = Sinh(accelerations[0].magnitude*LocalTime)/accelerations[0].magnitude;
-				velocity = accelerations[0]*CoordinateTime / Mathf.Sqrt(1f + (accelerations[0]*CoordinateTime).sqrMagnitude);
-				elapsed += LocalTime;
-			}else{
-				CoordinateTime = Sinh(accelerations[0].magnitude*duration)/accelerations[0].magnitude;
-				velocity = accelerations[0]*CoordinateTime / Mathf.Sqrt(1f + (accelerations[0]*CoordinateTime).sqrMagnitude);
-				elapsed += duration;
-			}
-			*/
 		}
 		CoordinateTime += (LocalTime - elapsed);
+		*/
+		CoordinateTime = LocalTime;
 		
 		//CoordinateTime = LocalTime;
 		//velocity = (transform.position - start_pos) / Time.deltaTime;

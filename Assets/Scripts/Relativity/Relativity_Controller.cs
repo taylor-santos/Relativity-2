@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -21,7 +21,6 @@ public class Relativity_Controller : MonoBehaviour {
 	public bool method;
 
 	private Relativity_Observer observerScript;
-	private Vector3 observerVelocity; //Observer's velocity relative to coordinate frame
 	private List<Material> mats;
 	private MeshFilter[] MFs;
 
@@ -505,10 +504,10 @@ public class Relativity_Controller : MonoBehaviour {
 		}
 	}
 	
-	void Update () {
+	void FixedUpdate () {
+		/*
 		if (method){
 			Vector3 xyz = spectrum_to_xyz();
-			int index = 0;
 			Color col = xyz_to_rgb(systems[system], xyz.x, xyz.y, xyz.z);
 			foreach(Material mat in mats){
 				mat.SetColor("_Color", col);
@@ -519,16 +518,15 @@ public class Relativity_Controller : MonoBehaviour {
 				mat.SetColor("_Color", col);
 			}
 		}
-		observerVelocity = observerScript.velocity;
+		*/
 		float observer_time = observerScript.CoordinateTime;
-		
+		/*
 		for (int i=AccelerationOffsets.Count; i<ProperAccelerations.Count; ++i){
 			if (AccelerationOffsets.Count == 0)
 				AccelerationOffsets.Add(Vector4.zero);
 			else
 				AccelerationOffsets.Add(AccelerationOffsets[i-1]);
 		}
-
 		Current_Event = get_state(observer_time); //Object's current event in observer's frame
 		foreach (MeshFilter MF in MFs){
 			Bounds newBounds = MF.sharedMesh.bounds;
@@ -536,8 +534,12 @@ public class Relativity_Controller : MonoBehaviour {
 			newBounds.extents = new Vector3(20,20,20);
 			MF.sharedMesh.bounds = newBounds;
 		}
-		if (DrawWorldLine)
+		*/
+		if (DrawWorldLine){
 			draw_path(observer_time);
+			//new_draw_path(observer_time);
+		}
+		/*
 		if (DrawMinkowski)
 		{
 			Matrix4x4 coordinate_observer_boost = lorentz_boost(observerVelocity);
@@ -560,6 +562,7 @@ public class Relativity_Controller : MonoBehaviour {
 				}
 			}
 		}
+		*/
 	}
 
 	Color xyz_to_rgb(colourSystem cs, double xc, double yc, double zc){
@@ -637,13 +640,44 @@ public class Relativity_Controller : MonoBehaviour {
 	}
 
 	Vector4 get_state(float observer_time){
+		/*
+		float elapsed = 0;
+		float current_observer_time = 0;
+		Vector3 coordinate_to_observer_velocity = observerScript.velocity;
+		Vector3 observer_coordinate_offset = Vector3.zero;
+		for (int i=0; i<observerScript.accelerations.Count; ++i){
+			float duration = observerScript.durations[i];
+			Vector3 acceleration = observerScript.accelerations[i];
+			if (elapsed + duration < observer_time){
+				float coordinate_duration = sinh(acceleration.magnitude*duration)/acceleration.magnitude;
+				current_observer_time += coordinate_duration;
+				coordinate_to_observer_velocity = add_velocity(coordinate_to_observer_velocity, acceleration*coordinate_duration / Mathf.Sqrt(1f + (acceleration*coordinate_duration).sqrMagnitude));
+				observer_coordinate_offset += acceleration.normalized * (Mathf.Sqrt(1 + Mathf.Pow(acceleration.magnitude * coordinate_duration, 2)) - 1)/acceleration.magnitude;
+				elapsed += duration;
+			}else if (elapsed < observer_time){
+				duration = observer_time-elapsed;
+				float coordinate_duration = sinh(acceleration.magnitude*duration)/acceleration.magnitude;
+				current_observer_time += coordinate_duration;
+				coordinate_to_observer_velocity = add_velocity(coordinate_to_observer_velocity, acceleration*coordinate_duration / Mathf.Sqrt(1f + (acceleration*coordinate_duration).sqrMagnitude));
+				//observer_coordinate_offset += acceleration.normalized * (Mathf.Sqrt(1 + Mathf.Pow(acceleration.magnitude * coordinate_duration, 2)) - 1)/acceleration.magnitude;
+				elapsed += duration;
+			}
+		}
+		current_observer_time += (observer_time - elapsed);
+		observer_time = current_observer_time;
+		*/
+		Vector3 coordinate_to_observer_velocity = observerScript.velocity;
+		Vector4 current_event_observer = combine_temporal_and_spatial(0, Observer.transform.position);
+
 		Vector3 coordinate_to_object_velocity = Velocity;
-		Vector3 observer_to_coordinate_velocity = -observerVelocity;
+		Vector3 observer_to_coordinate_velocity = -coordinate_to_observer_velocity;
 		Matrix4x4 object_to_coordinate_boost = lorentz_boost(-coordinate_to_object_velocity);
+		Matrix4x4 observer_to_coordinate_boost = lorentz_boost(coordinate_to_object_velocity);
 		Matrix4x4 coordinate_to_observer_boost = lorentz_boost(-observer_to_coordinate_velocity); //Boost from coordinate frame to observer frame
 		Vector4 current_event_object = combine_temporal_and_spatial(-ProperTimeOffset, transform.position);
-		Vector4 current_event_coordinate = object_to_coordinate_boost * current_event_object - combine_temporal_and_spatial(0, Observer.transform.position);
-		Vector4 current_event_observer = coordinate_to_observer_boost * current_event_coordinate;
+		//Vector4 current_event_coordinate = object_to_coordinate_boost * current_event_object - combine_temporal_and_spatial(0, observer_coordinate_offset);
+		Vector4 current_event_coordinate = object_to_coordinate_boost*current_event_object - observer_to_coordinate_boost*current_event_observer;
+		//Vector4 current_event_observer = coordinate_to_observer_boost * current_event_coordinate;
 		Vector3 observer_to_object_velocity = add_velocity(observer_to_coordinate_velocity, coordinate_to_object_velocity);
 		
 		List<Vector3> velocities = new List<Vector3>();
@@ -673,7 +707,6 @@ public class Relativity_Controller : MonoBehaviour {
 					Vector4 next_event_observer = coordinate_to_observer_boost * next_event_coordinate;
 					if (get_temporal_component(next_event_observer) > observer_time){
 						MCRF_duration = get_MCRF_time(proper_acceleration, -observer_to_coordinate_velocity, object_to_coordinate_boost, current_event_coordinate, observer_time);
-
 						next_event_observer = current_event_observer;
 						current_event_object = combine_temporal_and_spatial(MCRF_duration, get_displacement(proper_acceleration, MCRF_duration));
 						current_event_coordinate = current_event_coordinate + object_to_coordinate_boost * current_event_object;
@@ -710,12 +743,254 @@ public class Relativity_Controller : MonoBehaviour {
 		observer_to_object_velocity = add_velocity(observer_to_coordinate_velocity, coordinate_to_object_velocity);
 		Proper_Time += (observer_time - get_temporal_component(current_event_observer))*α(observer_to_object_velocity);
 		current_event_observer += (observer_time - get_temporal_component(current_event_observer))*combine_temporal_and_spatial(1, observer_to_object_velocity);
-		Vector4 relative_event_observer = current_event_observer + combine_temporal_and_spatial(0, Observer.transform.position);
-		Debug.DrawRay(add_to_Z_axis(get_spatial_component(relative_event_observer), get_temporal_component(relative_event_observer)-observer_time), observer_to_object_velocity, Color.white);
+		Vector4 relative_event_observer = current_event_observer - observer_to_coordinate_boost*current_event_observer;
+		Debug.DrawRay(add_time_to_Z_axis(relative_event_observer, -observer_time), Vector3.up, Color.white);
+		//Debug.DrawRay(add_time_to_Z_axis(get_spatial_component(current_event_observer), get_temporal_component(current_event_observer)-observer_time), Vector3.up, Color.white);
 		Current_Velocity = observer_to_object_velocity;
 		return current_event_observer + combine_temporal_and_spatial(0, Observer.transform.position);
 	}
 
+	Vector4 new_get_state(float observer_time){
+		Vector4 observer_in_observer_frame = Vector4.zero;
+		Matrix4x4 coordinate_to_observer_frame = lorentz_boost(observerScript.velocity);
+
+		Vector3 current_event_MCRF = Vector4.zero;
+		float elapsed = 0;
+		if (observer_time > 0){
+			for (int i=0; i<observerScript.accelerations.Count; ++i){
+				Vector3 acceleration = observerScript.accelerations[i];
+				float duration = Mathf.Min(observerScript.durations[i], observer_time-elapsed);
+				Vector3 displacement = acceleration.normalized * (cosh(acceleration.magnitude*duration) - 1)/acceleration.magnitude;
+			}
+		}
+		return Vector4.zero;
+	}
+
+	void draw_path(float observer_time){
+		Vector3 object_to_coordinate_velocity = -Velocity;
+		Vector3 coordinate_to_MCRF_velocity = observerScript.velocity;
+		Vector3 object_to_MCRF_velocity = add_velocity(object_to_coordinate_velocity, coordinate_to_MCRF_velocity);
+		Vector4 observer_start_in_MCRF = Vector4.zero;
+
+		Matrix4x4 object_to_coordinate_boost = lorentz_boost(object_to_coordinate_velocity);
+		Matrix4x4 coordinate_to_MCRF_boost = lorentz_boost(coordinate_to_MCRF_velocity);
+
+		Vector4 current_event_object = combine_temporal_and_spatial(-ProperTimeOffset, transform.position - Observer.transform.position);
+		Vector4 current_event_coordinate = object_to_coordinate_boost * current_event_object;
+		Vector4 current_event_MCRF = coordinate_to_MCRF_boost * current_event_coordinate;
+		Vector4 current_event_observer = current_event_MCRF;
+		Debug.DrawRay(add_time_to_Z_axis(current_event_MCRF, - observer_time) + Observer.transform.position, add_time_to_Z_axis(combine_temporal_and_spatial(0, object_to_MCRF_velocity), -1)*10000, Color.green);
+		int observer_acceleration_index = 0;
+		Vector3 observer_acceleration = observerScript.accelerations[observer_acceleration_index];
+		float observer_duration = observerScript.durations[observer_acceleration_index];
+		float total_duration = 0;
+		/*
+		for (int i=0; i<observerScript.accelerations.Count; ++i){
+			Vector3 rindler_horizon = -observerScript.accelerations[i].normalized * 1f / observerScript.accelerations[i].magnitude;
+			draw_event_ray(observer_start_in_MCRF + combine_temporal_and_spatial(0, rindler_horizon), (observerScript.accelerations[i].normalized + Vector3.forward)*observerScript.durations[i]*Mathf.Sqrt(2), combine_temporal_and_spatial(-observer_time, Observer.transform.position + Vector3.up*i), Color.yellow);
+			for (float T=0f; T<=observerScript.durations[i]; ++T){
+				float MCRF_observer_time = sinh(observerScript.accelerations[i].magnitude*T)/observerScript.accelerations[i].magnitude;
+				Vector3 observer_velocity_temp = observerScript.accelerations[i].normalized * tanh(observerScript.accelerations[i].magnitude * T);
+				Matrix4x4 observer_to_MCRF_boost = lorentz_boost(-observer_velocity_temp);
+				Matrix4x4 MCRF_to_observer_boost = lorentz_boost(observer_velocity_temp);
+				Vector3 observer_displacement_in_MCRF = observerScript.accelerations[i].normalized * (Mathf.Sqrt(1f + (observerScript.accelerations[i]*MCRF_observer_time).sqrMagnitude) - 1f) / observerScript.accelerations[i].magnitude;
+				Vector4 observer_in_MCRF = combine_temporal_and_spatial(MCRF_observer_time, observer_displacement_in_MCRF);
+				Vector4 observer_in_observer_frame = MCRF_to_observer_boost * observer_in_MCRF;
+				Vector4 start = observer_in_observer_frame + combine_temporal_and_spatial(0, rindler_horizon);
+				Vector4 curr = observer_in_observer_frame - combine_temporal_and_spatial(0, observerScript.accelerations[0].normalized * Mathf.Floor(1f / (10*observerScript.accelerations[0].magnitude))*10);
+				draw_event_line(observer_to_MCRF_boost*start, observer_to_MCRF_boost*curr, combine_temporal_and_spatial(0, Observer.transform.position + Vector3.up*i), Color.white - new Color(0,0,0,0.8f));
+				for (int k=0; k<40; ++k){
+					Vector4 next = curr + combine_temporal_and_spatial(0, observerScript.accelerations[i].normalized);
+					draw_event_line(observer_to_MCRF_boost*curr, observer_to_MCRF_boost*next, combine_temporal_and_spatial(0, Observer.transform.position + Vector3.up*i), k%2==0? Color.grey - new Color(0,0,0,0.8f) : Color.white - new Color(0,0,0,0.8f));
+					curr = next;
+				}
+			}
+		}
+		*/
+		for (int i=0; i<ProperAccelerations.Count; ++i){
+			Vector3 proper_acceleration = ProperAccelerations[i];
+			float proper_duration = AccelerationDurations[i];
+			Vector3 offset = AccelerationOffsets[i];
+			float a = proper_acceleration.magnitude;
+			float L = Vector3.Dot(offset, proper_acceleration)/a;
+			if (L <= 1f/a){
+				float b = 1f/(1f - a*L);
+				proper_acceleration *= b;
+				proper_duration /= b;
+			}else{
+				proper_acceleration = new Vector3(0,0,0);
+				proper_duration = 0;
+			}
+
+			if (proper_acceleration.magnitude > 0){
+				int count = 1 + (int)AccelerationCurveDetail;
+				float object_time_increment = proper_duration/count;
+				for (int j=0; j<count; ++j){
+					float time_increment = sinh(proper_acceleration.magnitude * object_time_increment)/proper_acceleration.magnitude;
+					Vector4 next_event_object = combine_temporal_and_spatial(time_increment, get_displacement(proper_acceleration, time_increment));
+					Vector4 next_event_coordinate = current_event_coordinate + object_to_coordinate_boost*next_event_object;
+					Vector4 next_event_MCRF = coordinate_to_MCRF_boost*next_event_coordinate - observer_start_in_MCRF;
+					
+					float MCRF_time = get_temporal_component(next_event_MCRF);
+					
+					float MCRF_observer_time = MCRF_time / Mathf.Sqrt(Mathf.Pow(1+Vector3.Dot(observer_acceleration, get_spatial_component(next_event_MCRF)), 2) - Mathf.Pow(MCRF_time, 2)*observer_acceleration.sqrMagnitude);
+					float observer_new_time = asinh(observer_acceleration.magnitude*MCRF_observer_time)/observer_acceleration.magnitude;
+
+					if (observer_new_time > observer_duration){
+						
+						if (observer_acceleration_index+1 < observerScript.accelerations.Count){
+							Vector3 next_MCRF_velocity = observer_acceleration.normalized * tanh(observer_acceleration.magnitude * observer_duration);
+							Matrix4x4 next_MCRF_boost = lorentz_boost(next_MCRF_velocity);
+							float duration_in_prev_MCRF = sinh(observer_acceleration.magnitude*observer_duration)/observer_acceleration.magnitude;
+							Vector3 displacement_in_prev_MCRF = observer_acceleration.normalized * (cosh(observer_acceleration.magnitude*observer_duration) - 1)/observer_acceleration.magnitude;
+							float observer_time_in_prev_MCRF = asinh(observer_acceleration.magnitude*duration_in_prev_MCRF)/observer_acceleration.magnitude;
+							Vector4 observer_in_prev_MCRF = combine_temporal_and_spatial(duration_in_prev_MCRF, displacement_in_prev_MCRF);
+							Vector4 observer_in_next_MCRF = next_MCRF_boost * (observer_in_prev_MCRF + observer_start_in_MCRF);
+							total_duration += observer_duration;
+							current_event_observer -= combine_temporal_and_spatial(observer_duration, Vector3.zero);
+							observer_start_in_MCRF = observer_in_next_MCRF;
+							//draw_event_ray(observer_in_prev_MCRF, Vector3.up, combine_temporal_and_spatial(-observer_time, Observer.transform.position + Vector3.up*observer_acceleration_index), Color.green);
+							//draw_event_ray(observer_in_next_MCRF, Vector3.up, combine_temporal_and_spatial(-observer_time, Observer.transform.position + Vector3.up*observer_acceleration_index), Color.red);
+							observer_acceleration_index++;
+							coordinate_to_MCRF_boost = coordinate_to_MCRF_boost * next_MCRF_boost;
+							next_event_MCRF = coordinate_to_MCRF_boost*next_event_coordinate - observer_start_in_MCRF;
+							current_event_MCRF = next_event_MCRF;
+							
+							observer_acceleration = observerScript.accelerations[observer_acceleration_index];
+							MCRF_time = get_temporal_component(next_event_MCRF);
+							MCRF_observer_time = MCRF_time / Mathf.Sqrt(Mathf.Pow(1+Vector3.Dot(observer_acceleration, get_spatial_component(next_event_MCRF)), 2) - Mathf.Pow(MCRF_time, 2)*observer_acceleration.sqrMagnitude);
+							observer_new_time = asinh(observer_acceleration.magnitude*MCRF_observer_time)/observer_acceleration.magnitude;
+							observer_duration = observerScript.durations[observer_acceleration_index];
+						}
+					}
+
+						
+					if (observer_new_time > 0){
+						Vector3 observer_velocity_in_MCRF = proper_to_velocity(observer_acceleration*MCRF_observer_time);
+						Matrix4x4 MCRF_to_observer_boost = lorentz_boost(observer_velocity_in_MCRF);
+						Vector3 observer_displacement_in_MCRF = observer_acceleration.normalized * (Mathf.Sqrt(1f + (observer_acceleration*MCRF_observer_time).sqrMagnitude) - 1f) / observer_acceleration.magnitude;
+						Vector4 observer_in_MCRF = combine_temporal_and_spatial(MCRF_observer_time, observer_displacement_in_MCRF);
+						Vector4 observer_in_observer_frame = MCRF_to_observer_boost * observer_in_MCRF;
+						//draw_event_ray(observer_in_observer_frame, Vector3.up, combine_temporal_and_spatial(-observer_time, Observer.transform.position), Color.red);
+						Vector4 object_in_observer_frame = MCRF_to_observer_boost * next_event_MCRF;
+						//draw_event_ray(object_in_observer_frame, Vector3.up, combine_temporal_and_spatial(-observer_time, Observer.transform.position), Color.red);
+						Vector4 next_event_observer = combine_temporal_and_spatial(observer_new_time, get_spatial_component(object_in_observer_frame - observer_in_observer_frame));
+						draw_event_line(current_event_observer, next_event_observer, combine_temporal_and_spatial(-observer_time + total_duration, Observer.transform.position), observer_acceleration_index%2==0?(j%2==0?Color.red:Color.blue):(j%2==0?Color.green:Color.magenta));
+						current_event_observer = next_event_observer;
+					}else{
+						current_event_observer = next_event_MCRF;
+					}
+					
+					//draw_event_line(current_event_MCRF, next_event_MCRF, combine_temporal_and_spatial(-observer_time, Observer.transform.position + Vector3.up*observer_acceleration_index), i%2==0?Color.cyan:Color.green);
+					//draw_event_line(current_event_coordinate, next_event_coordinate, combine_temporal_and_spatial(-observer_time, Observer.transform.position + Vector3.up*observer_acceleration_index), i%2==0?Color.cyan:Color.green);
+					
+					current_event_object = next_event_object;
+					current_event_coordinate = next_event_coordinate;
+					current_event_MCRF = next_event_MCRF;
+					Vector3 added_velocity = proper_to_velocity(proper_acceleration*time_increment);
+					object_to_coordinate_boost = object_to_coordinate_boost*lorentz_boost(-added_velocity);
+					object_to_coordinate_velocity = add_velocity(-added_velocity, object_to_coordinate_velocity);
+				}
+			}
+		}
+	}
+
+	void new_draw_path(float observer_time){
+		Vector3 coordinate_to_observer_velocity = observerScript.velocity;
+		Vector3 coordinate_to_object_velocity = Velocity;
+		Vector3 observer_to_object_velocity = add_velocity(-coordinate_to_observer_velocity, coordinate_to_object_velocity);
+
+		Matrix4x4 object_to_coordinate_boost = lorentz_boost(-coordinate_to_object_velocity);
+		Matrix4x4 coordinate_to_observer_boost = lorentz_boost(coordinate_to_observer_velocity);
+
+		Vector4 current_event_object = combine_temporal_and_spatial(-ProperTimeOffset, transform.position - Observer.transform.position);
+		Vector4 current_event_coordinate = object_to_coordinate_boost * current_event_object;
+		Vector4 current_event_starting_frame = coordinate_to_observer_boost * current_event_coordinate;
+		Vector4 current_event_observer_frame = current_event_starting_frame;
+		int observer_acceleration_index = 0;
+		Debug.DrawRay(add_time_to_Z_axis(current_event_starting_frame, - observer_time) + Observer.transform.position, -add_time_to_Z_axis(combine_temporal_and_spatial(0, observer_to_object_velocity), 1)*10000, Color.green);
+		
+		Vector3 rindler_horizon = -observerScript.accelerations[observer_acceleration_index].normalized * 1f / observerScript.accelerations[observer_acceleration_index].magnitude;
+		Debug.DrawRay(rindler_horizon + Observer.transform.position, new Vector3(1,0,1)*10000, Color.yellow);
+		for (int i=0; i<ProperAccelerations.Count; ++i){
+			Vector3 proper_acceleration = ProperAccelerations[i];
+			float proper_duration = AccelerationDurations[i];
+			Vector3 offset = AccelerationOffsets[i];
+			float a = proper_acceleration.magnitude;
+			float L = Vector3.Dot(offset, proper_acceleration)/a;
+			if (L <= 1f/a){
+				float b = 1f/(1f - a*L);
+				proper_acceleration *= b;
+				proper_duration /= b;
+			}else{
+				proper_acceleration = new Vector3(0,0,0);
+				proper_duration = 0;
+			}
+			if (proper_acceleration.magnitude > 0){
+				int count = 1 + (int)AccelerationCurveDetail;
+				float object_time_increment = proper_duration/count;
+				for (int j=0; j<count; ++j){
+					float object_MCRF_time_increment = sinh(proper_acceleration.magnitude * object_time_increment)/proper_acceleration.magnitude;
+					Vector4 next_event_object = combine_temporal_and_spatial(object_MCRF_time_increment, get_displacement(proper_acceleration, object_MCRF_time_increment));
+					Vector4 next_event_coordinate = current_event_coordinate + object_to_coordinate_boost * next_event_object;
+					Vector4 next_event_starting_frame = coordinate_to_observer_boost * next_event_coordinate;
+					
+					//draw_event_line(current_event_starting_frame, next_event_starting_frame, combine_temporal_and_spatial(-observer_time, Observer.transform.position), Color.cyan);
+
+					float starting_frame_time = get_temporal_component(next_event_starting_frame) / Mathf.Sqrt(Mathf.Pow(1+Vector3.Dot(observerScript.accelerations[observer_acceleration_index], get_spatial_component(next_event_starting_frame)), 2) - Mathf.Pow(get_temporal_component(next_event_starting_frame), 2)*observerScript.accelerations[observer_acceleration_index].sqrMagnitude);
+					float observer_new_time = asinh(observerScript.accelerations[observer_acceleration_index].magnitude*starting_frame_time)/observerScript.accelerations[observer_acceleration_index].magnitude;
+					Vector3 observer_velocity_in_starting_frame = proper_to_velocity(observerScript.accelerations[observer_acceleration_index]*starting_frame_time);
+					if (observer_new_time > observerScript.durations[observer_acceleration_index]){
+						observer_velocity_in_starting_frame = observerScript.accelerations[observer_acceleration_index].normalized * tanh(observerScript.accelerations[observer_acceleration_index].magnitude*observerScript.durations[observer_acceleration_index]);
+						coordinate_to_observer_boost = coordinate_to_observer_boost*lorentz_boost(observer_velocity_in_starting_frame);
+						next_event_starting_frame = next_event_starting_frame = coordinate_to_observer_boost * next_event_coordinate;
+						observer_acceleration_index++;
+						if (observer_acceleration_index >= observerScript.accelerations.Count){
+							break;
+						}
+						starting_frame_time = get_temporal_component(next_event_starting_frame) / Mathf.Sqrt(Mathf.Pow(1+Vector3.Dot(observerScript.accelerations[observer_acceleration_index], get_spatial_component(next_event_starting_frame)), 2) - Mathf.Pow(get_temporal_component(next_event_starting_frame), 2)*observerScript.accelerations[observer_acceleration_index].sqrMagnitude);
+						observer_new_time = asinh(observerScript.accelerations[observer_acceleration_index].magnitude*starting_frame_time)/observerScript.accelerations[observer_acceleration_index].magnitude;
+					}
+					
+					Matrix4x4 starting_frame_to_observer_boost = lorentz_boost(observer_velocity_in_starting_frame);
+					Vector3 observer_displacement_in_starting_frame = observerScript.accelerations[observer_acceleration_index].normalized * (Mathf.Sqrt(1f + (observerScript.accelerations[observer_acceleration_index]*starting_frame_time).sqrMagnitude) - 1f) / observerScript.accelerations[observer_acceleration_index].magnitude;
+					Vector4 observer_in_starting_frame = combine_temporal_and_spatial(starting_frame_time, observer_displacement_in_starting_frame);
+					Vector4 observer_in_observer_frame = starting_frame_to_observer_boost * observer_in_starting_frame;
+					Vector4 object_in_observer_frame = starting_frame_to_observer_boost * next_event_starting_frame;
+					Vector4 next_event_observer_frame = combine_temporal_and_spatial(observer_new_time, get_spatial_component(object_in_observer_frame - observer_in_observer_frame));
+					draw_event_line(current_event_observer_frame, next_event_observer_frame, combine_temporal_and_spatial(-observer_time, Observer.transform.position), i%2==0?new Color(1,0.647f,0):Color.cyan);
+					current_event_observer_frame = next_event_observer_frame;
+					
+					Vector4 start = observer_in_observer_frame + combine_temporal_and_spatial(0, Vector3.left * (int)(1f/observerScript.accelerations[observer_acceleration_index].magnitude));
+					//for (int k=0; k<20; ++k){
+					//	Vector4 next = start + combine_temporal_and_spatial(0, Vector3.right);
+					//	draw_event_line(starting_frame_to_observer_boost.inverse*start, starting_frame_to_observer_boost.inverse*next, combine_temporal_and_spatial(0, Observer.transform.position), k%2==0? Color.red : Color.white);
+					//	start = next;
+					//}
+					
+
+					current_event_object = next_event_object;
+					current_event_coordinate = next_event_coordinate;
+					current_event_starting_frame = next_event_starting_frame;
+					Vector3 added_velocity = proper_to_velocity(proper_acceleration*object_MCRF_time_increment);
+					object_to_coordinate_boost = object_to_coordinate_boost*lorentz_boost(-added_velocity);
+					coordinate_to_object_velocity = add_velocity(coordinate_to_object_velocity, added_velocity);
+				}
+			}
+		}
+		observer_to_object_velocity = add_velocity(-coordinate_to_observer_velocity, coordinate_to_object_velocity);
+		Debug.DrawRay(add_time_to_Z_axis(current_event_starting_frame, -observer_time) + Observer.transform.position, add_time_to_Z_axis(combine_temporal_and_spatial(0, observer_to_object_velocity), 1)*10000, Color.green);
+	}
+
+	void draw_event_ray(Vector4 start, Vector3 direction, Vector4 offset, Color color){
+		Debug.DrawRay(add_time_to_Z_axis(start, get_temporal_component(offset)) + get_spatial_component(offset), direction, color);
+	}
+
+
+	void draw_event_line(Vector4 start, Vector4 end, Vector4 offset, Color color){
+		Debug.DrawLine(add_time_to_Z_axis(start, get_temporal_component(offset)) + get_spatial_component(offset), add_time_to_Z_axis(end, get_temporal_component(offset)) + get_spatial_component(offset), color);
+	}
+	/*
 	void draw_path(float observer_time){
 		Vector3 coordinate_to_object_velocity = Velocity;
 		Vector3 observer_to_coordinate_velocity = -observerVelocity;
@@ -726,7 +1001,7 @@ public class Relativity_Controller : MonoBehaviour {
 		Vector4 current_event_observer = coordinate_to_observer_boost * current_event_coordinate;
 		Vector3 observer_to_object_velocity = add_velocity(observer_to_coordinate_velocity, coordinate_to_object_velocity);
 		Vector4 relative_event_observer = current_event_observer + combine_temporal_and_spatial(0, Observer.transform.position);
-		Debug.DrawRay(add_to_Z_axis(get_spatial_component(relative_event_observer), get_temporal_component(relative_event_observer) - observer_time), -add_to_Z_axis(observer_to_object_velocity, 1)*10000, Color.cyan);
+		Debug.DrawRay(add_time_to_Z_axis(relative_event_observer, -observer_time), -add_time_to_Z_axis(observer_to_object_velocity, 1)*10000, Color.yellow);
 		List<Vector3> velocities = new List<Vector3>();
 		int velocities_index = 0;
 		velocities.Add(velocity_to_proper(coordinate_to_object_velocity));
@@ -755,8 +1030,8 @@ public class Relativity_Controller : MonoBehaviour {
 					Vector4 next_event_observer = coordinate_to_observer_boost * next_event_coordinate;
 					relative_event_observer = current_event_observer + combine_temporal_and_spatial(0, Observer.transform.position);
 					Vector4 relative_next_event_observer = next_event_observer + combine_temporal_and_spatial(0, Observer.transform.position);
-					Debug.DrawLine( add_to_Z_axis(get_spatial_component(relative_event_observer), get_temporal_component(relative_event_observer) - observer_time),
-					                add_to_Z_axis(get_spatial_component(relative_next_event_observer), get_temporal_component(relative_next_event_observer) - observer_time),
+					Debug.DrawLine( add_time_to_Z_axis(relative_event_observer, -observer_time),
+					                add_time_to_Z_axis(relative_next_event_observer, -observer_time),
 					                i%2==0?new Color(1,0.5f,0):Color.green);
 					current_event_object = next_event_object;
 					current_event_coordinate = next_event_coordinate;
@@ -777,9 +1052,9 @@ public class Relativity_Controller : MonoBehaviour {
 		coordinate_to_object_velocity = proper_to_velocity(coordinate_to_object_proper_velocity);
 		observer_to_object_velocity = add_velocity(observer_to_coordinate_velocity, coordinate_to_object_velocity);
 		relative_event_observer = current_event_observer + combine_temporal_and_spatial(0, Observer.transform.position);
-		Debug.DrawRay(add_to_Z_axis(get_spatial_component(relative_event_observer), get_temporal_component(relative_event_observer) - observer_time), add_to_Z_axis(observer_to_object_velocity, 1)*10000, Color.cyan);
+		Debug.DrawRay(add_time_to_Z_axis(relative_event_observer, -observer_time), add_time_to_Z_axis(combine_temporal_and_spatial(0, observer_to_object_velocity), 1)*10000, Color.cyan);
 	}
-
+	*/
 	Vector3 velocity_to_proper(Vector3 v){
 		return v / Mathf.Sqrt(1f - v.sqrMagnitude);
 	}
@@ -879,10 +1154,9 @@ public class Relativity_Controller : MonoBehaviour {
 		return new Vector3(v.y, v.z, v.w);
 	}
 
-	Vector3 add_to_Z_axis(Vector3 v, float z){
+	Vector3 add_time_to_Z_axis(Vector4 e, float t){
 		//Add new z value to vector v's z-axis
-		v.z += z;
-		return v;
+		return get_spatial_component(e) + new Vector3(0, 0, get_temporal_component(e) + t);
 	}
 
 	Vector3 boost_to_minkowski(Vector4 pt, Matrix4x4 boost){
@@ -951,6 +1225,26 @@ public class Relativity_Controller : MonoBehaviour {
 	}
 
 	float get_MCRF_time(Vector3 a, Vector3 coordinate_velocity, Matrix4x4 object_to_coordinate_boost, Vector4 current_event_coordinate, float observer_time){
+		float Q = 0;
+		for (int i=0; i<3; ++i){
+			for (int j=0; j<3; ++j){
+				Q += a[j]*coordinate_velocity[i]*object_to_coordinate_boost[i+1, j+1];
+			}
+		}
+		Vector3 Tr1 = new Vector3(object_to_coordinate_boost[0,1], object_to_coordinate_boost[0,2], object_to_coordinate_boost[0,3]);
+		Vector3 Tc1 = new Vector3(object_to_coordinate_boost[1,0], object_to_coordinate_boost[2,0], object_to_coordinate_boost[3,0]);
+		float cEcV = Vector3.Dot(get_spatial_component(current_event_coordinate), coordinate_velocity);
+		float cVcV = coordinate_velocity.sqrMagnitude;
+		float aTr1 = Vector3.Dot(a, Tr1);
+		float aa = a.sqrMagnitude;
+		float cVTc1 = Vector3.Dot(coordinate_velocity, Tc1);
+		float A = Mathf.Sqrt(1-cVcV);
+		float B = Mathf.Pow(cVTc1-object_to_coordinate_boost[0,0], 2);
+		float C = cEcV+observer_time*A;
+		float cT = get_temporal_component(current_event_coordinate);
+		return (Mathf.Sqrt(Mathf.Pow(Q-aTr1,2)*(2*cT*Q-2*Q*(C)+2*aTr1*(-cT+C)+aa*(Mathf.Pow(cT,2)+Mathf.Pow(observer_time,2)+Mathf.Pow(cEcV,2)-2*cEcV*(cT-observer_time*A)-observer_time*(2*cT*A+observer_time*cVcV))+B))-(Q-aTr1+aa*(cT-cEcV-observer_time*A))*(cVTc1-object_to_coordinate_boost[0,0]))/(Mathf.Pow(Q,2)-2*Q*aTr1+Mathf.Pow(aTr1,2)-aa*B);
+	}
+	float old_get_MCRF_time(Vector3 a, Vector3 coordinate_velocity, Matrix4x4 object_to_coordinate_boost, Vector4 current_event_coordinate, float observer_time){
 		//Inverse of get_observer_time(). Outputted using Mathematica (Sorry!). Inverse has two solutions, check which is valid then return. Again, sorry for this. I feel really bad.
 		//This is actually the ugliest thing I have ever made. So sorry.
 		float currCoordT = get_temporal_component(current_event_coordinate);
