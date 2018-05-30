@@ -1,6 +1,31 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+public class Matrix {
+	public Matrix4x4 Transformation;
+	public Vector4 Translation;
+	Matrix() {
+		Transformation = Matrix4x4.identity;
+		Translation = Vector3.zero;
+	}
+	Matrix(Matrix4x4 _Transformation, Vector4 _Translation) {
+		Transformation = _Transformation;
+		Translation = _Translation;
+	}
+	Matrix(Matrix4x4 _Transformation) {
+		Transformation = _Transformation;
+		Translation = Vector4.zero;
+	}
+	public static Matrix operator *(Matrix lhs, Matrix rhs){
+		Matrix ret = new Matrix();
+		ret.Transformation = lhs.Transformation * rhs.Transformation;
+		ret.Translation.w  = lhs.Translation.x + rhs.Translation.x * lhs.Transformation[0, 0] + rhs.Translation.y * lhs.Transformation[0, 1] + rhs.Translation.z * lhs.Transformation[0, 2] + rhs.Translation.w * lhs.Transformation[0, 3];
+		ret.Translation.y  = lhs.Translation.y + rhs.Translation.x * lhs.Transformation[1, 0] + rhs.Translation.y * lhs.Transformation[1, 1] + rhs.Translation.z * lhs.Transformation[1, 2] + rhs.Translation.w * lhs.Transformation[1, 3];
+		ret.Translation.z  = lhs.Translation.z + rhs.Translation.x * lhs.Transformation[2, 0] + rhs.Translation.y * lhs.Transformation[2, 1] + rhs.Translation.z * lhs.Transformation[2, 2] + rhs.Translation.w * lhs.Transformation[2, 3];
+		ret.Translation.w  = lhs.Translation.w + rhs.Translation.x * lhs.Transformation[3, 0] + rhs.Translation.y * lhs.Transformation[3, 1] + rhs.Translation.z * lhs.Transformation[3, 2] + rhs.Translation.w * lhs.Transformation[3, 3];
+		return ret;
+	}
+}
 
 public class Relativity_Controller : MonoBehaviour {
 
@@ -58,85 +83,8 @@ public class Relativity_Controller : MonoBehaviour {
 		float observer_time = observerScript.CoordinateTime;
 		Current_Event = get_state(observer_time);
 	}
-
+	
 	Vector4 get_state(float observer_time) {
-		Matrix4x4 observer_to_coordinate_boost = Matrix4x4.identity;
-		Matrix4x4 coordinate_to_observer_boost = Matrix4x4.identity;
-		Vector4 MCRF_in_coordinate = Vector4.zero;
-		Vector4 observer_in_observer_frame = Vector4.zero;
-		float proper_time = 0;
-		for (int accel_index = 0; accel_index < observerScript.accelerations.Count; accel_index++) {
-			Vector3 proper_acceleration = observerScript.accelerations[accel_index];
-			float a = proper_acceleration.magnitude;
-			float proper_duration = observerScript.durations[accel_index];
-			float MCRF_duration = sinh(a * proper_duration) / a;
-			bool last_accel = false;
-			//Vector4 event_in_MCRF = coordinate_to_observer_boost * MCRF_in_coordinate;
-			float dT = observer_time - proper_time;
-			if (dT < proper_duration) {
-				proper_duration = dT;
-				MCRF_duration = sinh(a * dT) / a;
-				last_accel = true;
-			}
-			proper_time += proper_duration;
-			Vector3 displacement_in_MCRF = proper_acceleration * (Mathf.Sqrt(1 + Mathf.Pow(a * MCRF_duration, 2)) - 1) / proper_acceleration.sqrMagnitude;
-			Vector4 event_in_MCRF = combine_temporal_and_spatial(MCRF_duration, displacement_in_MCRF);
-			Vector3 new_MCRF_velocity = proper_acceleration * MCRF_duration / Mathf.Sqrt(1 + Mathf.Pow(a * MCRF_duration, 2));
-			Matrix4x4 new_boost = lorentz_boost(new_MCRF_velocity);
-			observer_in_observer_frame += new_boost * event_in_MCRF;
-			observer_to_coordinate_boost = observer_to_coordinate_boost * lorentz_boost(-new_MCRF_velocity);
-			coordinate_to_observer_boost = new_boost * coordinate_to_observer_boost;
-			MCRF_in_coordinate = observer_to_coordinate_boost * observer_in_observer_frame;
-			if (last_accel || accel_index == observerScript.accelerations.Count - 1) {
-				break;
-			}
-		}
-		Debug.Log(MCRF_in_coordinate + " " + observer_in_observer_frame);
-		observer_to_coordinate_boost = observer_to_coordinate_boost * lorentz_boost(-observerScript.velocity);
-		coordinate_to_observer_boost = lorentz_boost(observerScript.velocity) * coordinate_to_observer_boost;
-
-		draw_event_ray(MCRF_in_coordinate, Vector3.up, Vector4.zero, Color.blue);
-		draw_event_ray(observer_in_observer_frame, Vector3.up, Vector4.zero, Color.red);
-
-		//Debug.Log(get_temporal_component(coordinate_to_observer_boost*MCRF_in_coordinate));
-		//float elapsed_time = 0;
-		Vector3 MCRF_velocity = Velocity;
-		//Matrix4x4 MCRF_to_coordinate_boost = lorentz_boost(-MCRF_velocity);
-		//Matrix4x4 coordinate_to_MCRF_boost = lorentz_boost(MCRF_velocity);
-		Matrix4x4 MCRF_to_coordinate_boost = coordinate_to_observer_boost;
-		Matrix4x4 coordinate_to_MCRF_boost = observer_to_coordinate_boost;
-		//Debug.Log(get_temporal_component(MCRF_to_coordinate_boost*MCRF_in_coordinate));
-		//MCRF_in_coordinate = MCRF_to_coordinate_boost * combine_temporal_and_spatial(-ProperTimeOffset, transform.position);
-		for (int accel_index = 0; accel_index < ProperAccelerations.Count; accel_index++) {
-			Vector3 proper_acceleration = ProperAccelerations[accel_index];
-			float a = proper_acceleration.magnitude;
-			float proper_duration = AccelerationDurations[accel_index];
-			float MCRF_duration = sinh(a * proper_duration) / a;
-			bool last_accel = false;
-			float dt = get_temporal_component(MCRF_in_coordinate);
-			Vector3 B = get_spatial_component(MCRF_to_coordinate_boost.GetRow(0));
-			Vector3 A = proper_acceleration;
-			float B0 = MCRF_to_coordinate_boost[0, 0];
-			float mT = get_MCRF_time(proper_acceleration, B, B0, dt);
-			if (mT < MCRF_duration) {
-				MCRF_duration = mT;
-				last_accel = true;
-			}
-
-			Vector3 displacement_in_MCRF = proper_acceleration * (Mathf.Sqrt(1 + Mathf.Pow(a * MCRF_duration, 2)) - 1) / proper_acceleration.sqrMagnitude;
-			Vector4 event_in_MCRF = coordinate_to_MCRF_boost * MCRF_in_coordinate;
-			event_in_MCRF += combine_temporal_and_spatial(MCRF_duration, displacement_in_MCRF);
-			MCRF_in_coordinate = MCRF_to_coordinate_boost * event_in_MCRF;
-
-			Vector3 new_MCRF_velocity = proper_acceleration * MCRF_duration / Mathf.Sqrt(1 + Mathf.Pow(a * MCRF_duration, 2));
-			MCRF_to_coordinate_boost = MCRF_to_coordinate_boost * lorentz_boost(-new_MCRF_velocity);
-			coordinate_to_MCRF_boost = lorentz_boost(new_MCRF_velocity) * coordinate_to_MCRF_boost;
-			//draw_event_ray(MCRF_in_coordinate, Vector3.up * 1.5f, combine_temporal_and_spatial(-observer_time, Vector3.zero), Color.red);
-			if (last_accel || accel_index == ProperAccelerations.Count - 1) {
-				break;
-			}
-		}
-		draw_event_ray(MCRF_in_coordinate, Vector3.up * 1.5f, combine_temporal_and_spatial(-observer_time, Vector3.zero), Color.green);
 		return Vector4.zero;
 	}
 
