@@ -1,0 +1,63 @@
+if(aa == -(ab/t)){ 
+	if(ab < 0 && B0 < -Mathf.Sqrt(-2*ab*t - aa*t2) && t > 0) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) - Mathf.Sqrt(( ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+	
+	if(t < 0 && ab > 0 && B0 > Mathf.Sqrt(-2*ab*t - aa*t2)) {  return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) - Mathf.Sqrt(( ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+	if(B0 < -Mathf.Sqrt(-2*ab*t - aa*t2) && t < 0 && ab > 0) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) + Mathf.Sqrt(( ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+}
+if(ab == 0 && B0 == 0 && t == 0 && aa > 0) { Debug.Log("Error, no MCRFTime possible."); return 0; }
+if(ab == 0 &&  t == 0 && B0 < 0 && aa > 0) { return 0; }
+if(ab == 0 &&  t == 0 && aa > 0 && B0 > 0) { return 0; }
+if(ab == 0 &&  B0 < 0 && t < 0 && aa > 0) { return t/B0; }
+if(ab == 0 &&  B0 < 0 && aa > 0 && t > 0) { return t/B0; }
+if(ab == 0 &&  t < 0 && aa > 0 && B0 > 0) { return t/B0; }
+if(ab == 0 &&  aa > 0 && B0 > 0 && t > 0) { return t/B0; }
+if(B0 == 0 &&  t == 0 && ab < 0 && aa > 0) { return 0; }
+if(B0 == 0 &&  t == 0 && aa > 0 && ab > 0) { return 0; }
+if(B0 == -Mathf.Sqrt((ab2/aa)) &&  0 < aa && aa < -(ab/t) && ab < 0 && t > 0) { return (2*ab*t + aa*t2)/(2*ab*B0 + 2*aa*B0*t); }
+if(B0 == -Mathf.Sqrt((ab2/aa)) &&  0 < aa && aa < -(ab/t) && t < 0 && ab > 0) { return (2*ab*t + aa*t2)/(2*ab*B0 + 2*aa*B0*t); }
+if(B0 == -Mathf.Sqrt((ab2/aa)) &&  ab < 0 && t < 0 && aa > 0) { return (2*ab*t + aa*t2)/(2*ab*B0 + 2*aa*B0*t); }
+if(B0 == -Mathf.Sqrt((ab2/aa)) &&  aa > 0 && ab > 0 && t > 0) { return (2*ab*t + aa*t2)/(2*ab*B0 + 2*aa*B0*t); }
+if(B0 == Mathf.Sqrt(ab2/aa) &&  0 < aa && aa < -(ab/t) && ab < 0 && t > 0) { return (2*ab*t + aa*t2)/(2*ab*B0 + 2*aa*B0*t); }
+if(B0 == Mathf.Sqrt(ab2/aa) &&  0 < aa && aa < -(ab/t) && t < 0 && ab > 0) { return (2*ab*t + aa*t2)/(2*ab*B0 + 2*aa*B0*t); }
+if(B0 == Mathf.Sqrt(ab2/aa) &&  ab < 0 && t < 0 && aa > 0) { return (2*ab*t + aa*t2)/(2*ab*B0 + 2*aa*B0*t); }
+if(B0 == Mathf.Sqrt(ab2/aa) &&  aa > 0 && ab > 0 && t > 0) { return (2*ab*t + aa*t2)/(2*ab*B0 + 2*aa*B0*t); }
+if(B0 == -Mathf.Sqrt(-2*ab*t - aa*t2) &&  0 < aa && aa < -(ab/t) && ab < 0 && t > 0) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) - Mathf.Sqrt(( ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+if(B0 == -Mathf.Sqrt(-2*ab*t - aa*t2) &&  0 < aa && aa < -(ab/t) && t < 0 && ab > 0) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) - Mathf.Sqrt(( ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+if(B0 == Mathf.Sqrt(-2*ab*t - aa*t2) &&  0 < aa && aa < -(ab/t) && ab < 0 && t > 0) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) - Mathf.Sqrt(( ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+if(B0 == Mathf.Sqrt(-2*ab*t - aa*t2) &&  0 < aa && aa < -(ab/t) && t < 0 && ab > 0) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) - Mathf.Sqrt(( ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+if( t == 0 && 0 < B0 && B0 < Mathf.Sqrt(ab2/aa) && ab < 0 && aa > 0) { return 0; }
+if( t == 0 && 0 < B0 && B0 < Mathf.Sqrt(ab2/aa) && aa > 0 && ab > 0) { return 0; }
+if( t == 0 && -Mathf.Sqrt((ab2/aa)) < B0 && B0 < 0 && ab < 0 && aa > 0) { return 0; }
+if( t == 0 && -Mathf.Sqrt((ab2/aa)) < B0 && B0 < 0 && aa > 0 && ab > 0) { return 0; }
+if( t == 0 && ab < 0 && B0 >= Mathf.Sqrt(ab2/aa) && aa > 0) { return 0; }
+if( t == 0 && ab < 0 && aa > 0 && B0 <= -Mathf.Sqrt((ab2/aa))) { return 0; }
+if( t == 0 && B0 >= Mathf.Sqrt(ab2/aa) && aa > 0 && ab > 0) { return 0; }
+if( t == 0 && aa > 0 && ab > 0 && B0 <= -Mathf.Sqrt((ab2/ aa))) { return 0; }
+if( t == 0 && 0 < B0 && B0 < Mathf.Sqrt(ab2/aa) && aa > 0 && ab > 0) { return -Mathf.Sqrt(((ab2*B02)/Mathf.Pow(ab2 - aa*B02, 2))) - ( ab*B0)/(ab2 - aa*B02); }
+if( t == 0 && -Mathf.Sqrt((ab2/aa)) < B0 && B0 < 0 && ab < 0 && aa > 0) { return -Mathf.Sqrt(((ab2*B02)/Mathf.Pow(ab2 - aa*B02, 2))) - ( ab*B0)/(ab2 - aa*B02); }
+if( t == 0 && 0 < B0 && B0 < Mathf.Sqrt(ab2/aa) && ab < 0 && aa > 0) { return Mathf.Sqrt((ab2*B02)/Mathf.Pow(ab2 - aa*B02, 2)) - (ab*B0)/(ab2 - aa*B02); }
+if( t == 0 && -Mathf.Sqrt((ab2/aa)) < B0 && B0 < 0 && aa > 0 && ab > 0) { return Mathf.Sqrt((ab2*B02)/Mathf.Pow(ab2 - aa*B02, 2)) - (ab*B0)/(ab2 - aa*B02); }
+if( 0 < aa && aa < -(ab/t) && -Mathf.Sqrt((ab2/aa)) < B0 && B0 < -Mathf.Sqrt(-2*ab*t - aa*t2) && ab < 0 && t > 0) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) - Mathf.Sqrt((ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+if( 0 < aa && aa < -(ab/t) && -Mathf.Sqrt((ab2/aa)) < B0 && B0 < -Mathf.Sqrt(-2*ab*t - aa*t2) && t < 0 && ab > 0) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) - Mathf.Sqrt(( ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+if( 0 < aa && aa < -(ab/t) && Mathf.Sqrt(-2*ab*t - aa*t2) < B0 && B0 < Mathf.Sqrt(ab2/aa) && ab < 0 && t > 0) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) - Mathf.Sqrt((ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+if( 0 < aa && aa < -(ab/t) && Mathf.Sqrt(-2*ab*t - aa*t2) < B0 && B0 < Mathf.Sqrt(ab2/aa) && t < 0 && ab > 0) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) - Mathf.Sqrt(( ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+if( 0 < aa && aa < -(ab/t) && ab < 0 && B0 < -Mathf.Sqrt((ab2/aa)) && t > 0) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) - Mathf.Sqrt((ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+if( 0 < aa && aa < -(ab/t) && t < 0 && ab > 0 && B0 > Mathf.Sqrt(ab2/ aa)) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) - Mathf.Sqrt(( ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+if( -Mathf.Sqrt((ab2/aa)) < B0 && B0 < Mathf.Sqrt(ab2/aa) && ab < 0 && t < 0 && aa > 0) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) - Mathf.Sqrt(( ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+if( -Mathf.Sqrt((ab2/aa)) < B0 && B0 < Mathf.Sqrt(ab2/aa) && aa > 0 && ab > 0 && t > 0) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) - Mathf.Sqrt((ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+if( ab < 0 && B0 < -Mathf.Sqrt((ab2/aa)) && t < 0 && aa > 0) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) - Mathf.Sqrt(( ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+if( ab < 0 && B0 < -Mathf.Sqrt((ab2/aa)) && aa > -(ab/t) && t > 0) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) - Mathf.Sqrt((ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+if( t < 0 && aa > -(ab/t) && ab > 0 && B0 > Mathf.Sqrt(ab2/ aa)) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) - Mathf.Sqrt(( ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+if( aa > 0 && ab > 0 && B0 > Mathf.Sqrt(ab2/aa) && t > 0) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) - Mathf.Sqrt(( ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+if( 0 < aa && aa < -(ab/t) && -Mathf.Sqrt((ab2/aa)) < B0 && B0 < -Mathf.Sqrt(-2*ab*t - aa*t2) && ab < 0 && t > 0) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) + Mathf.Sqrt(( ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+if( 0 < aa && aa < -(ab/t) && -Mathf.Sqrt((ab2/aa)) < B0 && B0 < -Mathf.Sqrt(-2*ab*t - aa*t2) && t < 0 && ab > 0) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) + Mathf.Sqrt(( ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+if( 0 < aa && aa < -(ab/t) && Mathf.Sqrt(-2*ab*t - aa*t2) < B0 && B0 < Mathf.Sqrt(ab2/aa) && ab < 0 && t > 0) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) + Mathf.Sqrt((ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+if( 0 < aa && aa < -(ab/t) && Mathf.Sqrt(-2*ab*t - aa*t2) < B0 && B0 < Mathf.Sqrt(ab2/aa) && t < 0 && ab > 0) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) + Mathf.Sqrt(( ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+if( 0 < aa && aa < -(ab/t) && ab < 0 && B0 > Mathf.Sqrt(ab2/aa) && t > 0) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) + Mathf.Sqrt((ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+if( 0 < aa && aa < -(ab/t) && B0 < -Mathf.Sqrt((ab2/aa)) && t < 0 && ab > 0) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) + Mathf.Sqrt(( ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+if( -Mathf.Sqrt((ab2/aa)) < B0 && B0 < Mathf.Sqrt(ab2/aa) && ab < 0 && t < 0 && aa > 0) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) + Mathf.Sqrt((ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+if( -Mathf.Sqrt((ab2/aa)) < B0 && B0 < Mathf.Sqrt(ab2/aa) && aa > 0 && ab > 0 && t > 0) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) + Mathf.Sqrt((ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+if( ab < 0 && t < 0 && aa > 0 && B0 > Mathf.Sqrt(ab2/ aa)) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) + Mathf.Sqrt(( ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+if( ab < 0 && aa > -(ab/t) && B0 > Mathf.Sqrt(ab2/aa) && t > 0) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) + Mathf.Sqrt(( ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+if( B0 < -Mathf.Sqrt((ab2/aa)) && t < 0 && aa > -(ab/t) && ab > 0) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) + Mathf.Sqrt(( ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }
+if( B0 < -Mathf.Sqrt((ab2/aa)) && aa > 0 && ab > 0 && t > 0) { return (-ab*B0 - aa*B0*t)/(ab2 - aa*B02) + Mathf.Sqrt((ab2*B02 + 2*ab3*t + aa*ab2*t2)/Mathf.Pow(ab2 - aa*B02, 2)); }

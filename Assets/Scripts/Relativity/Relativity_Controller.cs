@@ -10,8 +10,6 @@ public class Relativity_Controller : MonoBehaviour {
 	public List<Vector3> ProperAccelerations;
 	public List<float> AccelerationDurations;
 	public List<Vector3> AccelerationOffsets;
-	public bool DrawMinkowski;
-	public bool DrawWorldLine = true;
 	public uint AccelerationCurveDetail = 10;
 	public Vector3 Current_Velocity;
 	public float Proper_Time;
@@ -24,7 +22,7 @@ public class Relativity_Controller : MonoBehaviour {
 	private List<Material> mats;
 	private MeshFilter[] MFs;
 
-	private static double[,] rgb_colour_match = new double[69,3]{ /*390 through 730, stepsize 5*/
+	private static double[,] rgb_colour_match = new double[69, 3]{ /*390 through 730, stepsize 5*/
 		{ 0.0018397, -0.00045393,  0.0121520}, { 0.0046153, -0.00104640,  0.0311100}, { 0.0096264, -0.00216890,  0.0623710},
 		{ 0.0189790, -0.00443040,  0.1316100}, { 0.0308030, -0.00720480,  0.2275000}, { 0.0424590, -0.01257900,  0.3589700},
 		{ 0.0516620, -0.01665100,  0.5239600}, { 0.0528370, -0.02124000,  0.6858600}, { 0.0442870, -0.01993600,  0.7960400},
@@ -50,7 +48,7 @@ public class Relativity_Controller : MonoBehaviour {
 		{ 0.0065177, -0.00005768,  0.0000061}, { 0.0045377, -0.00003900,  0.0000050}, { 0.0031742, -0.00002651,  0.0000041}
 	};
 
-	private static double[,] new_rgb_colour_match = new double[341,3]{
+	private static double[,] new_rgb_colour_match = new double[341, 3]{
 		{0.0001587409684,-0.00008558141781,0.003911662773},
 		{0.0002066402381,-0.0001079216124,0.005132158212},
 		{0.0002545395077,-0.000130261807,0.00635265365},
@@ -394,600 +392,301 @@ public class Relativity_Controller : MonoBehaviour {
 		{0.000273890081,-0.000004998235339,0.000001327847277}
 	};
 
-    private static double[,] cie_colour_match = new double[81,3]{
-        {0.0014,0.0000,0.0065}, {0.0022,0.0001,0.0105}, {0.0042,0.0001,0.0201},
-        {0.0076,0.0002,0.0362}, {0.0143,0.0004,0.0679}, {0.0232,0.0006,0.1102},
-        {0.0435,0.0012,0.2074}, {0.0776,0.0022,0.3713}, {0.1344,0.0040,0.6456},
-        {0.2148,0.0073,1.0391}, {0.2839,0.0116,1.3856}, {0.3285,0.0168,1.6230},
-        {0.3483,0.0230,1.7471}, {0.3481,0.0298,1.7826}, {0.3362,0.0380,1.7721},
-        {0.3187,0.0480,1.7441}, {0.2908,0.0600,1.6692}, {0.2511,0.0739,1.5281},
-        {0.1954,0.0910,1.2876}, {0.1421,0.1126,1.0419}, {0.0956,0.1390,0.8130},
-        {0.0580,0.1693,0.6162}, {0.0320,0.2080,0.4652}, {0.0147,0.2586,0.3533},
-        {0.0049,0.3230,0.2720}, {0.0024,0.4073,0.2123}, {0.0093,0.5030,0.1582},
-        {0.0291,0.6082,0.1117}, {0.0633,0.7100,0.0782}, {0.1096,0.7932,0.0573},
-        {0.1655,0.8620,0.0422}, {0.2257,0.9149,0.0298}, {0.2904,0.9540,0.0203},
-        {0.3597,0.9803,0.0134}, {0.4334,0.9950,0.0087}, {0.5121,1.0000,0.0057},
-        {0.5945,0.9950,0.0039}, {0.6784,0.9786,0.0027}, {0.7621,0.9520,0.0021},
-        {0.8425,0.9154,0.0018}, {0.9163,0.8700,0.0017}, {0.9786,0.8163,0.0014},
-        {1.0263,0.7570,0.0011}, {1.0567,0.6949,0.0010}, {1.0622,0.6310,0.0008},
-        {1.0456,0.5668,0.0006}, {1.0026,0.5030,0.0003}, {0.9384,0.4412,0.0002},
-        {0.8544,0.3810,0.0002}, {0.7514,0.3210,0.0001}, {0.6424,0.2650,0.0000},
-        {0.5419,0.2170,0.0000}, {0.4479,0.1750,0.0000}, {0.3608,0.1382,0.0000},
-        {0.2835,0.1070,0.0000}, {0.2187,0.0816,0.0000}, {0.1649,0.0610,0.0000},
-        {0.1212,0.0446,0.0000}, {0.0874,0.0320,0.0000}, {0.0636,0.0232,0.0000},
-        {0.0468,0.0170,0.0000}, {0.0329,0.0119,0.0000}, {0.0227,0.0082,0.0000},
-        {0.0158,0.0057,0.0000}, {0.0114,0.0041,0.0000}, {0.0081,0.0029,0.0000},
-        {0.0058,0.0021,0.0000}, {0.0041,0.0015,0.0000}, {0.0029,0.0010,0.0000},
-        {0.0020,0.0007,0.0000}, {0.0014,0.0005,0.0000}, {0.0010,0.0004,0.0000},
-        {0.0007,0.0002,0.0000}, {0.0005,0.0002,0.0000}, {0.0003,0.0001,0.0000},
-        {0.0002,0.0001,0.0000}, {0.0002,0.0001,0.0000}, {0.0001,0.0000,0.0000},
-        {0.0001,0.0000,0.0000}, {0.0001,0.0000,0.0000}, {0.0000,0.0000,0.0000}
-    };
-    /* For NTSC television */
+	private static double[,] cie_colour_match = new double[81, 3]{
+		{0.0014,0.0000,0.0065}, {0.0022,0.0001,0.0105}, {0.0042,0.0001,0.0201},
+		{0.0076,0.0002,0.0362}, {0.0143,0.0004,0.0679}, {0.0232,0.0006,0.1102},
+		{0.0435,0.0012,0.2074}, {0.0776,0.0022,0.3713}, {0.1344,0.0040,0.6456},
+		{0.2148,0.0073,1.0391}, {0.2839,0.0116,1.3856}, {0.3285,0.0168,1.6230},
+		{0.3483,0.0230,1.7471}, {0.3481,0.0298,1.7826}, {0.3362,0.0380,1.7721},
+		{0.3187,0.0480,1.7441}, {0.2908,0.0600,1.6692}, {0.2511,0.0739,1.5281},
+		{0.1954,0.0910,1.2876}, {0.1421,0.1126,1.0419}, {0.0956,0.1390,0.8130},
+		{0.0580,0.1693,0.6162}, {0.0320,0.2080,0.4652}, {0.0147,0.2586,0.3533},
+		{0.0049,0.3230,0.2720}, {0.0024,0.4073,0.2123}, {0.0093,0.5030,0.1582},
+		{0.0291,0.6082,0.1117}, {0.0633,0.7100,0.0782}, {0.1096,0.7932,0.0573},
+		{0.1655,0.8620,0.0422}, {0.2257,0.9149,0.0298}, {0.2904,0.9540,0.0203},
+		{0.3597,0.9803,0.0134}, {0.4334,0.9950,0.0087}, {0.5121,1.0000,0.0057},
+		{0.5945,0.9950,0.0039}, {0.6784,0.9786,0.0027}, {0.7621,0.9520,0.0021},
+		{0.8425,0.9154,0.0018}, {0.9163,0.8700,0.0017}, {0.9786,0.8163,0.0014},
+		{1.0263,0.7570,0.0011}, {1.0567,0.6949,0.0010}, {1.0622,0.6310,0.0008},
+		{1.0456,0.5668,0.0006}, {1.0026,0.5030,0.0003}, {0.9384,0.4412,0.0002},
+		{0.8544,0.3810,0.0002}, {0.7514,0.3210,0.0001}, {0.6424,0.2650,0.0000},
+		{0.5419,0.2170,0.0000}, {0.4479,0.1750,0.0000}, {0.3608,0.1382,0.0000},
+		{0.2835,0.1070,0.0000}, {0.2187,0.0816,0.0000}, {0.1649,0.0610,0.0000},
+		{0.1212,0.0446,0.0000}, {0.0874,0.0320,0.0000}, {0.0636,0.0232,0.0000},
+		{0.0468,0.0170,0.0000}, {0.0329,0.0119,0.0000}, {0.0227,0.0082,0.0000},
+		{0.0158,0.0057,0.0000}, {0.0114,0.0041,0.0000}, {0.0081,0.0029,0.0000},
+		{0.0058,0.0021,0.0000}, {0.0041,0.0015,0.0000}, {0.0029,0.0010,0.0000},
+		{0.0020,0.0007,0.0000}, {0.0014,0.0005,0.0000}, {0.0010,0.0004,0.0000},
+		{0.0007,0.0002,0.0000}, {0.0005,0.0002,0.0000}, {0.0003,0.0001,0.0000},
+		{0.0002,0.0001,0.0000}, {0.0002,0.0001,0.0000}, {0.0001,0.0000,0.0000},
+		{0.0001,0.0000,0.0000}, {0.0001,0.0000,0.0000}, {0.0000,0.0000,0.0000}
+	};
+	/* For NTSC television */
 	private static float IlluminantCx = 0.3101f;
-	private static float IlluminantCy = 0.3162f; 
-	/* For EBU and SMPTE */       
+	private static float IlluminantCy = 0.3162f;
+	/* For EBU and SMPTE */
 	private static float IlluminantD65x = 0.3127f;
 	private static float IlluminantD65y = 0.3291f;
-	/* CIE equal-energy illuminant */      
+	/* CIE equal-energy illuminant */
 	private static float IlluminantEx = 0.33333333f;
 	private static float IlluminantEy = 0.33333333f;
 	/* Rec. 709 */
-	private static float GAMMA_REC709 = 0;     
+	private static float GAMMA_REC709 = 0;
 
-    struct colourSystem {
-		public string name;                     /* Colour system name */
-		public double xRed, yRed,              /* Red x, y */
-		           xGreen, yGreen,          /* Green x, y */
-		           xBlue, yBlue,            /* Blue x, y */
-		           xWhite, yWhite,          /* White point x, y */
-		           gamma;                   /* Gamma correction for system */
-		public colourSystem(string name_in, 
-		    	double xRed_in, double yRed_in,
-		    	double xGreen_in, double yGreen_in,
-		    	double xBlue_in, double yBlue_in,
-		    	double xWhite_in, double yWhite_in,
-		    	double gamma_in){
-		    	name   = name_in;
-		    	xRed   = xRed_in;
-		    	yRed   = yRed_in;
-		    	xGreen = xGreen_in;
-		    	yGreen = yGreen_in;
-		    	xBlue  = xBlue_in;
-		    	yBlue  = yBlue_in;
-		    	xWhite = xWhite_in;
-		    	yWhite = yWhite_in;
-		    	gamma  = gamma_in;
-		    }
+	struct colourSystem {
+		public string name;                  /* Colour system name */
+		public double xRed, yRed,             /* Red x, y */
+				   xGreen, yGreen,        /* Green x, y */
+				   xBlue, yBlue,            /* Blue x, y */
+				   xWhite, yWhite,        /* White point x, y */
+				   gamma;                  /* Gamma correction for system */
+		public colourSystem(string name_in,
+				double xRed_in, double yRed_in,
+				double xGreen_in, double yGreen_in,
+				double xBlue_in, double yBlue_in,
+				double xWhite_in, double yWhite_in,
+				double gamma_in) {
+			name = name_in;
+			xRed = xRed_in;
+			yRed = yRed_in;
+			xGreen = xGreen_in;
+			yGreen = yGreen_in;
+			xBlue = xBlue_in;
+			yBlue = yBlue_in;
+			xWhite = xWhite_in;
+			yWhite = yWhite_in;
+			gamma = gamma_in;
+		}
 	};
-	
-    /*               Name                  xRed    yRed    xGreen  yGreen  xBlue  yBlue    White point     Gamma*/
-    private static colourSystem[] systems = new colourSystem[6]{
-   		new colourSystem( "NTSC",               0.67,   0.33,   0.21,   0.71,   0.14,   0.08,   IlluminantCx, IlluminantCy,    GAMMA_REC709 ),
+
+	/*			   Name				  xRed	yRed	xGreen  yGreen  xBlue  yBlue	White point	 Gamma*/
+	private static colourSystem[] systems = new colourSystem[6]{
+   		new colourSystem( "NTSC",              0.67,   0.33,   0.21,   0.71,   0.14,   0.08,   IlluminantCx, IlluminantCy,  GAMMA_REC709 ),
 		new colourSystem( "EBU",   0.64,   0.33,   0.29,   0.60,   0.15,   0.06,   IlluminantD65x, IlluminantD65y,  GAMMA_REC709 ),
-		new colourSystem( "SMPTE",              0.630,  0.340,  0.310,  0.595,  0.155,  0.070,  IlluminantD65x, IlluminantD65y,  GAMMA_REC709 ),
-		new colourSystem( "HDTV",               0.670,  0.330,  0.210,  0.710,  0.150,  0.060,  IlluminantD65x, IlluminantD65y,  GAMMA_REC709 ),
+		new colourSystem( "SMPTE",            0.630,  0.340,  0.310,  0.595,  0.155,  0.070,  IlluminantD65x, IlluminantD65y,  GAMMA_REC709 ),
+		new colourSystem( "HDTV",              0.670,  0.330,  0.210,  0.710,  0.150,  0.060,  IlluminantD65x, IlluminantD65y,  GAMMA_REC709 ),
 		new colourSystem( "CIE",                0.7355, 0.2645, 0.2658, 0.7243, 0.1669, 0.0085, IlluminantEx, IlluminantEy,   GAMMA_REC709 ),
 		new colourSystem( "CIE REC 709",        0.64,   0.33,   0.30,   0.60,   0.15,   0.06,   IlluminantD65x, IlluminantD65y, GAMMA_REC709 )
 	};
 
-	void Start () {
+	void Start() {
 		observerScript = Observer.GetComponent<Relativity_Observer>();
 		Renderer[] renderers = GetComponentsInChildren<Renderer>();
 		mats = new List<Material>();
-		foreach (Renderer R in renderers){
+		foreach (Renderer R in renderers) {
 			Material[] childMaterials = R.materials;
-			foreach (Material mat in childMaterials){
+			foreach (Material mat in childMaterials) {
 				if (mat.shader == Shader.Find("Relativity/Relativity_Shader"))
 					mats.Add(mat);
 			}
 		}
 		MFs = GetComponentsInChildren<MeshFilter>();
-		if (mats.Count != 0){
-			if (ProperAccelerations.Count > 0 && AccelerationOffsets.Count > 0){
+		if (mats.Count != 0) {
+			if (ProperAccelerations.Count > 0 && AccelerationOffsets.Count > 0) {
 				Vector4[] shader_ProperAccelerations = new Vector4[ProperAccelerations.Count];
 				Vector4[] shader_AccelerationOffsets = new Vector4[ProperAccelerations.Count];
-				for (int i=0; i<ProperAccelerations.Count; ++i){
+				for (int i = 0; i < ProperAccelerations.Count; ++i) {
 					shader_ProperAccelerations[i] = (Vector4)ProperAccelerations[i];
 					shader_AccelerationOffsets[i] = (Vector4)AccelerationOffsets[i];
 				}
-				foreach(Material mat in mats){
+				foreach (Material mat in mats) {
 					mat.SetVectorArray("_accelerations", shader_ProperAccelerations);
 					mat.SetFloatArray("_durations", AccelerationDurations.ToArray());
 					mat.SetVectorArray("_accel_positions", shader_AccelerationOffsets);
 				}
 			}
-			foreach(Material mat in mats){
+			foreach (Material mat in mats) {
 				mat.SetVector("_Velocity", Velocity);
 				mat.SetFloat("_Proper_Time_Offset", ProperTimeOffset);
 			}
 		}
 	}
-	
-	void FixedUpdate () {
-		/*
-		if (method){
-			Vector3 xyz = spectrum_to_xyz();
-			Color col = xyz_to_rgb(systems[system], xyz.x, xyz.y, xyz.z);
-			foreach(Material mat in mats){
-				mat.SetColor("_Color", col);
-			}
-		}else{
-			Color col = spectrum_to_rgb();
-			foreach(Material mat in mats){
-				mat.SetColor("_Color", col);
-			}
-		}
-		*/
+
+	void FixedUpdate() {
 		float observer_time = observerScript.CoordinateTime;
-		/*
-		for (int i=AccelerationOffsets.Count; i<ProperAccelerations.Count; ++i){
-			if (AccelerationOffsets.Count == 0)
-				AccelerationOffsets.Add(Vector4.zero);
-			else
-				AccelerationOffsets.Add(AccelerationOffsets[i-1]);
-		}
-		Current_Event = get_state(observer_time); //Object's current event in observer's frame
-		foreach (MeshFilter MF in MFs){
-			Bounds newBounds = MF.sharedMesh.bounds;
-			newBounds.center = transform.InverseTransformPoint(get_spatial_component(Current_Event));
-			newBounds.extents = new Vector3(20,20,20);
-			MF.sharedMesh.bounds = newBounds;
-		}
-		*/
-		if (DrawWorldLine){
-			draw_path(observer_time);
-			//new_draw_path(observer_time);
-		}
-		/*
-		if (DrawMinkowski)
-		{
-			Matrix4x4 coordinate_observer_boost = lorentz_boost(observerVelocity);
-			Color[] colors = new Color[3]{Color.blue, Color.red, Color.green};
-			float[] alpha = new float[3]{0.15f, 1f, 0.1f};
-			int sep = 15;
-			int[] seps = new int[3]{0, 1, -1};
-			for (int i=0; i<3; ++i){
-				for (int j=0; j<2; ++j){
-					for (int k=0; k<3; ++k){
-						for (int m=0; m<3; ++m){
-							Vector4 dir = new Vector4();
-							dir[i] = 1;
-							Vector4 pt = new Vector4();
-							pt[(i+1)%3] = seps[k]*sep;
-							pt[(i+2)%3] = seps[m]*sep;
-							Debug.DrawRay(boost_to_minkowski(pt, coordinate_observer_boost), boost_to_minkowski(dir, coordinate_observer_boost)*100 * (j==0?1:-1), new Color(colors[i].r, colors[i].g, colors[i].b, k==0&&m==0?alpha[1]:alpha[0]));
-						}
-					}
-				}
-			}
-		}
-		*/
+		Current_Event = get_state(observer_time);
 	}
 
-	Color xyz_to_rgb(colourSystem cs, double xc, double yc, double zc){
-	    double xr, yr, zr, xg, yg, zg, xb, yb, zb;
-	    double xw, yw, zw;
-	    double rx, ry, rz, gx, gy, gz, bx, by, bz;
-	    double rw, gw, bw;
+	Color xyz_to_rgb(colourSystem cs, double xc, double yc, double zc) {
+		double xr, yr, zr, xg, yg, zg, xb, yb, zb;
+		double xw, yw, zw;
+		double rx, ry, rz, gx, gy, gz, bx, by, bz;
+		double rw, gw, bw;
 
-	    xr = cs.xRed;    yr = cs.yRed;    zr = 1 - (xr + yr);
-	    xg = cs.xGreen;  yg = cs.yGreen;  zg = 1 - (xg + yg);
-	    xb = cs.xBlue;   yb = cs.yBlue;   zb = 1 - (xb + yb);
+		xr = cs.xRed;
+		yr = cs.yRed;
+		zr = 1 - (xr + yr);
+		xg = cs.xGreen;
+		yg = cs.yGreen;
+		zg = 1 - (xg + yg);
+		xb = cs.xBlue;
+		yb = cs.yBlue;
+		zb = 1 - (xb + yb);
 
-	    xw = cs.xWhite;  yw = cs.yWhite;  zw = 1 - (xw + yw);
+		xw = cs.xWhite;
+		yw = cs.yWhite;
+		zw = 1 - (xw + yw);
 
-	    /* xyz -> rgb matrix, before scaling to white. */
+		/* xyz -> rgb matrix, before scaling to white. */
 
-	    rx = (yg * zb) - (yb * zg);  ry = (xb * zg) - (xg * zb);  rz = (xg * yb) - (xb * yg);
-	    gx = (yb * zr) - (yr * zb);  gy = (xr * zb) - (xb * zr);  gz = (xb * yr) - (xr * yb);
-	    bx = (yr * zg) - (yg * zr);  by = (xg * zr) - (xr * zg);  bz = (xr * yg) - (xg * yr);
+		rx = (yg * zb) - (yb * zg);
+		ry = (xb * zg) - (xg * zb);
+		rz = (xg * yb) - (xb * yg);
+		gx = (yb * zr) - (yr * zb);
+		gy = (xr * zb) - (xb * zr);
+		gz = (xb * yr) - (xr * yb);
+		bx = (yr * zg) - (yg * zr);
+		by = (xg * zr) - (xr * zg);
+		bz = (xr * yg) - (xg * yr);
 
-	    /* White scaling factors.
-	       Dividing by yw scales the white luminance to unity, as conventional. */
+		/* White scaling factors.
+		   Dividing by yw scales the white luminance to unity, as conventional. */
 
-	    rw = ((rx * xw) + (ry * yw) + (rz * zw)) / yw;
-	    gw = ((gx * xw) + (gy * yw) + (gz * zw)) / yw;
-	    bw = ((bx * xw) + (by * yw) + (bz * zw)) / yw;
+		rw = ((rx * xw) + (ry * yw) + (rz * zw)) / yw;
+		gw = ((gx * xw) + (gy * yw) + (gz * zw)) / yw;
+		bw = ((bx * xw) + (by * yw) + (bz * zw)) / yw;
 
-	    /* xyz -> rgb matrix, correctly scaled to white. */
+		/* xyz -> rgb matrix, correctly scaled to white. */
 
-	    rx = rx / rw;  ry = ry / rw;  rz = rz / rw;
-	    gx = gx / gw;  gy = gy / gw;  gz = gz / gw;
-	    bx = bx / bw;  by = by / bw;  bz = bz / bw;
+		rx = rx / rw;
+		ry = ry / rw;
+		rz = rz / rw;
+		gx = gx / gw;
+		gy = gy / gw;
+		gz = gz / gw;
+		bx = bx / bw;
+		by = by / bw;
+		bz = bz / bw;
 
-	    /* rgb of the desired point */
+		/* rgb of the desired point */
 
-	    return new Color(
-	    	(float)((rx * xc) + (ry * yc) + (rz * zc)), 
-	    	(float)((gx * xc) + (gy * yc) + (gz * zc)), 
-	    	(float)((bx * xc) + (by * yc) + (bz * zc)));
+		return new Color(
+			(float)((rx * xc) + (ry * yc) + (rz * zc)),
+			(float)((gx * xc) + (gy * yc) + (gz * zc)),
+			(float)((bx * xc) + (by * yc) + (bz * zc)));
 	}
 
-	Vector3 spectrum_to_xyz(){
-		double X=0,Y=0,Z=0;
-		int i=0;
+	Vector3 spectrum_to_xyz() {
+		double X = 0, Y = 0, Z = 0;
+		int i = 0;
 		float lambda = 380f;
 		for (; lambda < 780.1f; i++, lambda += 5) {
-	        double Me;
+			double Me;
 
-	        Me = ColorSpectrum.Evaluate(lambda);
-	        if (Me<0)
-	        	Me = 0;
-	        X += Me * cie_colour_match[i,0];
-	        Y += Me * cie_colour_match[i,1];
-	        Z += Me * cie_colour_match[i,2];
-	    }
-	    double XYZ = (X + Y + Z);
-	    return new Vector3((float)(X / XYZ), (float)(Y / XYZ), (float)(Z / XYZ));
+			Me = ColorSpectrum.Evaluate(lambda);
+			if (Me < 0)
+				Me = 0;
+			X += Me * cie_colour_match[i, 0];
+			Y += Me * cie_colour_match[i, 1];
+			Z += Me * cie_colour_match[i, 2];
+		}
+		double XYZ = (X + Y + Z);
+		return new Vector3((float)(X / XYZ), (float)(Y / XYZ), (float)(Z / XYZ));
 	}
 
-	Color spectrum_to_rgb(){
-		double R=0,G=0,B=0;
-		int i=0;
+	Color spectrum_to_rgb() {
+		double R = 0, G = 0, B = 0;
+		int i = 0;
 		float lambda = 390;
-		for(; lambda <= 730; i++, lambda += 1){
+		for (; lambda <= 730; i++, lambda += 1) {
 			double Me = ColorSpectrum.Evaluate(lambda);
-			if (Me<0)
-	        	Me = 0;
-	        R += Me * new_rgb_colour_match[i,0];
-	        G += Me * new_rgb_colour_match[i,1];
-	        B += Me * new_rgb_colour_match[i,2];
+			if (Me < 0)
+				Me = 0;
+			R += Me * new_rgb_colour_match[i, 0];
+			G += Me * new_rgb_colour_match[i, 1];
+			B += Me * new_rgb_colour_match[i, 2];
 		}
 		double RGB = Mathf.Max((float)R, (float)G, (float)B);
 		RGB = 5;
-		return new Color((float)(R/RGB), (float)(G/RGB), (float)(B/RGB));
+		return new Color((float)(R / RGB), (float)(G / RGB), (float)(B / RGB));
 	}
 
-	Vector4 get_state(float observer_time){
-		/*
-		float elapsed = 0;
-		float current_observer_time = 0;
-		Vector3 coordinate_to_observer_velocity = observerScript.velocity;
-		Vector3 observer_coordinate_offset = Vector3.zero;
-		for (int i=0; i<observerScript.accelerations.Count; ++i){
-			float duration = observerScript.durations[i];
-			Vector3 acceleration = observerScript.accelerations[i];
-			if (elapsed + duration < observer_time){
-				float coordinate_duration = sinh(acceleration.magnitude*duration)/acceleration.magnitude;
-				current_observer_time += coordinate_duration;
-				coordinate_to_observer_velocity = add_velocity(coordinate_to_observer_velocity, acceleration*coordinate_duration / Mathf.Sqrt(1f + (acceleration*coordinate_duration).sqrMagnitude));
-				observer_coordinate_offset += acceleration.normalized * (Mathf.Sqrt(1 + Mathf.Pow(acceleration.magnitude * coordinate_duration, 2)) - 1)/acceleration.magnitude;
-				elapsed += duration;
-			}else if (elapsed < observer_time){
-				duration = observer_time-elapsed;
-				float coordinate_duration = sinh(acceleration.magnitude*duration)/acceleration.magnitude;
-				current_observer_time += coordinate_duration;
-				coordinate_to_observer_velocity = add_velocity(coordinate_to_observer_velocity, acceleration*coordinate_duration / Mathf.Sqrt(1f + (acceleration*coordinate_duration).sqrMagnitude));
-				//observer_coordinate_offset += acceleration.normalized * (Mathf.Sqrt(1 + Mathf.Pow(acceleration.magnitude * coordinate_duration, 2)) - 1)/acceleration.magnitude;
-				elapsed += duration;
+	Vector4 get_state(float observer_time) {
+		Matrix4x4 observer_to_coordinate_boost = Matrix4x4.identity;
+		Matrix4x4 coordinate_to_observer_boost = Matrix4x4.identity;
+		Vector4 MCRF_in_coordinate = Vector4.zero;
+		Vector4 observer_in_observer_frame = Vector4.zero;
+		float proper_time = 0;
+		for (int accel_index = 0; accel_index < observerScript.accelerations.Count; accel_index++) {
+			Vector3 proper_acceleration = observerScript.accelerations[accel_index];
+			float a = proper_acceleration.magnitude;
+			float proper_duration = observerScript.durations[accel_index];
+			float MCRF_duration = sinh(a * proper_duration) / a;
+			bool last_accel = false;
+			//Vector4 event_in_MCRF = coordinate_to_observer_boost * MCRF_in_coordinate;
+			float dT = observer_time - proper_time;
+			if (dT < proper_duration) {
+				proper_duration = dT;
+				MCRF_duration = sinh(a * dT) / a;
+				last_accel = true;
 			}
-		}
-		current_observer_time += (observer_time - elapsed);
-		observer_time = current_observer_time;
-		*/
-		Vector3 coordinate_to_observer_velocity = observerScript.velocity;
-		Vector4 current_event_observer = combine_temporal_and_spatial(0, Observer.transform.position);
-
-		Vector3 coordinate_to_object_velocity = Velocity;
-		Vector3 observer_to_coordinate_velocity = -coordinate_to_observer_velocity;
-		Matrix4x4 object_to_coordinate_boost = lorentz_boost(-coordinate_to_object_velocity);
-		Matrix4x4 observer_to_coordinate_boost = lorentz_boost(coordinate_to_object_velocity);
-		Matrix4x4 coordinate_to_observer_boost = lorentz_boost(-observer_to_coordinate_velocity); //Boost from coordinate frame to observer frame
-		Vector4 current_event_object = combine_temporal_and_spatial(-ProperTimeOffset, transform.position);
-		//Vector4 current_event_coordinate = object_to_coordinate_boost * current_event_object - combine_temporal_and_spatial(0, observer_coordinate_offset);
-		Vector4 current_event_coordinate = object_to_coordinate_boost*current_event_object - observer_to_coordinate_boost*current_event_observer;
-		//Vector4 current_event_observer = coordinate_to_observer_boost * current_event_coordinate;
-		Vector3 observer_to_object_velocity = add_velocity(observer_to_coordinate_velocity, coordinate_to_object_velocity);
-		
-		List<Vector3> velocities = new List<Vector3>();
-		int velocities_index = 0;
-		velocities.Add(velocity_to_proper(coordinate_to_object_velocity));
-		velocities_index++;
-		Proper_Time = 0;
-		for (int i=0; i<ProperAccelerations.Count; ++i){
-			if (get_temporal_component(current_event_observer) < observer_time){
-				Vector3 proper_acceleration = ProperAccelerations[i];
-				float proper_duration = AccelerationDurations[i];
-				Vector3 offset = AccelerationOffsets[i];
-				float a = proper_acceleration.magnitude;
-				float L = Vector3.Dot(offset, proper_acceleration)/a;
-				if (L <= 1f/a){
-					float b = 1f/(1f - a*L);
-					proper_acceleration *= b;
-					proper_duration /= b;
-				}else{
-					proper_acceleration = new Vector3(0,0,0);
-					proper_duration = 0;
-				}
-				if (proper_acceleration.magnitude > 0){
-					float MCRF_duration = sinh(proper_acceleration.magnitude * proper_duration)/proper_acceleration.magnitude;
-					Vector4 next_event_object = combine_temporal_and_spatial(MCRF_duration, get_displacement(proper_acceleration, MCRF_duration));
-					Vector4 next_event_coordinate = current_event_coordinate + object_to_coordinate_boost * next_event_object;
-					Vector4 next_event_observer = coordinate_to_observer_boost * next_event_coordinate;
-					if (get_temporal_component(next_event_observer) > observer_time){
-						MCRF_duration = get_MCRF_time(proper_acceleration, -observer_to_coordinate_velocity, object_to_coordinate_boost, current_event_coordinate, observer_time);
-						next_event_observer = current_event_observer;
-						current_event_object = combine_temporal_and_spatial(MCRF_duration, get_displacement(proper_acceleration, MCRF_duration));
-						current_event_coordinate = current_event_coordinate + object_to_coordinate_boost * current_event_object;
-						current_event_observer = coordinate_to_observer_boost * current_event_coordinate;
-						Vector3 added_velocity = proper_to_velocity(proper_acceleration*MCRF_duration);
-						Proper_Time += asinh(proper_acceleration.magnitude * MCRF_duration)/proper_acceleration.magnitude;
-						velocities.Add(proper_acceleration*MCRF_duration);
-						velocities_index++;
-						object_to_coordinate_boost = object_to_coordinate_boost*lorentz_boost(-added_velocity);
-						break;
-					}else{
-						current_event_object = next_event_object;
-						current_event_coordinate = next_event_coordinate;
-						current_event_observer = next_event_observer;
-						Vector3 added_velocity = proper_to_velocity(proper_acceleration*MCRF_duration);
-						Proper_Time += asinh(proper_acceleration.magnitude * MCRF_duration)/proper_acceleration.magnitude;
-						velocities.Add(proper_acceleration*MCRF_duration);
-						velocities_index++;
-						object_to_coordinate_boost = object_to_coordinate_boost*lorentz_boost(-added_velocity);
-					}
-				}else{
-					
-				}
-			}else{
+			proper_time += proper_duration;
+			Vector3 displacement_in_MCRF = proper_acceleration * (Mathf.Sqrt(1 + Mathf.Pow(a * MCRF_duration, 2)) - 1) / proper_acceleration.sqrMagnitude;
+			Vector4 event_in_MCRF = combine_temporal_and_spatial(MCRF_duration, displacement_in_MCRF);
+			Vector3 new_MCRF_velocity = proper_acceleration * MCRF_duration / Mathf.Sqrt(1 + Mathf.Pow(a * MCRF_duration, 2));
+			Matrix4x4 new_boost = lorentz_boost(new_MCRF_velocity);
+			observer_in_observer_frame += new_boost * event_in_MCRF;
+			observer_to_coordinate_boost = observer_to_coordinate_boost * lorentz_boost(-new_MCRF_velocity);
+			coordinate_to_observer_boost = new_boost * coordinate_to_observer_boost;
+			MCRF_in_coordinate = observer_to_coordinate_boost * observer_in_observer_frame;
+			if (last_accel || accel_index == observerScript.accelerations.Count - 1) {
 				break;
 			}
 		}
-		Vector3 coordinate_to_object_proper_velocity = velocities[--velocities_index];
-		velocities_index--;
-		for (int i=velocities_index; i>=0; i--){
-			coordinate_to_object_proper_velocity = add_proper_velocity(velocities[i], coordinate_to_object_proper_velocity);
-		}
-		coordinate_to_object_velocity = proper_to_velocity(coordinate_to_object_proper_velocity);
-		observer_to_object_velocity = add_velocity(observer_to_coordinate_velocity, coordinate_to_object_velocity);
-		Proper_Time += (observer_time - get_temporal_component(current_event_observer))*α(observer_to_object_velocity);
-		current_event_observer += (observer_time - get_temporal_component(current_event_observer))*combine_temporal_and_spatial(1, observer_to_object_velocity);
-		Vector4 relative_event_observer = current_event_observer - observer_to_coordinate_boost*current_event_observer;
-		Debug.DrawRay(add_time_to_Z_axis(relative_event_observer, -observer_time), Vector3.up, Color.white);
-		//Debug.DrawRay(add_time_to_Z_axis(get_spatial_component(current_event_observer), get_temporal_component(current_event_observer)-observer_time), Vector3.up, Color.white);
-		Current_Velocity = observer_to_object_velocity;
-		return current_event_observer + combine_temporal_and_spatial(0, Observer.transform.position);
-	}
+		Debug.Log(MCRF_in_coordinate + " " + observer_in_observer_frame);
+		observer_to_coordinate_boost = observer_to_coordinate_boost * lorentz_boost(-observerScript.velocity);
+		coordinate_to_observer_boost = lorentz_boost(observerScript.velocity) * coordinate_to_observer_boost;
 
-	Vector4 new_get_state(float observer_time){
-		Vector4 observer_in_observer_frame = Vector4.zero;
-		Matrix4x4 coordinate_to_observer_frame = lorentz_boost(observerScript.velocity);
+		draw_event_ray(MCRF_in_coordinate, Vector3.up, Vector4.zero, Color.blue);
+		draw_event_ray(observer_in_observer_frame, Vector3.up, Vector4.zero, Color.red);
 
-		Vector3 current_event_MCRF = Vector4.zero;
-		float elapsed = 0;
-		if (observer_time > 0){
-			for (int i=0; i<observerScript.accelerations.Count; ++i){
-				Vector3 acceleration = observerScript.accelerations[i];
-				float duration = Mathf.Min(observerScript.durations[i], observer_time-elapsed);
-				Vector3 displacement = acceleration.normalized * (cosh(acceleration.magnitude*duration) - 1)/acceleration.magnitude;
+		//Debug.Log(get_temporal_component(coordinate_to_observer_boost*MCRF_in_coordinate));
+		//float elapsed_time = 0;
+		Vector3 MCRF_velocity = Velocity;
+		//Matrix4x4 MCRF_to_coordinate_boost = lorentz_boost(-MCRF_velocity);
+		//Matrix4x4 coordinate_to_MCRF_boost = lorentz_boost(MCRF_velocity);
+		Matrix4x4 MCRF_to_coordinate_boost = coordinate_to_observer_boost;
+		Matrix4x4 coordinate_to_MCRF_boost = observer_to_coordinate_boost;
+		//Debug.Log(get_temporal_component(MCRF_to_coordinate_boost*MCRF_in_coordinate));
+		//MCRF_in_coordinate = MCRF_to_coordinate_boost * combine_temporal_and_spatial(-ProperTimeOffset, transform.position);
+		for (int accel_index = 0; accel_index < ProperAccelerations.Count; accel_index++) {
+			Vector3 proper_acceleration = ProperAccelerations[accel_index];
+			float a = proper_acceleration.magnitude;
+			float proper_duration = AccelerationDurations[accel_index];
+			float MCRF_duration = sinh(a * proper_duration) / a;
+			bool last_accel = false;
+			float dt = get_temporal_component(MCRF_in_coordinate);
+			Vector3 B = get_spatial_component(MCRF_to_coordinate_boost.GetRow(0));
+			Vector3 A = proper_acceleration;
+			float B0 = MCRF_to_coordinate_boost[0, 0];
+			float mT = get_MCRF_time(proper_acceleration, B, B0, dt);
+			if (mT < MCRF_duration) {
+				MCRF_duration = mT;
+				last_accel = true;
+			}
+
+			Vector3 displacement_in_MCRF = proper_acceleration * (Mathf.Sqrt(1 + Mathf.Pow(a * MCRF_duration, 2)) - 1) / proper_acceleration.sqrMagnitude;
+			Vector4 event_in_MCRF = coordinate_to_MCRF_boost * MCRF_in_coordinate;
+			event_in_MCRF += combine_temporal_and_spatial(MCRF_duration, displacement_in_MCRF);
+			MCRF_in_coordinate = MCRF_to_coordinate_boost * event_in_MCRF;
+
+			Vector3 new_MCRF_velocity = proper_acceleration * MCRF_duration / Mathf.Sqrt(1 + Mathf.Pow(a * MCRF_duration, 2));
+			MCRF_to_coordinate_boost = MCRF_to_coordinate_boost * lorentz_boost(-new_MCRF_velocity);
+			coordinate_to_MCRF_boost = lorentz_boost(new_MCRF_velocity) * coordinate_to_MCRF_boost;
+			//draw_event_ray(MCRF_in_coordinate, Vector3.up * 1.5f, combine_temporal_and_spatial(-observer_time, Vector3.zero), Color.red);
+			if (last_accel || accel_index == ProperAccelerations.Count - 1) {
+				break;
 			}
 		}
+		draw_event_ray(MCRF_in_coordinate, Vector3.up * 1.5f, combine_temporal_and_spatial(-observer_time, Vector3.zero), Color.green);
 		return Vector4.zero;
 	}
 
-	void draw_path(float observer_time){
-		Vector3 object_to_coordinate_velocity = -Velocity;
-		Vector3 coordinate_to_MCRF_velocity = observerScript.velocity;
-		Vector3 object_to_MCRF_velocity = add_velocity(object_to_coordinate_velocity, coordinate_to_MCRF_velocity);
-		Vector4 observer_start_in_MCRF = Vector4.zero;
-
-		Matrix4x4 object_to_coordinate_boost = lorentz_boost(object_to_coordinate_velocity);
-		Matrix4x4 coordinate_to_MCRF_boost = lorentz_boost(coordinate_to_MCRF_velocity);
-
-		Vector4 current_event_object = combine_temporal_and_spatial(-ProperTimeOffset, transform.position - Observer.transform.position);
-		Vector4 current_event_coordinate = object_to_coordinate_boost * current_event_object;
-		Vector4 current_event_MCRF = coordinate_to_MCRF_boost * current_event_coordinate;
-		Vector4 current_event_observer = current_event_MCRF;
-		Debug.DrawRay(add_time_to_Z_axis(current_event_MCRF, - observer_time) + Observer.transform.position, add_time_to_Z_axis(combine_temporal_and_spatial(0, object_to_MCRF_velocity), -1)*10000, Color.green);
-		int observer_acceleration_index = 0;
-		Vector3 observer_acceleration = observerScript.accelerations[observer_acceleration_index];
-		float observer_duration = observerScript.durations[observer_acceleration_index];
-		float total_duration = 0;
-		/*
-		for (int i=0; i<observerScript.accelerations.Count; ++i){
-			Vector3 rindler_horizon = -observerScript.accelerations[i].normalized * 1f / observerScript.accelerations[i].magnitude;
-			draw_event_ray(observer_start_in_MCRF + combine_temporal_and_spatial(0, rindler_horizon), (observerScript.accelerations[i].normalized + Vector3.forward)*observerScript.durations[i]*Mathf.Sqrt(2), combine_temporal_and_spatial(-observer_time, Observer.transform.position + Vector3.up*i), Color.yellow);
-			for (float T=0f; T<=observerScript.durations[i]; ++T){
-				float MCRF_observer_time = sinh(observerScript.accelerations[i].magnitude*T)/observerScript.accelerations[i].magnitude;
-				Vector3 observer_velocity_temp = observerScript.accelerations[i].normalized * tanh(observerScript.accelerations[i].magnitude * T);
-				Matrix4x4 observer_to_MCRF_boost = lorentz_boost(-observer_velocity_temp);
-				Matrix4x4 MCRF_to_observer_boost = lorentz_boost(observer_velocity_temp);
-				Vector3 observer_displacement_in_MCRF = observerScript.accelerations[i].normalized * (Mathf.Sqrt(1f + (observerScript.accelerations[i]*MCRF_observer_time).sqrMagnitude) - 1f) / observerScript.accelerations[i].magnitude;
-				Vector4 observer_in_MCRF = combine_temporal_and_spatial(MCRF_observer_time, observer_displacement_in_MCRF);
-				Vector4 observer_in_observer_frame = MCRF_to_observer_boost * observer_in_MCRF;
-				Vector4 start = observer_in_observer_frame + combine_temporal_and_spatial(0, rindler_horizon);
-				Vector4 curr = observer_in_observer_frame - combine_temporal_and_spatial(0, observerScript.accelerations[0].normalized * Mathf.Floor(1f / (10*observerScript.accelerations[0].magnitude))*10);
-				draw_event_line(observer_to_MCRF_boost*start, observer_to_MCRF_boost*curr, combine_temporal_and_spatial(0, Observer.transform.position + Vector3.up*i), Color.white - new Color(0,0,0,0.8f));
-				for (int k=0; k<40; ++k){
-					Vector4 next = curr + combine_temporal_and_spatial(0, observerScript.accelerations[i].normalized);
-					draw_event_line(observer_to_MCRF_boost*curr, observer_to_MCRF_boost*next, combine_temporal_and_spatial(0, Observer.transform.position + Vector3.up*i), k%2==0? Color.grey - new Color(0,0,0,0.8f) : Color.white - new Color(0,0,0,0.8f));
-					curr = next;
-				}
-			}
-		}
-		*/
-		for (int i=0; i<ProperAccelerations.Count; ++i){
-			Vector3 proper_acceleration = ProperAccelerations[i];
-			float proper_duration = AccelerationDurations[i];
-			Vector3 offset = AccelerationOffsets[i];
-			float a = proper_acceleration.magnitude;
-			float L = Vector3.Dot(offset, proper_acceleration)/a;
-			if (L <= 1f/a){
-				float b = 1f/(1f - a*L);
-				proper_acceleration *= b;
-				proper_duration /= b;
-			}else{
-				proper_acceleration = new Vector3(0,0,0);
-				proper_duration = 0;
-			}
-
-			if (proper_acceleration.magnitude > 0){
-				int count = 1 + (int)AccelerationCurveDetail;
-				float object_time_increment = proper_duration/count;
-				for (int j=0; j<count; ++j){
-					float time_increment = sinh(proper_acceleration.magnitude * object_time_increment)/proper_acceleration.magnitude;
-					Vector4 next_event_object = combine_temporal_and_spatial(time_increment, get_displacement(proper_acceleration, time_increment));
-					Vector4 next_event_coordinate = current_event_coordinate + object_to_coordinate_boost*next_event_object;
-					Vector4 next_event_MCRF = coordinate_to_MCRF_boost*next_event_coordinate - observer_start_in_MCRF;
-					
-					float MCRF_time = get_temporal_component(next_event_MCRF);
-					
-					float MCRF_observer_time = MCRF_time / Mathf.Sqrt(Mathf.Pow(1+Vector3.Dot(observer_acceleration, get_spatial_component(next_event_MCRF)), 2) - Mathf.Pow(MCRF_time, 2)*observer_acceleration.sqrMagnitude);
-					float observer_new_time = asinh(observer_acceleration.magnitude*MCRF_observer_time)/observer_acceleration.magnitude;
-
-					if (observer_new_time > observer_duration){
-						
-						if (observer_acceleration_index+1 < observerScript.accelerations.Count){
-							Vector3 next_MCRF_velocity = observer_acceleration.normalized * tanh(observer_acceleration.magnitude * observer_duration);
-							Matrix4x4 next_MCRF_boost = lorentz_boost(next_MCRF_velocity);
-							float duration_in_prev_MCRF = sinh(observer_acceleration.magnitude*observer_duration)/observer_acceleration.magnitude;
-							Vector3 displacement_in_prev_MCRF = observer_acceleration.normalized * (cosh(observer_acceleration.magnitude*observer_duration) - 1)/observer_acceleration.magnitude;
-							float observer_time_in_prev_MCRF = asinh(observer_acceleration.magnitude*duration_in_prev_MCRF)/observer_acceleration.magnitude;
-							Vector4 observer_in_prev_MCRF = combine_temporal_and_spatial(duration_in_prev_MCRF, displacement_in_prev_MCRF);
-							Vector4 observer_in_next_MCRF = next_MCRF_boost * (observer_in_prev_MCRF + observer_start_in_MCRF);
-							total_duration += observer_duration;
-							current_event_observer -= combine_temporal_and_spatial(observer_duration, Vector3.zero);
-							observer_start_in_MCRF = observer_in_next_MCRF;
-							//draw_event_ray(observer_in_prev_MCRF, Vector3.up, combine_temporal_and_spatial(-observer_time, Observer.transform.position + Vector3.up*observer_acceleration_index), Color.green);
-							//draw_event_ray(observer_in_next_MCRF, Vector3.up, combine_temporal_and_spatial(-observer_time, Observer.transform.position + Vector3.up*observer_acceleration_index), Color.red);
-							observer_acceleration_index++;
-							coordinate_to_MCRF_boost = coordinate_to_MCRF_boost * next_MCRF_boost;
-							next_event_MCRF = coordinate_to_MCRF_boost*next_event_coordinate - observer_start_in_MCRF;
-							current_event_MCRF = next_event_MCRF;
-							
-							observer_acceleration = observerScript.accelerations[observer_acceleration_index];
-							MCRF_time = get_temporal_component(next_event_MCRF);
-							MCRF_observer_time = MCRF_time / Mathf.Sqrt(Mathf.Pow(1+Vector3.Dot(observer_acceleration, get_spatial_component(next_event_MCRF)), 2) - Mathf.Pow(MCRF_time, 2)*observer_acceleration.sqrMagnitude);
-							observer_new_time = asinh(observer_acceleration.magnitude*MCRF_observer_time)/observer_acceleration.magnitude;
-							observer_duration = observerScript.durations[observer_acceleration_index];
-						}
-					}
-
-						
-					if (observer_new_time > 0){
-						Vector3 observer_velocity_in_MCRF = proper_to_velocity(observer_acceleration*MCRF_observer_time);
-						Matrix4x4 MCRF_to_observer_boost = lorentz_boost(observer_velocity_in_MCRF);
-						Vector3 observer_displacement_in_MCRF = observer_acceleration.normalized * (Mathf.Sqrt(1f + (observer_acceleration*MCRF_observer_time).sqrMagnitude) - 1f) / observer_acceleration.magnitude;
-						Vector4 observer_in_MCRF = combine_temporal_and_spatial(MCRF_observer_time, observer_displacement_in_MCRF);
-						Vector4 observer_in_observer_frame = MCRF_to_observer_boost * observer_in_MCRF;
-						//draw_event_ray(observer_in_observer_frame, Vector3.up, combine_temporal_and_spatial(-observer_time, Observer.transform.position), Color.red);
-						Vector4 object_in_observer_frame = MCRF_to_observer_boost * next_event_MCRF;
-						//draw_event_ray(object_in_observer_frame, Vector3.up, combine_temporal_and_spatial(-observer_time, Observer.transform.position), Color.red);
-						Vector4 next_event_observer = combine_temporal_and_spatial(observer_new_time, get_spatial_component(object_in_observer_frame - observer_in_observer_frame));
-						draw_event_line(current_event_observer, next_event_observer, combine_temporal_and_spatial(-observer_time + total_duration, Observer.transform.position), observer_acceleration_index%2==0?(j%2==0?Color.red:Color.blue):(j%2==0?Color.green:Color.magenta));
-						current_event_observer = next_event_observer;
-					}else{
-						current_event_observer = next_event_MCRF;
-					}
-					
-					//draw_event_line(current_event_MCRF, next_event_MCRF, combine_temporal_and_spatial(-observer_time, Observer.transform.position + Vector3.up*observer_acceleration_index), i%2==0?Color.cyan:Color.green);
-					//draw_event_line(current_event_coordinate, next_event_coordinate, combine_temporal_and_spatial(-observer_time, Observer.transform.position + Vector3.up*observer_acceleration_index), i%2==0?Color.cyan:Color.green);
-					
-					current_event_object = next_event_object;
-					current_event_coordinate = next_event_coordinate;
-					current_event_MCRF = next_event_MCRF;
-					Vector3 added_velocity = proper_to_velocity(proper_acceleration*time_increment);
-					object_to_coordinate_boost = object_to_coordinate_boost*lorentz_boost(-added_velocity);
-					object_to_coordinate_velocity = add_velocity(-added_velocity, object_to_coordinate_velocity);
-				}
-			}
-		}
-	}
-
-	void new_draw_path(float observer_time){
-		Vector3 coordinate_to_observer_velocity = observerScript.velocity;
-		Vector3 coordinate_to_object_velocity = Velocity;
-		Vector3 observer_to_object_velocity = add_velocity(-coordinate_to_observer_velocity, coordinate_to_object_velocity);
-
-		Matrix4x4 object_to_coordinate_boost = lorentz_boost(-coordinate_to_object_velocity);
-		Matrix4x4 coordinate_to_observer_boost = lorentz_boost(coordinate_to_observer_velocity);
-
-		Vector4 current_event_object = combine_temporal_and_spatial(-ProperTimeOffset, transform.position - Observer.transform.position);
-		Vector4 current_event_coordinate = object_to_coordinate_boost * current_event_object;
-		Vector4 current_event_starting_frame = coordinate_to_observer_boost * current_event_coordinate;
-		Vector4 current_event_observer_frame = current_event_starting_frame;
-		int observer_acceleration_index = 0;
-		Debug.DrawRay(add_time_to_Z_axis(current_event_starting_frame, - observer_time) + Observer.transform.position, -add_time_to_Z_axis(combine_temporal_and_spatial(0, observer_to_object_velocity), 1)*10000, Color.green);
-		
-		Vector3 rindler_horizon = -observerScript.accelerations[observer_acceleration_index].normalized * 1f / observerScript.accelerations[observer_acceleration_index].magnitude;
-		Debug.DrawRay(rindler_horizon + Observer.transform.position, new Vector3(1,0,1)*10000, Color.yellow);
-		for (int i=0; i<ProperAccelerations.Count; ++i){
-			Vector3 proper_acceleration = ProperAccelerations[i];
-			float proper_duration = AccelerationDurations[i];
-			Vector3 offset = AccelerationOffsets[i];
-			float a = proper_acceleration.magnitude;
-			float L = Vector3.Dot(offset, proper_acceleration)/a;
-			if (L <= 1f/a){
-				float b = 1f/(1f - a*L);
-				proper_acceleration *= b;
-				proper_duration /= b;
-			}else{
-				proper_acceleration = new Vector3(0,0,0);
-				proper_duration = 0;
-			}
-			if (proper_acceleration.magnitude > 0){
-				int count = 1 + (int)AccelerationCurveDetail;
-				float object_time_increment = proper_duration/count;
-				for (int j=0; j<count; ++j){
-					float object_MCRF_time_increment = sinh(proper_acceleration.magnitude * object_time_increment)/proper_acceleration.magnitude;
-					Vector4 next_event_object = combine_temporal_and_spatial(object_MCRF_time_increment, get_displacement(proper_acceleration, object_MCRF_time_increment));
-					Vector4 next_event_coordinate = current_event_coordinate + object_to_coordinate_boost * next_event_object;
-					Vector4 next_event_starting_frame = coordinate_to_observer_boost * next_event_coordinate;
-					
-					//draw_event_line(current_event_starting_frame, next_event_starting_frame, combine_temporal_and_spatial(-observer_time, Observer.transform.position), Color.cyan);
-
-					float starting_frame_time = get_temporal_component(next_event_starting_frame) / Mathf.Sqrt(Mathf.Pow(1+Vector3.Dot(observerScript.accelerations[observer_acceleration_index], get_spatial_component(next_event_starting_frame)), 2) - Mathf.Pow(get_temporal_component(next_event_starting_frame), 2)*observerScript.accelerations[observer_acceleration_index].sqrMagnitude);
-					float observer_new_time = asinh(observerScript.accelerations[observer_acceleration_index].magnitude*starting_frame_time)/observerScript.accelerations[observer_acceleration_index].magnitude;
-					Vector3 observer_velocity_in_starting_frame = proper_to_velocity(observerScript.accelerations[observer_acceleration_index]*starting_frame_time);
-					if (observer_new_time > observerScript.durations[observer_acceleration_index]){
-						observer_velocity_in_starting_frame = observerScript.accelerations[observer_acceleration_index].normalized * tanh(observerScript.accelerations[observer_acceleration_index].magnitude*observerScript.durations[observer_acceleration_index]);
-						coordinate_to_observer_boost = coordinate_to_observer_boost*lorentz_boost(observer_velocity_in_starting_frame);
-						next_event_starting_frame = next_event_starting_frame = coordinate_to_observer_boost * next_event_coordinate;
-						observer_acceleration_index++;
-						if (observer_acceleration_index >= observerScript.accelerations.Count){
-							break;
-						}
-						starting_frame_time = get_temporal_component(next_event_starting_frame) / Mathf.Sqrt(Mathf.Pow(1+Vector3.Dot(observerScript.accelerations[observer_acceleration_index], get_spatial_component(next_event_starting_frame)), 2) - Mathf.Pow(get_temporal_component(next_event_starting_frame), 2)*observerScript.accelerations[observer_acceleration_index].sqrMagnitude);
-						observer_new_time = asinh(observerScript.accelerations[observer_acceleration_index].magnitude*starting_frame_time)/observerScript.accelerations[observer_acceleration_index].magnitude;
-					}
-					
-					Matrix4x4 starting_frame_to_observer_boost = lorentz_boost(observer_velocity_in_starting_frame);
-					Vector3 observer_displacement_in_starting_frame = observerScript.accelerations[observer_acceleration_index].normalized * (Mathf.Sqrt(1f + (observerScript.accelerations[observer_acceleration_index]*starting_frame_time).sqrMagnitude) - 1f) / observerScript.accelerations[observer_acceleration_index].magnitude;
-					Vector4 observer_in_starting_frame = combine_temporal_and_spatial(starting_frame_time, observer_displacement_in_starting_frame);
-					Vector4 observer_in_observer_frame = starting_frame_to_observer_boost * observer_in_starting_frame;
-					Vector4 object_in_observer_frame = starting_frame_to_observer_boost * next_event_starting_frame;
-					Vector4 next_event_observer_frame = combine_temporal_and_spatial(observer_new_time, get_spatial_component(object_in_observer_frame - observer_in_observer_frame));
-					draw_event_line(current_event_observer_frame, next_event_observer_frame, combine_temporal_and_spatial(-observer_time, Observer.transform.position), i%2==0?new Color(1,0.647f,0):Color.cyan);
-					current_event_observer_frame = next_event_observer_frame;
-					
-					Vector4 start = observer_in_observer_frame + combine_temporal_and_spatial(0, Vector3.left * (int)(1f/observerScript.accelerations[observer_acceleration_index].magnitude));
-					//for (int k=0; k<20; ++k){
-					//	Vector4 next = start + combine_temporal_and_spatial(0, Vector3.right);
-					//	draw_event_line(starting_frame_to_observer_boost.inverse*start, starting_frame_to_observer_boost.inverse*next, combine_temporal_and_spatial(0, Observer.transform.position), k%2==0? Color.red : Color.white);
-					//	start = next;
-					//}
-					
-
-					current_event_object = next_event_object;
-					current_event_coordinate = next_event_coordinate;
-					current_event_starting_frame = next_event_starting_frame;
-					Vector3 added_velocity = proper_to_velocity(proper_acceleration*object_MCRF_time_increment);
-					object_to_coordinate_boost = object_to_coordinate_boost*lorentz_boost(-added_velocity);
-					coordinate_to_object_velocity = add_velocity(coordinate_to_object_velocity, added_velocity);
-				}
-			}
-		}
-		observer_to_object_velocity = add_velocity(-coordinate_to_observer_velocity, coordinate_to_object_velocity);
-		Debug.DrawRay(add_time_to_Z_axis(current_event_starting_frame, -observer_time) + Observer.transform.position, add_time_to_Z_axis(combine_temporal_and_spatial(0, observer_to_object_velocity), 1)*10000, Color.green);
-	}
-
-	void draw_event_ray(Vector4 start, Vector3 direction, Vector4 offset, Color color){
+	void draw_event_ray(Vector4 start, Vector3 direction, Vector4 offset, Color color) {
 		Debug.DrawRay(add_time_to_Z_axis(start, get_temporal_component(offset)) + get_spatial_component(offset), direction, color);
 	}
 
-
-	void draw_event_line(Vector4 start, Vector4 end, Vector4 offset, Color color){
+	void draw_event_line(Vector4 start, Vector4 end, Vector4 offset, Color color) {
 		Debug.DrawLine(add_time_to_Z_axis(start, get_temporal_component(offset)) + get_spatial_component(offset), add_time_to_Z_axis(end, get_temporal_component(offset)) + get_spatial_component(offset), color);
 	}
 	/*
@@ -1031,8 +730,8 @@ public class Relativity_Controller : MonoBehaviour {
 					relative_event_observer = current_event_observer + combine_temporal_and_spatial(0, Observer.transform.position);
 					Vector4 relative_next_event_observer = next_event_observer + combine_temporal_and_spatial(0, Observer.transform.position);
 					Debug.DrawLine( add_time_to_Z_axis(relative_event_observer, -observer_time),
-					                add_time_to_Z_axis(relative_next_event_observer, -observer_time),
-					                i%2==0?new Color(1,0.5f,0):Color.green);
+									add_time_to_Z_axis(relative_next_event_observer, -observer_time),
+									i%2==0?new Color(1,0.5f,0):Color.green);
 					current_event_object = next_event_object;
 					current_event_coordinate = next_event_coordinate;
 					current_event_observer = next_event_observer;
@@ -1055,75 +754,73 @@ public class Relativity_Controller : MonoBehaviour {
 		Debug.DrawRay(add_time_to_Z_axis(relative_event_observer, -observer_time), add_time_to_Z_axis(combine_temporal_and_spatial(0, observer_to_object_velocity), 1)*10000, Color.cyan);
 	}
 	*/
-	Vector3 velocity_to_proper(Vector3 v){
+	Vector3 velocity_to_proper(Vector3 v) {
 		return v / Mathf.Sqrt(1f - v.sqrMagnitude);
 	}
 
-	Vector3 proper_to_velocity(Vector3 v){
+	Vector3 proper_to_velocity(Vector3 v) {
 		return v / Mathf.Sqrt(1f + v.sqrMagnitude);
 	}
 
-	Vector3 add_velocity(Vector3 v, Vector3 u){
+	Vector3 add_velocity(Vector3 v, Vector3 u) {
 		//Einstein Velocity Addition
 		if (v.sqrMagnitude == 0)
 			return u;
 		if (u.sqrMagnitude == 0)
 			return v;
 		float gamma = γ(v);
-		return 1f/(1+Vector3.Dot(u, v))*(v + u*α(v) + gamma/(1f + gamma)*Vector3.Dot(u, v)*v);
+		return 1f / (1 + Vector3.Dot(u, v)) * (v + u * α(v) + gamma / (1f + gamma) * Vector3.Dot(u, v) * v);
 	}
 
-	Vector3 add_proper_velocity(Vector3 v, Vector3 u){
-		float Bu = 1/Mathf.Sqrt(1f + u.sqrMagnitude);
-		float Bv = 1/Mathf.Sqrt(1f + v.sqrMagnitude);
-		return v+u+(Bv/(1+Bv)*Vector3.Dot(v,u) + (1-Bu)/Bu)*v;
+	Vector3 add_proper_velocity(Vector3 v, Vector3 u) {
+		float Bu = 1 / Mathf.Sqrt(1f + u.sqrMagnitude);
+		float Bv = 1 / Mathf.Sqrt(1f + v.sqrMagnitude);
+		return v + u + (Bv / (1 + Bv) * Vector3.Dot(v, u) + (1 - Bu) / Bu) * v;
 	}
 
-	float γ(Vector3 v){
+	float gamma(Vector3 v) {
 		//Lorentz Factor
-		return 1f/Mathf.Sqrt(1 - v.sqrMagnitude);
+		return 1f / Mathf.Sqrt(1 - v.sqrMagnitude);
 	}
 
-	float α(Vector3 v){ 
+	float γ(Vector3 v) {
+		//Lorentz Factor
+		return 1f / Mathf.Sqrt(1 - v.sqrMagnitude);
+	}
+
+	float α(Vector3 v) {
 		//Reciprocal Lorentz Factor
 		return Mathf.Sqrt(1 - v.sqrMagnitude);
 	}
 
-	float sinh(float x)
-	{
-		return (Mathf.Pow(Mathf.Exp(1), x) - Mathf.Pow(Mathf.Exp(1), -x))/2;
+	float sinh(float x) {
+		return (Mathf.Pow(Mathf.Exp(1), x) - Mathf.Pow(Mathf.Exp(1), -x)) / 2;
 	}
 
-	float cosh(float x)
-	{
-		return (Mathf.Pow(Mathf.Exp(1), x) + Mathf.Pow(Mathf.Exp(1), -x))/2;
+	float cosh(float x) {
+		return (Mathf.Pow(Mathf.Exp(1), x) + Mathf.Pow(Mathf.Exp(1), -x)) / 2;
 	}
 
-	float tanh(float x)
-	{
-		return sinh(x)/cosh(x);
+	float tanh(float x) {
+		return sinh(x) / cosh(x);
 	}
 
-	float atanh(float x)
-	{
-		return (Mathf.Log(1 + x) - Mathf.Log(1 - x))/2;
+	float atanh(float x) {
+		return (Mathf.Log(1 + x) - Mathf.Log(1 - x)) / 2;
 	}
 
-	float acosh(float x)
-	{
-		return Mathf.Log(x + Mathf.Sqrt(Mathf.Pow(x,2) - 1));
+	float acosh(float x) {
+		return Mathf.Log(x + Mathf.Sqrt(Mathf.Pow(x, 2) - 1));
 	}
 
-	float asinh(float x)
-	{
-		return Mathf.Log(x + Mathf.Sqrt(1 + Mathf.Pow(x,2)));
+	float asinh(float x) {
+		return Mathf.Log(x + Mathf.Sqrt(1 + Mathf.Pow(x, 2)));
 	}
 
-	Matrix4x4 lorentz_boost(Vector3 v){
+	Matrix4x4 lorentz_boost(Vector3 v) {
 		//Computes the Lorentz Boost matrix for a given 3-dimensional velocity
 		float βSqr = v.sqrMagnitude;
-		if (βSqr == 0f)
-		{
+		if (βSqr == 0f) {
 			return Matrix4x4.identity;
 		}
 		float βx = v.x;
@@ -1132,259 +829,109 @@ public class Relativity_Controller : MonoBehaviour {
 		float gamma = γ(v);
 
 		Matrix4x4 boost = new Matrix4x4(
-			new Vector4(     gamma,  -gamma*βx,                    -gamma*βy,                    -gamma*βz                    ),
-			new Vector4( -βx*gamma,  (gamma-1)*(βx*βx)/(βSqr) + 1, (gamma-1)*(βx*βy)/(βSqr),     (gamma-1)*(βx*βz)/(βSqr)     ),
-			new Vector4( -βy*gamma,  (gamma-1)*(βy*βx)/(βSqr),     (gamma-1)*(βy*βy)/(βSqr) + 1, (gamma-1)*(βy*βz)/(βSqr)     ),
-			new Vector4( -βz*gamma,  (gamma-1)*(βz*βx)/(βSqr),     (gamma-1)*(βz*βy)/(βSqr),     (gamma-1)*(βz*βz)/(βSqr) + 1 )
+			new Vector4(gamma, -gamma * βx, -gamma * βy, -gamma * βz),
+			new Vector4(-βx * gamma, (gamma - 1) * (βx * βx) / (βSqr) + 1, (gamma - 1) * (βx * βy) / (βSqr), (gamma - 1) * (βx * βz) / (βSqr)),
+			new Vector4(-βy * gamma, (gamma - 1) * (βy * βx) / (βSqr), (gamma - 1) * (βy * βy) / (βSqr) + 1, (gamma - 1) * (βy * βz) / (βSqr)),
+			new Vector4(-βz * gamma, (gamma - 1) * (βz * βx) / (βSqr), (gamma - 1) * (βz * βy) / (βSqr), (gamma - 1) * (βz * βz) / (βSqr) + 1)
 		);
 
 		return boost;
 
 	}
 
-	Vector4 combine_temporal_and_spatial(float t, Vector3 p){
+	Vector4 combine_temporal_and_spatial(float t, Vector3 p) {
 		return new Vector4(t, p.x, p.y, p.z);
 	}
 
-	float get_temporal_component(Vector4 v){
+	float get_temporal_component(Vector4 v) {
 		return v.x;
 	}
 
-	Vector3 get_spatial_component(Vector4 v){
+	Vector3 get_spatial_component(Vector4 v) {
 		return new Vector3(v.y, v.z, v.w);
 	}
 
-	Vector3 add_time_to_Z_axis(Vector4 e, float t){
+	Vector3 add_time_to_Z_axis(Vector4 e, float t) {
 		//Add new z value to vector v's z-axis
 		return get_spatial_component(e) + new Vector3(0, 0, get_temporal_component(e) + t);
 	}
 
-	Vector3 boost_to_minkowski(Vector4 pt, Matrix4x4 boost){
+	Vector3 boost_to_minkowski(Vector4 pt, Matrix4x4 boost) {
 		//Applies a Lorentz boost to a (t,x,y,z) point, then converts it into (x,y,t) coordinates for Minkowski diagram rendering
-		Vector4 new_pt = boost*pt;
+		Vector4 new_pt = boost * pt;
 		return new Vector3(new_pt.y, new_pt.z, new_pt.x);
 	}
 
-	Vector3 get_displacement(Vector3 a, float T){
-		return
-		(
-			a
-			*
-			(
-				Mathf.Sqrt(
-					1
-					+
-					Mathf.Pow(T, 2)
-					*
-					a.sqrMagnitude
-				)
-				-
-				1
-			)
-		)
-		/
-		(
-			a.sqrMagnitude
-		);
-	}
-
-	float get_observer_time(Vector3 a, Vector3 cV, Matrix4x4 object_to_coordinate_boost, Vector4 current_event_coordinate, float MCRFTime){
-		float ax = a.x;
-		float ay = a.y;
-		float az = a.z;
-		float currCoordX = get_spatial_component(current_event_coordinate).x;
-		float currCoordY = get_spatial_component(current_event_coordinate).y;
-		float currCoordZ = get_spatial_component(current_event_coordinate).z;
-		float currCoordT = get_temporal_component(current_event_coordinate);
-		float cVx = cV.x;
-		float cVy = cV.y;
-		float cVz = cV.z;
-		float B11 = object_to_coordinate_boost[0,0];
-		float B12 = object_to_coordinate_boost[0,1];
-		float B13 = object_to_coordinate_boost[0,2];
-		float B14 = object_to_coordinate_boost[0,3];
-		float B21 = object_to_coordinate_boost[1,0];
-		float B22 = object_to_coordinate_boost[1,1];
-		float B23 = object_to_coordinate_boost[1,2];
-		float B24 = object_to_coordinate_boost[1,3];
-		float B31 = object_to_coordinate_boost[2,0];
-		float B32 = object_to_coordinate_boost[2,1];
-		float B33 = object_to_coordinate_boost[2,2];
-		float B34 = object_to_coordinate_boost[2,3];
-		float B41 = object_to_coordinate_boost[3,0];
-		float B42 = object_to_coordinate_boost[3,1];
-		float B43 = object_to_coordinate_boost[3,2];
-		float B44 = object_to_coordinate_boost[3,3];
-		
-		return
-		(1/((Mathf.Pow(ax, 2) + Mathf.Pow(ay, 2) + Mathf.Pow(az, 2))*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))))*((-az)*B14 + Mathf.Pow(ax, 2)*(currCoordT - currCoordX*cVx - currCoordY*cVy - currCoordZ*cVz + B11*MCRFTime - (B21*cVx + B31*cVy + B41*cVz)*MCRFTime) + 
-		Mathf.Pow(ay, 2)*(currCoordT - currCoordX*cVx - currCoordY*cVy - currCoordZ*cVz + B11*MCRFTime - (B21*cVx + B31*cVy + B41*cVz)*MCRFTime) + ax*(B12 - B22*cVx - B32*cVy - B42*cVz)*(-1 + Mathf.Sqrt(1 + (Mathf.Pow(ax, 2) + Mathf.Pow(ay, 2) + Mathf.Pow(az, 2))*Mathf.Pow(MCRFTime, 2))) + 
-		ay*(B13 - B23*cVx - B33*cVy - B43*cVz)*(-1 + Mathf.Sqrt(1 + (Mathf.Pow(ax, 2) + Mathf.Pow(ay, 2) + Mathf.Pow(az, 2))*Mathf.Pow(MCRFTime, 2))) + 
-		az*(B24*cVx + B34*cVy + B44*cVz + az*(currCoordT - currCoordX*cVx - currCoordY*cVy - currCoordZ*cVz + B11*MCRFTime - (B21*cVx + B31*cVy + B41*cVz)*MCRFTime) + B14*Mathf.Sqrt(1 + (Mathf.Pow(ax, 2) + Mathf.Pow(ay, 2) + Mathf.Pow(az, 2))*Mathf.Pow(MCRFTime, 2)) - 
-		(B24*cVx + B34*cVy + B44*cVz)*Mathf.Sqrt(1 + (Mathf.Pow(ax, 2) + Mathf.Pow(ay, 2) + Mathf.Pow(az, 2))*Mathf.Pow(MCRFTime, 2))));
-	}
-
-	float get_MCRF_time(Vector3 a, Vector3 coordinate_velocity, Matrix4x4 object_to_coordinate_boost, Vector4 current_event_coordinate, float observer_time){
-		float Q = 0;
-		for (int i=0; i<3; ++i){
-			for (int j=0; j<3; ++j){
-				Q += a[j]*coordinate_velocity[i]*object_to_coordinate_boost[i+1, j+1];
-			}
-		}
-		Vector3 Tr1 = new Vector3(object_to_coordinate_boost[0,1], object_to_coordinate_boost[0,2], object_to_coordinate_boost[0,3]);
-		Vector3 Tc1 = new Vector3(object_to_coordinate_boost[1,0], object_to_coordinate_boost[2,0], object_to_coordinate_boost[3,0]);
-		float cEcV = Vector3.Dot(get_spatial_component(current_event_coordinate), coordinate_velocity);
-		float cVcV = coordinate_velocity.sqrMagnitude;
-		float aTr1 = Vector3.Dot(a, Tr1);
+	float get_MCRF_time(Vector3 a, Vector3 B, float B0, float t) {
 		float aa = a.sqrMagnitude;
-		float cVTc1 = Vector3.Dot(coordinate_velocity, Tc1);
-		float A = Mathf.Sqrt(1-cVcV);
-		float B = Mathf.Pow(cVTc1-object_to_coordinate_boost[0,0], 2);
-		float C = cEcV+observer_time*A;
-		float cT = get_temporal_component(current_event_coordinate);
-		return (Mathf.Sqrt(Mathf.Pow(Q-aTr1,2)*(2*cT*Q-2*Q*(C)+2*aTr1*(-cT+C)+aa*(Mathf.Pow(cT,2)+Mathf.Pow(observer_time,2)+Mathf.Pow(cEcV,2)-2*cEcV*(cT-observer_time*A)-observer_time*(2*cT*A+observer_time*cVcV))+B))-(Q-aTr1+aa*(cT-cEcV-observer_time*A))*(cVTc1-object_to_coordinate_boost[0,0]))/(Mathf.Pow(Q,2)-2*Q*aTr1+Mathf.Pow(aTr1,2)-aa*B);
+		float ab = Vector3.Dot(a, B);
+		float t2 = t * t;
+		float ab2 = ab * ab;
+		float B02 = B0 * B0;
+		float ab3 = ab2 * ab;
+		if (aa == -(ab / t) && ab < 0 && B0 < -Mathf.Sqrt(-2 * ab * t - aa * t2) && t > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) - Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (aa == -(ab / t) && t < 0 && ab > 0 && B0 > Mathf.Sqrt(-2 * ab * t - aa * t2)) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) - Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (aa == -(ab / t) && ab < 0 && B0 > Mathf.Sqrt(-2 * ab * t - aa * t2) && t > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) + Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (aa == -(ab / t) && B0 < -Mathf.Sqrt(-2 * ab * t - aa * t2) && t < 0 && ab > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) + Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (ab == 0 && B0 == 0 && t == 0 && aa > 0) { Debug.Log("Error, no MCRFTime possible."); return 0; }
+		else if (ab == 0 && t == 0 && B0 < 0 && aa > 0) { return 0; }
+		else if (ab == 0 && t == 0 && aa > 0 && B0 > 0) { return 0; }
+		else if (ab == 0 && B0 < 0 && t < 0 && aa > 0) { return t / B0; }
+		else if (ab == 0 && B0 < 0 && aa > 0 && t > 0) { return t / B0; }
+		else if (ab == 0 && t < 0 && aa > 0 && B0 > 0) { return t / B0; }
+		else if (ab == 0 && aa > 0 && B0 > 0 && t > 0) { return t / B0; }
+		else if (B0 == 0 && t == 0 && ab < 0 && aa > 0) { return 0; }
+		else if (B0 == 0 && t == 0 && aa > 0 && ab > 0) { return 0; }
+		else if (B0 == -Mathf.Sqrt((ab2 / aa)) && 0 < aa && aa < -(ab / t) && ab < 0 && t > 0) { return (2 * ab * t + aa * t2) / (2 * ab * B0 + 2 * aa * B0 * t); }
+		else if (B0 == -Mathf.Sqrt((ab2 / aa)) && 0 < aa && aa < -(ab / t) && t < 0 && ab > 0) { return (2 * ab * t + aa * t2) / (2 * ab * B0 + 2 * aa * B0 * t); }
+		else if (B0 == -Mathf.Sqrt((ab2 / aa)) && ab < 0 && t < 0 && aa > 0) { return (2 * ab * t + aa * t2) / (2 * ab * B0 + 2 * aa * B0 * t); }
+		else if (B0 == -Mathf.Sqrt((ab2 / aa)) && aa > 0 && ab > 0 && t > 0) { return (2 * ab * t + aa * t2) / (2 * ab * B0 + 2 * aa * B0 * t); }
+		else if (B0 == Mathf.Sqrt(ab2 / aa) && 0 < aa && aa < -(ab / t) && ab < 0 && t > 0) { return (2 * ab * t + aa * t2) / (2 * ab * B0 + 2 * aa * B0 * t); }
+		else if (B0 == Mathf.Sqrt(ab2 / aa) && 0 < aa && aa < -(ab / t) && t < 0 && ab > 0) { return (2 * ab * t + aa * t2) / (2 * ab * B0 + 2 * aa * B0 * t); }
+		else if (B0 == Mathf.Sqrt(ab2 / aa) && ab < 0 && t < 0 && aa > 0) { return (2 * ab * t + aa * t2) / (2 * ab * B0 + 2 * aa * B0 * t); }
+		else if (B0 == Mathf.Sqrt(ab2 / aa) && aa > 0 && ab > 0 && t > 0) { return (2 * ab * t + aa * t2) / (2 * ab * B0 + 2 * aa * B0 * t); }
+		else if (B0 == -Mathf.Sqrt(-2 * ab * t - aa * t2) && 0 < aa && aa < -(ab / t) && ab < 0 && t > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) - Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (B0 == -Mathf.Sqrt(-2 * ab * t - aa * t2) && 0 < aa && aa < -(ab / t) && t < 0 && ab > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) - Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (B0 == Mathf.Sqrt(-2 * ab * t - aa * t2) && 0 < aa && aa < -(ab / t) && ab < 0 && t > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) - Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (B0 == Mathf.Sqrt(-2 * ab * t - aa * t2) && 0 < aa && aa < -(ab / t) && t < 0 && ab > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) - Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (t == 0 && 0 < B0 && B0 < Mathf.Sqrt(ab2 / aa) && ab < 0 && aa > 0) { return 0; }
+		else if (t == 0 && 0 < B0 && B0 < Mathf.Sqrt(ab2 / aa) && aa > 0 && ab > 0) { return 0; }
+		else if (t == 0 && -Mathf.Sqrt((ab2 / aa)) < B0 && B0 < 0 && ab < 0 && aa > 0) { return 0; }
+		else if (t == 0 && -Mathf.Sqrt((ab2 / aa)) < B0 && B0 < 0 && aa > 0 && ab > 0) { return 0; }
+		else if (t == 0 && ab < 0 && B0 >= Mathf.Sqrt(ab2 / aa) && aa > 0) { return 0; }
+		else if (t == 0 && ab < 0 && aa > 0 && B0 <= -Mathf.Sqrt((ab2 / aa))) { return 0; }
+		else if (t == 0 && B0 >= Mathf.Sqrt(ab2 / aa) && aa > 0 && ab > 0) { return 0; }
+		else if (t == 0 && aa > 0 && ab > 0 && B0 <= -Mathf.Sqrt((ab2 / aa))) { return 0; }
+		else if (t == 0 && 0 < B0 && B0 < Mathf.Sqrt(ab2 / aa) && aa > 0 && ab > 0) { return -Mathf.Sqrt(((ab2 * B02) / Mathf.Pow(ab2 - aa * B02, 2))) - (ab * B0) / (ab2 - aa * B02); }
+		else if (t == 0 && -Mathf.Sqrt((ab2 / aa)) < B0 && B0 < 0 && ab < 0 && aa > 0) { return -Mathf.Sqrt(((ab2 * B02) / Mathf.Pow(ab2 - aa * B02, 2))) - (ab * B0) / (ab2 - aa * B02); }
+		else if (t == 0 && 0 < B0 && B0 < Mathf.Sqrt(ab2 / aa) && ab < 0 && aa > 0) { return Mathf.Sqrt((ab2 * B02) / Mathf.Pow(ab2 - aa * B02, 2)) - (ab * B0) / (ab2 - aa * B02); }
+		else if (t == 0 && -Mathf.Sqrt((ab2 / aa)) < B0 && B0 < 0 && aa > 0 && ab > 0) { return Mathf.Sqrt((ab2 * B02) / Mathf.Pow(ab2 - aa * B02, 2)) - (ab * B0) / (ab2 - aa * B02); }
+		else if (0 < aa && aa < -(ab / t) && -Mathf.Sqrt((ab2 / aa)) < B0 && B0 < -Mathf.Sqrt(-2 * ab * t - aa * t2) && ab < 0 && t > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) - Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (0 < aa && aa < -(ab / t) && -Mathf.Sqrt((ab2 / aa)) < B0 && B0 < -Mathf.Sqrt(-2 * ab * t - aa * t2) && t < 0 && ab > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) - Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (0 < aa && aa < -(ab / t) && Mathf.Sqrt(-2 * ab * t - aa * t2) < B0 && B0 < Mathf.Sqrt(ab2 / aa) && ab < 0 && t > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) - Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (0 < aa && aa < -(ab / t) && Mathf.Sqrt(-2 * ab * t - aa * t2) < B0 && B0 < Mathf.Sqrt(ab2 / aa) && t < 0 && ab > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) - Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (0 < aa && aa < -(ab / t) && ab < 0 && B0 < -Mathf.Sqrt((ab2 / aa)) && t > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) - Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (0 < aa && aa < -(ab / t) && t < 0 && ab > 0 && B0 > Mathf.Sqrt(ab2 / aa)) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) - Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (-Mathf.Sqrt((ab2 / aa)) < B0 && B0 < Mathf.Sqrt(ab2 / aa) && ab < 0 && t < 0 && aa > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) - Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (-Mathf.Sqrt((ab2 / aa)) < B0 && B0 < Mathf.Sqrt(ab2 / aa) && aa > 0 && ab > 0 && t > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) - Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (ab < 0 && B0 < -Mathf.Sqrt((ab2 / aa)) && t < 0 && aa > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) - Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (ab < 0 && B0 < -Mathf.Sqrt((ab2 / aa)) && aa > -(ab / t) && t > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) - Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (t < 0 && aa > -(ab / t) && ab > 0 && B0 > Mathf.Sqrt(ab2 / aa)) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) - Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (aa > 0 && ab > 0 && B0 > Mathf.Sqrt(ab2 / aa) && t > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) - Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (0 < aa && aa < -(ab / t) && -Mathf.Sqrt((ab2 / aa)) < B0 && B0 < -Mathf.Sqrt(-2 * ab * t - aa * t2) && ab < 0 && t > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) + Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (0 < aa && aa < -(ab / t) && -Mathf.Sqrt((ab2 / aa)) < B0 && B0 < -Mathf.Sqrt(-2 * ab * t - aa * t2) && t < 0 && ab > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) + Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (0 < aa && aa < -(ab / t) && Mathf.Sqrt(-2 * ab * t - aa * t2) < B0 && B0 < Mathf.Sqrt(ab2 / aa) && ab < 0 && t > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) + Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (0 < aa && aa < -(ab / t) && Mathf.Sqrt(-2 * ab * t - aa * t2) < B0 && B0 < Mathf.Sqrt(ab2 / aa) && t < 0 && ab > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) + Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (0 < aa && aa < -(ab / t) && ab < 0 && B0 > Mathf.Sqrt(ab2 / aa) && t > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) + Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (0 < aa && aa < -(ab / t) && B0 < -Mathf.Sqrt((ab2 / aa)) && t < 0 && ab > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) + Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (-Mathf.Sqrt((ab2 / aa)) < B0 && B0 < Mathf.Sqrt(ab2 / aa) && ab < 0 && t < 0 && aa > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) + Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (-Mathf.Sqrt((ab2 / aa)) < B0 && B0 < Mathf.Sqrt(ab2 / aa) && aa > 0 && ab > 0 && t > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) + Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (ab < 0 && t < 0 && aa > 0 && B0 > Mathf.Sqrt(ab2 / aa)) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) + Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (ab < 0 && aa > -(ab / t) && B0 > Mathf.Sqrt(ab2 / aa) && t > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) + Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (B0 < -Mathf.Sqrt((ab2 / aa)) && t < 0 && aa > -(ab / t) && ab > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) + Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		else if (B0 < -Mathf.Sqrt((ab2 / aa)) && aa > 0 && ab > 0 && t > 0) { return (-ab * B0 - aa * B0 * t) / (ab2 - aa * B02) + Mathf.Sqrt((ab2 * B02 + 2 * ab3 * t + aa * ab2 * t2) / Mathf.Pow(ab2 - aa * B02, 2)); }
+		Debug.Log("Error: No valid MCRFTime found!");
+		return 0;
 	}
-	float old_get_MCRF_time(Vector3 a, Vector3 coordinate_velocity, Matrix4x4 object_to_coordinate_boost, Vector4 current_event_coordinate, float observer_time){
-		//Inverse of get_observer_time(). Outputted using Mathematica (Sorry!). Inverse has two solutions, check which is valid then return. Again, sorry for this. I feel really bad.
-		//This is actually the ugliest thing I have ever made. So sorry.
-		float currCoordT = get_temporal_component(current_event_coordinate);
-		float currCoordX = get_spatial_component(current_event_coordinate).x;
-		float currCoordY = get_spatial_component(current_event_coordinate).y;
-		float currCoordZ = get_spatial_component(current_event_coordinate).z;
-		float ax = a.x;
-		float ay = a.y;
-		float az = a.z;
-		float cVx = coordinate_velocity.x;
-		float cVy = coordinate_velocity.y;
-		float cVz = coordinate_velocity.z;
-		float B11 = object_to_coordinate_boost[0,0];
-		float B12 = object_to_coordinate_boost[0,1];
-		float B13 = object_to_coordinate_boost[0,2];
-		float B14 = object_to_coordinate_boost[0,3];
-		float B21 = object_to_coordinate_boost[1,0];
-		float B22 = object_to_coordinate_boost[1,1];
-		float B23 = object_to_coordinate_boost[1,2];
-		float B24 = object_to_coordinate_boost[1,3];
-		float B31 = object_to_coordinate_boost[2,0];
-		float B32 = object_to_coordinate_boost[2,1];
-		float B33 = object_to_coordinate_boost[2,2];
-		float B34 = object_to_coordinate_boost[2,3];
-		float B41 = object_to_coordinate_boost[3,0];
-		float B42 = object_to_coordinate_boost[3,1];
-		float B43 = object_to_coordinate_boost[3,2];
-		float B44 = object_to_coordinate_boost[3,3];
-		float t = observer_time;
-		float T1 = (Mathf.Sqrt(Mathf.Pow(ax*(-B12 + B22*cVx + B32*cVy + B42*cVz) + ay*(-B13 + B23*cVx + B33*cVy + B43*cVz) + az*(-B14 + B24*cVx + B34*cVy + B44*cVz), 2)*(Mathf.Pow(B11, 2) - 2*az*B14*currCoordT + Mathf.Pow(az, 2)*Mathf.Pow(currCoordT, 2) + 2*az*B24*currCoordT*cVx + 
-		           2*az*B14*currCoordX*cVx - 2*Mathf.Pow(az, 2)*currCoordT*currCoordX*cVx + Mathf.Pow(B21, 2)*Mathf.Pow(cVx, 2) - 2*az*B24*currCoordX*Mathf.Pow(cVx, 2) + Mathf.Pow(az, 2)*Mathf.Pow(currCoordX, 2)*Mathf.Pow(cVx, 2) + 2*az*B34*currCoordT*cVy + 2*az*B14*currCoordY*cVy - 2*Mathf.Pow(az, 2)*currCoordT*currCoordY*cVy + 
-		           2*B21*B31*cVx*cVy - 2*az*B34*currCoordX*cVx*cVy - 2*az*B24*currCoordY*cVx*cVy + 2*Mathf.Pow(az, 2)*currCoordX*currCoordY*cVx*cVy + Mathf.Pow(B31, 2)*Mathf.Pow(cVy, 2) - 2*az*B34*currCoordY*Mathf.Pow(cVy, 2) + Mathf.Pow(az, 2)*Mathf.Pow(currCoordY, 2)*Mathf.Pow(cVy, 2) + 2*az*B44*currCoordT*cVz + 
-		           2*az*B14*currCoordZ*cVz - 2*Mathf.Pow(az, 2)*currCoordT*currCoordZ*cVz + 2*B21*B41*cVx*cVz - 2*az*B44*currCoordX*cVx*cVz - 2*az*B24*currCoordZ*cVx*cVz + 2*Mathf.Pow(az, 2)*currCoordX*currCoordZ*cVx*cVz + 2*B31*B41*cVy*cVz - 
-		           2*az*B44*currCoordY*cVy*cVz - 2*az*B34*currCoordZ*cVy*cVz + 2*Mathf.Pow(az, 2)*currCoordY*currCoordZ*cVy*cVz + Mathf.Pow(B41, 2)*Mathf.Pow(cVz, 2) - 2*az*B44*currCoordZ*Mathf.Pow(cVz, 2) + Mathf.Pow(az, 2)*Mathf.Pow(currCoordZ, 2)*Mathf.Pow(cVz, 2) - 2*B11*(B21*cVx + B31*cVy + B41*cVz) + 
-		           2*ay*(B13 - B23*cVx - B33*cVy - B43*cVz)*(-currCoordT + currCoordX*cVx + currCoordY*cVy + currCoordZ*cVz) + 2*ay*B13*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 2*az*B14*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 
-		           2*Mathf.Pow(ay, 2)*currCoordT*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 2*Mathf.Pow(az, 2)*currCoordT*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 2*ay*B23*cVx*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 2*az*B24*cVx*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 
-		           2*Mathf.Pow(ay, 2)*currCoordX*cVx*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 2*Mathf.Pow(az, 2)*currCoordX*cVx*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 2*ay*B33*cVy*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 2*az*B34*cVy*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 
-		           2*Mathf.Pow(ay, 2)*currCoordY*cVy*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 2*Mathf.Pow(az, 2)*currCoordY*cVy*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 2*ay*B43*cVz*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 2*az*B44*cVz*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 
-		           2*Mathf.Pow(ay, 2)*currCoordZ*cVz*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 2*Mathf.Pow(az, 2)*currCoordZ*cVz*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + Mathf.Pow(az, 2)*Mathf.Pow(t, 2) - Mathf.Pow(az, 2)*Mathf.Pow(cVx, 2)*Mathf.Pow(t, 2) - Mathf.Pow(az, 2)*Mathf.Pow(cVy, 2)*Mathf.Pow(t, 2) - Mathf.Pow(az, 2)*Mathf.Pow(cVz, 2)*Mathf.Pow(t, 2) + 
-		           2*ax*(B12 - B22*cVx - B32*cVy - B42*cVz)*(-currCoordT + currCoordX*cVx + currCoordY*cVy + currCoordZ*cVz + Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t) + 
-		           Mathf.Pow(ay, 2)*(Mathf.Pow(-currCoordT + currCoordX*cVx + currCoordY*cVy + currCoordZ*cVz, 2) - (-1 + Mathf.Pow(cVx, 2) + Mathf.Pow(cVy, 2) + Mathf.Pow(cVz, 2))*Mathf.Pow(t, 2)) + Mathf.Pow(ax, 2)*(Mathf.Pow(currCoordT, 2) + Mathf.Pow(currCoordX, 2)*Mathf.Pow(cVx, 2) + Mathf.Pow(currCoordY, 2)*Mathf.Pow(cVy, 2) + 2*currCoordY*currCoordZ*cVy*cVz + 
-		           Mathf.Pow(currCoordZ, 2)*Mathf.Pow(cVz, 2) + 2*currCoordY*cVy*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 2*currCoordZ*cVz*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + Mathf.Pow(t, 2) - Mathf.Pow(cVx, 2)*Mathf.Pow(t, 2) - Mathf.Pow(cVy, 2)*Mathf.Pow(t, 2) - Mathf.Pow(cVz, 2)*Mathf.Pow(t, 2) + 
-		           2*currCoordX*cVx*(currCoordY*cVy + currCoordZ*cVz + Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t) - 2*currCoordT*(currCoordX*cVx + currCoordY*cVy + currCoordZ*cVz + Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t)))) + 
-		           (B11 - B21*cVx - B31*cVy - B41*cVz)*(ax*(B12 - B22*cVx - B32*cVy - B42*cVz) + ay*(B13 - B23*cVx - B33*cVy - B43*cVz) + Mathf.Pow(ax, 2)*(-currCoordT + currCoordX*cVx + currCoordY*cVy + currCoordZ*cVz + 
-		           Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t) + Mathf.Pow(ay, 2)*(-currCoordT + currCoordX*cVx + currCoordY*cVy + currCoordZ*cVz + Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t) + 
-		           az*(B14 - B24*cVx - B34*cVy - B44*cVz + az*(-currCoordT + currCoordX*cVx + currCoordY*cVy + currCoordZ*cVz + Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t))))/
-		           (Mathf.Pow(ax, 2)*(B11 - B12 - B21*cVx + B22*cVx - B31*cVy + B32*cVy - B41*cVz + B42*cVz)*(B11 + B12 - (B21 + B22)*cVx - (B31 + B32)*cVy - (B41 + B42)*cVz) + 
-		           Mathf.Pow(ay, 2)*(B11 - B13 - B21*cVx + B23*cVx - B31*cVy + B33*cVy - B41*cVz + B43*cVz)*(B11 + B13 - (B21 + B23)*cVx - (B31 + B33)*cVy - (B41 + B43)*cVz) + 
-		           2*ay*az*(B13 - B23*cVx - B33*cVy - B43*cVz)*(-B14 + B24*cVx + B34*cVy + B44*cVz) + Mathf.Pow(az, 2)*(B11 - B14 - B21*cVx + B24*cVx - B31*cVy + B34*cVy - B41*cVz + B44*cVz)*
-		           (B11 + B14 - (B21 + B24)*cVx - (B31 + B34)*cVy - (B41 + B44)*cVz) + 2*ax*(B12 - B22*cVx - B32*cVy - B42*cVz)*(ay*(-B13 + B23*cVx + B33*cVy + B43*cVz) + az*(-B14 + B24*cVx + B34*cVy + B44*cVz)));
-		float T2 = (-Mathf.Sqrt(Mathf.Pow(ax*(-B12 + B22*cVx + B32*cVy + B42*cVz) + ay*(-B13 + B23*cVx + B33*cVy + B43*cVz) + az*(-B14 + B24*cVx + B34*cVy + B44*cVz), 2)*(Mathf.Pow(B11, 2) - 2*az*B14*currCoordT + Mathf.Pow(az, 2)*Mathf.Pow(currCoordT, 2) + 2*az*B24*currCoordT*cVx + 
-		           2*az*B14*currCoordX*cVx - 2*Mathf.Pow(az, 2)*currCoordT*currCoordX*cVx + Mathf.Pow(B21, 2)*Mathf.Pow(cVx, 2) - 2*az*B24*currCoordX*Mathf.Pow(cVx, 2) + Mathf.Pow(az, 2)*Mathf.Pow(currCoordX, 2)*Mathf.Pow(cVx, 2) + 2*az*B34*currCoordT*cVy + 2*az*B14*currCoordY*cVy - 2*Mathf.Pow(az, 2)*currCoordT*currCoordY*cVy + 
-		           2*B21*B31*cVx*cVy - 2*az*B34*currCoordX*cVx*cVy - 2*az*B24*currCoordY*cVx*cVy + 2*Mathf.Pow(az, 2)*currCoordX*currCoordY*cVx*cVy + Mathf.Pow(B31, 2)*Mathf.Pow(cVy, 2) - 2*az*B34*currCoordY*Mathf.Pow(cVy, 2) + Mathf.Pow(az, 2)*Mathf.Pow(currCoordY, 2)*Mathf.Pow(cVy, 2) + 2*az*B44*currCoordT*cVz + 
-		           2*az*B14*currCoordZ*cVz - 2*Mathf.Pow(az, 2)*currCoordT*currCoordZ*cVz + 2*B21*B41*cVx*cVz - 2*az*B44*currCoordX*cVx*cVz - 2*az*B24*currCoordZ*cVx*cVz + 2*Mathf.Pow(az, 2)*currCoordX*currCoordZ*cVx*cVz + 2*B31*B41*cVy*cVz - 
-		           2*az*B44*currCoordY*cVy*cVz - 2*az*B34*currCoordZ*cVy*cVz + 2*Mathf.Pow(az, 2)*currCoordY*currCoordZ*cVy*cVz + Mathf.Pow(B41, 2)*Mathf.Pow(cVz, 2) - 2*az*B44*currCoordZ*Mathf.Pow(cVz, 2) + Mathf.Pow(az, 2)*Mathf.Pow(currCoordZ, 2)*Mathf.Pow(cVz, 2) - 2*B11*(B21*cVx + B31*cVy + B41*cVz) + 
-		           2*ay*(B13 - B23*cVx - B33*cVy - B43*cVz)*(-currCoordT + currCoordX*cVx + currCoordY*cVy + currCoordZ*cVz) + 2*ay*B13*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 2*az*B14*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 
-		           2*Mathf.Pow(ay, 2)*currCoordT*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 2*Mathf.Pow(az, 2)*currCoordT*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 2*ay*B23*cVx*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 2*az*B24*cVx*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 
-		           2*Mathf.Pow(ay, 2)*currCoordX*cVx*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 2*Mathf.Pow(az, 2)*currCoordX*cVx*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 2*ay*B33*cVy*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 2*az*B34*cVy*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 
-		           2*Mathf.Pow(ay, 2)*currCoordY*cVy*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 2*Mathf.Pow(az, 2)*currCoordY*cVy*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 2*ay*B43*cVz*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 2*az*B44*cVz*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 
-		           2*Mathf.Pow(ay, 2)*currCoordZ*cVz*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 2*Mathf.Pow(az, 2)*currCoordZ*cVz*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + Mathf.Pow(az, 2)*Mathf.Pow(t, 2) - Mathf.Pow(az, 2)*Mathf.Pow(cVx, 2)*Mathf.Pow(t, 2) - Mathf.Pow(az, 2)*Mathf.Pow(cVy, 2)*Mathf.Pow(t, 2) - Mathf.Pow(az, 2)*Mathf.Pow(cVz, 2)*Mathf.Pow(t, 2) + 
-		           2*ax*(B12 - B22*cVx - B32*cVy - B42*cVz)*(-currCoordT + currCoordX*cVx + currCoordY*cVy + currCoordZ*cVz + Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t) + 
-		           Mathf.Pow(ay, 2)*(Mathf.Pow(-currCoordT + currCoordX*cVx + currCoordY*cVy + currCoordZ*cVz, 2) - (-1 + Mathf.Pow(cVx, 2) + Mathf.Pow(cVy, 2) + Mathf.Pow(cVz, 2))*Mathf.Pow(t, 2)) + Mathf.Pow(ax, 2)*(Mathf.Pow(currCoordT, 2) + Mathf.Pow(currCoordX, 2)*Mathf.Pow(cVx, 2) + Mathf.Pow(currCoordY, 2)*Mathf.Pow(cVy, 2) + 2*currCoordY*currCoordZ*cVy*cVz + 
-		           Mathf.Pow(currCoordZ, 2)*Mathf.Pow(cVz, 2) + 2*currCoordY*cVy*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 2*currCoordZ*cVz*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + Mathf.Pow(t, 2) - Mathf.Pow(cVx, 2)*Mathf.Pow(t, 2) - Mathf.Pow(cVy, 2)*Mathf.Pow(t, 2) - Mathf.Pow(cVz, 2)*Mathf.Pow(t, 2) + 
-		           2*currCoordX*cVx*(currCoordY*cVy + currCoordZ*cVz + Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t) - 2*currCoordT*(currCoordX*cVx + currCoordY*cVy + currCoordZ*cVz + Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t)))) + 
-		           (B11 - B21*cVx - B31*cVy - B41*cVz)*(ax*(B12 - B22*cVx - B32*cVy - B42*cVz) + ay*(B13 - B23*cVx - B33*cVy - B43*cVz) + Mathf.Pow(ax, 2)*(-currCoordT + currCoordX*cVx + currCoordY*cVy + currCoordZ*cVz + 
-		           Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t) + Mathf.Pow(ay, 2)*(-currCoordT + currCoordX*cVx + currCoordY*cVy + currCoordZ*cVz + Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t) + 
-		           az*(B14 - B24*cVx - B34*cVy - B44*cVz + az*(-currCoordT + currCoordX*cVx + currCoordY*cVy + currCoordZ*cVz + Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t))))/
-		           (Mathf.Pow(ax, 2)*(B11 - B12 - B21*cVx + B22*cVx - B31*cVy + B32*cVy - B41*cVz + B42*cVz)*(B11 + B12 - (B21 + B22)*cVx - (B31 + B32)*cVy - (B41 + B42)*cVz) + 
-		           Mathf.Pow(ay, 2)*(B11 - B13 - B21*cVx + B23*cVx - B31*cVy + B33*cVy - B41*cVz + B43*cVz)*(B11 + B13 - (B21 + B23)*cVx - (B31 + B33)*cVy - (B41 + B43)*cVz) + 
-		           2*ay*az*(B13 - B23*cVx - B33*cVy - B43*cVz)*(-B14 + B24*cVx + B34*cVy + B44*cVz) + Mathf.Pow(az, 2)*(B11 - B14 - B21*cVx + B24*cVx - B31*cVy + B34*cVy - B41*cVz + B44*cVz)*
-		           (B11 + B14 - (B21 + B24)*cVx - (B31 + B34)*cVy - (B41 + B44)*cVz) + 2*ax*(B12 - B22*cVx - B32*cVy - B42*cVz)*(ay*(-B13 + B23*cVx + B33*cVy + B43*cVz) + az*(-B14 + B24*cVx + B34*cVy + B44*cVz)));
-		/*
-		float T1 = (az*B11*B14 - Mathf.Pow(az, 2)*B11*currCoordT - az*B14*B21*cVx - az*B11*B24*cVx + Mathf.Pow(az, 2)*B21*currCoordT*cVx + Mathf.Pow(az, 2)*B11*currCoordX*cVx + az*B21*B24*Mathf.Pow(cVx, 2) - Mathf.Pow(az, 2)*B21*currCoordX*Mathf.Pow(cVx, 2) - az*B14*B31*cVy - az*B11*B34*cVy + 
-		           Mathf.Pow(az, 2)*B31*currCoordT*cVy + Mathf.Pow(az, 2)*B11*currCoordY*cVy + az*B24*B31*cVx*cVy + az*B21*B34*cVx*cVy - Mathf.Pow(az, 2)*B31*currCoordX*cVx*cVy - Mathf.Pow(az, 2)*B21*currCoordY*cVx*cVy + az*B31*B34*Mathf.Pow(cVy, 2) - Mathf.Pow(az, 2)*B31*currCoordY*Mathf.Pow(cVy, 2) - az*B14*B41*cVz - 
-		           az*B11*B44*cVz + Mathf.Pow(az, 2)*B41*currCoordT*cVz + Mathf.Pow(az, 2)*B11*currCoordZ*cVz + az*B24*B41*cVx*cVz + az*B21*B44*cVx*cVz - Mathf.Pow(az, 2)*B41*currCoordX*cVx*cVz - Mathf.Pow(az, 2)*B21*currCoordZ*cVx*cVz + az*B34*B41*cVy*cVz + az*B31*B44*cVy*cVz - 
-		           Mathf.Pow(az, 2)*B41*currCoordY*cVy*cVz - Mathf.Pow(az, 2)*B31*currCoordZ*cVy*cVz + az*B41*B44*Mathf.Pow(cVz, 2) - Mathf.Pow(az, 2)*B41*currCoordZ*Mathf.Pow(cVz, 2) - ax*(B11 - B21*cVx - B31*cVy - B41*cVz)*(-B12 + B22*cVx + B32*cVy + B42*cVz) - 
-		           ay*(B11 - B21*cVx - B31*cVy - B41*cVz)*(-B13 + B23*cVx + B33*cVy + B43*cVz) + Mathf.Pow(az, 2)*B11*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - Mathf.Pow(az, 2)*B21*cVx*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - Mathf.Pow(az, 2)*B31*cVy*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 
-		           Mathf.Pow(az, 2)*B41*cVz*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + Mathf.Pow(ax, 2)*(B11 - B21*cVx - B31*cVy - B41*cVz)*(-currCoordT + currCoordX*cVx + currCoordY*cVy + currCoordZ*cVz + Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t) + 
-		           Mathf.Pow(ay, 2)*(B11 - B21*cVx - B31*cVy - B41*cVz)*(-currCoordT + currCoordX*cVx + currCoordY*cVy + currCoordZ*cVz + Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t) + 
-		           Mathf.Sqrt(Mathf.Pow(ax*(-B12 + B22*cVx + B32*cVy + B42*cVz) + ay*(-B13 + B23*cVx + B33*cVy + B43*cVz) + az*(-B14 + B24*cVx + B34*cVy + B44*cVz), 2)*(Mathf.Pow(B11, 2) - 2*ay*B13*currCoordT - 2*az*B14*currCoordT + Mathf.Pow(ay, 2)*Mathf.Pow(currCoordT, 2) + 
-		           Mathf.Pow(az, 2)*Mathf.Pow(currCoordT, 2) + 2*ay*B23*currCoordT*cVx + 2*az*B24*currCoordT*cVx + 2*ay*B13*currCoordX*cVx + 2*az*B14*currCoordX*cVx - 2*Mathf.Pow(ay, 2)*currCoordT*currCoordX*cVx - 2*Mathf.Pow(az, 2)*currCoordT*currCoordX*cVx + Mathf.Pow(B21, 2)*Mathf.Pow(cVx, 2) - 
-		           2*ay*B23*currCoordX*Mathf.Pow(cVx, 2) - 2*az*B24*currCoordX*Mathf.Pow(cVx, 2) + Mathf.Pow(ay, 2)*Mathf.Pow(currCoordX, 2)*Mathf.Pow(cVx, 2) + Mathf.Pow(az, 2)*Mathf.Pow(currCoordX, 2)*Mathf.Pow(cVx, 2) + 2*ay*B33*currCoordT*cVy + 2*az*B34*currCoordT*cVy + 2*ay*B13*currCoordY*cVy + 2*az*B14*currCoordY*cVy - 
-		           2*Mathf.Pow(ay, 2)*currCoordT*currCoordY*cVy - 2*Mathf.Pow(az, 2)*currCoordT*currCoordY*cVy + 2*B21*B31*cVx*cVy - 2*ay*B33*currCoordX*cVx*cVy - 2*az*B34*currCoordX*cVx*cVy - 2*ay*B23*currCoordY*cVx*cVy - 2*az*B24*currCoordY*cVx*cVy + 
-		           2*Mathf.Pow(ay, 2)*currCoordX*currCoordY*cVx*cVy + 2*Mathf.Pow(az, 2)*currCoordX*currCoordY*cVx*cVy + Mathf.Pow(B31, 2)*Mathf.Pow(cVy, 2) - 2*ay*B33*currCoordY*Mathf.Pow(cVy, 2) - 2*az*B34*currCoordY*Mathf.Pow(cVy, 2) + Mathf.Pow(ay, 2)*Mathf.Pow(currCoordY, 2)*Mathf.Pow(cVy, 2) + Mathf.Pow(az, 2)*Mathf.Pow(currCoordY, 2)*Mathf.Pow(cVy, 2) + 
-		           2*ay*B43*currCoordT*cVz + 2*az*B44*currCoordT*cVz + 2*ay*B13*currCoordZ*cVz + 2*az*B14*currCoordZ*cVz - 2*Mathf.Pow(ay, 2)*currCoordT*currCoordZ*cVz - 2*Mathf.Pow(az, 2)*currCoordT*currCoordZ*cVz + 2*B21*B41*cVx*cVz - 
-		           2*ay*B43*currCoordX*cVx*cVz - 2*az*B44*currCoordX*cVx*cVz - 2*ay*B23*currCoordZ*cVx*cVz - 2*az*B24*currCoordZ*cVx*cVz + 2*Mathf.Pow(ay, 2)*currCoordX*currCoordZ*cVx*cVz + 2*Mathf.Pow(az, 2)*currCoordX*currCoordZ*cVx*cVz + 2*B31*B41*cVy*cVz - 
-		           2*ay*B43*currCoordY*cVy*cVz - 2*az*B44*currCoordY*cVy*cVz - 2*ay*B33*currCoordZ*cVy*cVz - 2*az*B34*currCoordZ*cVy*cVz + 2*Mathf.Pow(ay, 2)*currCoordY*currCoordZ*cVy*cVz + 2*Mathf.Pow(az, 2)*currCoordY*currCoordZ*cVy*cVz + Mathf.Pow(B41, 2)*Mathf.Pow(cVz, 2) - 
-		           2*ay*B43*currCoordZ*Mathf.Pow(cVz, 2) - 2*az*B44*currCoordZ*Mathf.Pow(cVz, 2) + Mathf.Pow(ay, 2)*Mathf.Pow(currCoordZ, 2)*Mathf.Pow(cVz, 2) + Mathf.Pow(az, 2)*Mathf.Pow(currCoordZ, 2)*Mathf.Pow(cVz, 2) - 2*B11*(B21*cVx + B31*cVy + B41*cVz) + 2*ay*B13*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 
-		           2*az*B14*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 2*Mathf.Pow(ay, 2)*currCoordT*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 2*Mathf.Pow(az, 2)*currCoordT*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 2*ay*B23*cVx*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 
-		           2*az*B24*cVx*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 2*Mathf.Pow(ay, 2)*currCoordX*cVx*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 2*Mathf.Pow(az, 2)*currCoordX*cVx*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 2*ay*B33*cVy*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 
-		           2*az*B34*cVy*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 2*Mathf.Pow(ay, 2)*currCoordY*cVy*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 2*Mathf.Pow(az, 2)*currCoordY*cVy*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 2*ay*B43*cVz*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 
-		           2*az*B44*cVz*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 2*Mathf.Pow(ay, 2)*currCoordZ*cVz*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 2*Mathf.Pow(az, 2)*currCoordZ*cVz*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + Mathf.Pow(ay, 2)*Mathf.Pow(t, 2) + Mathf.Pow(az, 2)*Mathf.Pow(t, 2) - Mathf.Pow(ay, 2)*Mathf.Pow(cVx, 2)*Mathf.Pow(t, 2) - 
-		           Mathf.Pow(az, 2)*Mathf.Pow(cVx, 2)*Mathf.Pow(t, 2) - Mathf.Pow(ay, 2)*Mathf.Pow(cVy, 2)*Mathf.Pow(t, 2) - Mathf.Pow(az, 2)*Mathf.Pow(cVy, 2)*Mathf.Pow(t, 2) - Mathf.Pow(ay, 2)*Mathf.Pow(cVz, 2)*Mathf.Pow(t, 2) - Mathf.Pow(az, 2)*Mathf.Pow(cVz, 2)*Mathf.Pow(t, 2) + 2*ax*(B12 - B22*cVx - B32*cVy - B42*cVz)*(-currCoordT + currCoordX*cVx + currCoordY*cVy + currCoordZ*cVz + 
-		           Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t) + Mathf.Pow(ax, 2)*(Mathf.Pow(currCoordT, 2) + Mathf.Pow(currCoordX, 2)*Mathf.Pow(cVx, 2) + Mathf.Pow(currCoordY, 2)*Mathf.Pow(cVy, 2) + 2*currCoordY*currCoordZ*cVy*cVz + Mathf.Pow(currCoordZ, 2)*Mathf.Pow(cVz, 2) + 2*currCoordY*cVy*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 
-		           2*currCoordZ*cVz*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + Mathf.Pow(t, 2) - Mathf.Pow(cVx, 2)*Mathf.Pow(t, 2) - Mathf.Pow(cVy, 2)*Mathf.Pow(t, 2) - Mathf.Pow(cVz, 2)*Mathf.Pow(t, 2) + 2*currCoordX*cVx*(currCoordY*cVy + currCoordZ*cVz + Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t) - 
-		           2*currCoordT*(currCoordX*cVx + currCoordY*cVy + currCoordZ*cVz + Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t)))))/(2*ay*az*(B13 - B23*cVx - B33*cVy - B43*cVz)*(-B14 + B24*cVx + B34*cVy + B44*cVz) + 
-		           Mathf.Pow(ax, 2)*(Mathf.Pow(B11, 2) - Mathf.Pow(B12, 2) + Mathf.Pow(B21, 2)*Mathf.Pow(cVx, 2) - Mathf.Pow(B22, 2)*Mathf.Pow(cVx, 2) + 2*B21*B31*cVx*cVy - 2*B22*B32*cVx*cVy + Mathf.Pow(B31, 2)*Mathf.Pow(cVy, 2) - Mathf.Pow(B32, 2)*Mathf.Pow(cVy, 2) + 2*B21*B41*cVx*cVz - 2*B22*B42*cVx*cVz + 2*B31*B41*cVy*cVz - 2*B32*B42*cVy*cVz + Mathf.Pow(B41, 2)*Mathf.Pow(cVz, 2) - 
-		           Mathf.Pow(B42, 2)*Mathf.Pow(cVz, 2) - 2*B11*(B21*cVx + B31*cVy + B41*cVz) + 2*B12*(B22*cVx + B32*cVy + B42*cVz)) + Mathf.Pow(ay, 2)*(Mathf.Pow(B11, 2) - Mathf.Pow(B13, 2) + Mathf.Pow(B21, 2)*Mathf.Pow(cVx, 2) - Mathf.Pow(B23, 2)*Mathf.Pow(cVx, 2) + 2*B21*B31*cVx*cVy - 2*B23*B33*cVx*cVy + Mathf.Pow(B31, 2)*Mathf.Pow(cVy, 2) - Mathf.Pow(B33, 2)*Mathf.Pow(cVy, 2) + 
-		           2*B21*B41*cVx*cVz - 2*B23*B43*cVx*cVz + 2*B31*B41*cVy*cVz - 2*B33*B43*cVy*cVz + Mathf.Pow(B41, 2)*Mathf.Pow(cVz, 2) - Mathf.Pow(B43, 2)*Mathf.Pow(cVz, 2) - 2*B11*(B21*cVx + B31*cVy + B41*cVz) + 2*B13*(B23*cVx + B33*cVy + B43*cVz)) + 
-		           Mathf.Pow(az, 2)*(Mathf.Pow(B11, 2) - Mathf.Pow(B14, 2) + Mathf.Pow(B21, 2)*Mathf.Pow(cVx, 2) - Mathf.Pow(B24, 2)*Mathf.Pow(cVx, 2) + 2*B21*B31*cVx*cVy - 2*B24*B34*cVx*cVy + Mathf.Pow(B31, 2)*Mathf.Pow(cVy, 2) - Mathf.Pow(B34, 2)*Mathf.Pow(cVy, 2) + 2*B21*B41*cVx*cVz - 2*B24*B44*cVx*cVz + 2*B31*B41*cVy*cVz - 2*B34*B44*cVy*cVz + Mathf.Pow(B41, 2)*Mathf.Pow(cVz, 2) - 
-		           Mathf.Pow(B44, 2)*Mathf.Pow(cVz, 2) - 2*B11*(B21*cVx + B31*cVy + B41*cVz) + 2*B14*(B24*cVx + B34*cVy + B44*cVz)) + 2*ax*(B12 - B22*cVx - B32*cVy - B42*cVz)*(ay*(-B13 + B23*cVx + B33*cVy + B43*cVz) + az*(-B14 + B24*cVx + B34*cVy + B44*cVz)));
 
-		float T2 = 	((-az)*B11*B14 + Mathf.Pow(az, 2)*B11*currCoordT + az*B14*B21*cVx + az*B11*B24*cVx - Mathf.Pow(az, 2)*B21*currCoordT*cVx - Mathf.Pow(az, 2)*B11*currCoordX*cVx - az*B21*B24*Mathf.Pow(cVx, 2) + Mathf.Pow(az, 2)*B21*currCoordX*Mathf.Pow(cVx, 2) + az*B14*B31*cVy + az*B11*B34*cVy - 
-		           Mathf.Pow(az, 2)*B31*currCoordT*cVy - Mathf.Pow(az, 2)*B11*currCoordY*cVy - az*B24*B31*cVx*cVy - az*B21*B34*cVx*cVy + Mathf.Pow(az, 2)*B31*currCoordX*cVx*cVy + Mathf.Pow(az, 2)*B21*currCoordY*cVx*cVy - az*B31*B34*Mathf.Pow(cVy, 2) + Mathf.Pow(az, 2)*B31*currCoordY*Mathf.Pow(cVy, 2) + az*B14*B41*cVz + 
-		           az*B11*B44*cVz - Mathf.Pow(az, 2)*B41*currCoordT*cVz - Mathf.Pow(az, 2)*B11*currCoordZ*cVz - az*B24*B41*cVx*cVz - az*B21*B44*cVx*cVz + Mathf.Pow(az, 2)*B41*currCoordX*cVx*cVz + Mathf.Pow(az, 2)*B21*currCoordZ*cVx*cVz - az*B34*B41*cVy*cVz - az*B31*B44*cVy*cVz + 
-		           Mathf.Pow(az, 2)*B41*currCoordY*cVy*cVz + Mathf.Pow(az, 2)*B31*currCoordZ*cVy*cVz - az*B41*B44*Mathf.Pow(cVz, 2) + Mathf.Pow(az, 2)*B41*currCoordZ*Mathf.Pow(cVz, 2) + ax*(B11 - B21*cVx - B31*cVy - B41*cVz)*(-B12 + B22*cVx + B32*cVy + B42*cVz) + 
-		           ay*(B11 - B21*cVx - B31*cVy - B41*cVz)*(-B13 + B23*cVx + B33*cVy + B43*cVz) - Mathf.Pow(az, 2)*B11*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + Mathf.Pow(az, 2)*B21*cVx*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 
-		           Mathf.Pow(az, 2)*B31*cVy*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + Mathf.Pow(az, 2)*B41*cVz*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - Mathf.Pow(ax, 2)*(B11 - B21*cVx - B31*cVy - B41*cVz)*(-currCoordT + currCoordX*cVx + currCoordY*cVy + currCoordZ*cVz + 
-		           Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t) - Mathf.Pow(ay, 2)*(B11 - B21*cVx - B31*cVy - B41*cVz)*(-currCoordT + currCoordX*cVx + currCoordY*cVy + currCoordZ*cVz + Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t) + 
-		           Mathf.Sqrt(Mathf.Pow(ax*(-B12 + B22*cVx + B32*cVy + B42*cVz) + ay*(-B13 + B23*cVx + B33*cVy + B43*cVz) + az*(-B14 + B24*cVx + B34*cVy + B44*cVz), 2)*(Mathf.Pow(B11, 2) - 2*ay*B13*currCoordT - 2*az*B14*currCoordT + Mathf.Pow(ay, 2)*Mathf.Pow(currCoordT, 2) + 
-		           Mathf.Pow(az, 2)*Mathf.Pow(currCoordT, 2) + 2*ay*B23*currCoordT*cVx + 2*az*B24*currCoordT*cVx + 2*ay*B13*currCoordX*cVx + 2*az*B14*currCoordX*cVx - 2*Mathf.Pow(ay, 2)*currCoordT*currCoordX*cVx - 2*Mathf.Pow(az, 2)*currCoordT*currCoordX*cVx + Mathf.Pow(B21, 2)*Mathf.Pow(cVx, 2) - 
-		           2*ay*B23*currCoordX*Mathf.Pow(cVx, 2) - 2*az*B24*currCoordX*Mathf.Pow(cVx, 2) + Mathf.Pow(ay, 2)*Mathf.Pow(currCoordX, 2)*Mathf.Pow(cVx, 2) + Mathf.Pow(az, 2)*Mathf.Pow(currCoordX, 2)*Mathf.Pow(cVx, 2) + 2*ay*B33*currCoordT*cVy + 2*az*B34*currCoordT*cVy + 2*ay*B13*currCoordY*cVy + 2*az*B14*currCoordY*cVy - 
-		           2*Mathf.Pow(ay, 2)*currCoordT*currCoordY*cVy - 2*Mathf.Pow(az, 2)*currCoordT*currCoordY*cVy + 2*B21*B31*cVx*cVy - 2*ay*B33*currCoordX*cVx*cVy - 2*az*B34*currCoordX*cVx*cVy - 2*ay*B23*currCoordY*cVx*cVy - 2*az*B24*currCoordY*cVx*cVy + 
-		           2*Mathf.Pow(ay, 2)*currCoordX*currCoordY*cVx*cVy + 2*Mathf.Pow(az, 2)*currCoordX*currCoordY*cVx*cVy + Mathf.Pow(B31, 2)*Mathf.Pow(cVy, 2) - 2*ay*B33*currCoordY*Mathf.Pow(cVy, 2) - 2*az*B34*currCoordY*Mathf.Pow(cVy, 2) + Mathf.Pow(ay, 2)*Mathf.Pow(currCoordY, 2)*Mathf.Pow(cVy, 2) + Mathf.Pow(az, 2)*Mathf.Pow(currCoordY, 2)*Mathf.Pow(cVy, 2) + 
-		           2*ay*B43*currCoordT*cVz + 2*az*B44*currCoordT*cVz + 2*ay*B13*currCoordZ*cVz + 2*az*B14*currCoordZ*cVz - 2*Mathf.Pow(ay, 2)*currCoordT*currCoordZ*cVz - 2*Mathf.Pow(az, 2)*currCoordT*currCoordZ*cVz + 2*B21*B41*cVx*cVz - 
-		           2*ay*B43*currCoordX*cVx*cVz - 2*az*B44*currCoordX*cVx*cVz - 2*ay*B23*currCoordZ*cVx*cVz - 2*az*B24*currCoordZ*cVx*cVz + 2*Mathf.Pow(ay, 2)*currCoordX*currCoordZ*cVx*cVz + 2*Mathf.Pow(az, 2)*currCoordX*currCoordZ*cVx*cVz + 
-		           2*B31*B41*cVy*cVz - 2*ay*B43*currCoordY*cVy*cVz - 2*az*B44*currCoordY*cVy*cVz - 2*ay*B33*currCoordZ*cVy*cVz - 2*az*B34*currCoordZ*cVy*cVz + 2*Mathf.Pow(ay, 2)*currCoordY*currCoordZ*cVy*cVz + 
-		           2*Mathf.Pow(az, 2)*currCoordY*currCoordZ*cVy*cVz + Mathf.Pow(B41, 2)*Mathf.Pow(cVz, 2) - 2*ay*B43*currCoordZ*Mathf.Pow(cVz, 2) - 2*az*B44*currCoordZ*Mathf.Pow(cVz, 2) + Mathf.Pow(ay, 2)*Mathf.Pow(currCoordZ, 2)*Mathf.Pow(cVz, 2) + Mathf.Pow(az, 2)*Mathf.Pow(currCoordZ, 2)*Mathf.Pow(cVz, 2) - 2*B11*(B21*cVx + B31*cVy + B41*cVz) + 
-		           2*ay*B13*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 2*az*B14*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 2*Mathf.Pow(ay, 2)*currCoordT*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 2*Mathf.Pow(az, 2)*currCoordT*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 
-		           2*ay*B23*cVx*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 2*az*B24*cVx*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 2*Mathf.Pow(ay, 2)*currCoordX*cVx*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 2*Mathf.Pow(az, 2)*currCoordX*cVx*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 
-		           2*ay*B33*cVy*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 2*az*B34*cVy*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 2*Mathf.Pow(ay, 2)*currCoordY*cVy*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 2*Mathf.Pow(az, 2)*currCoordY*cVy*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 
-		           2*ay*B43*cVz*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t - 2*az*B44*cVz*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 2*Mathf.Pow(ay, 2)*currCoordZ*cVz*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 2*Mathf.Pow(az, 2)*currCoordZ*cVz*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 
-		           Mathf.Pow(ay, 2)*Mathf.Pow(t, 2) + Mathf.Pow(az, 2)*Mathf.Pow(t, 2) - Mathf.Pow(ay, 2)*Mathf.Pow(cVx, 2)*Mathf.Pow(t, 2) - Mathf.Pow(az, 2)*Mathf.Pow(cVx, 2)*Mathf.Pow(t, 2) - Mathf.Pow(ay, 2)*Mathf.Pow(cVy, 2)*Mathf.Pow(t, 2) - Mathf.Pow(az, 2)*Mathf.Pow(cVy, 2)*Mathf.Pow(t, 2) - Mathf.Pow(ay, 2)*Mathf.Pow(cVz, 2)*Mathf.Pow(t, 2) - Mathf.Pow(az, 2)*Mathf.Pow(cVz, 2)*Mathf.Pow(t, 2) + 2*ax*(B12 - B22*cVx - B32*cVy - B42*cVz)*
-		           (-currCoordT + currCoordX*cVx + currCoordY*cVy + currCoordZ*cVz + Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t) + Mathf.Pow(ax, 2)*(Mathf.Pow(currCoordT, 2) + Mathf.Pow(currCoordX, 2)*Mathf.Pow(cVx, 2) + Mathf.Pow(currCoordY, 2)*Mathf.Pow(cVy, 2) + 2*currCoordY*currCoordZ*cVy*cVz + 
-		           Mathf.Pow(currCoordZ, 2)*Mathf.Pow(cVz, 2) + 2*currCoordY*cVy*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + 2*currCoordZ*cVz*Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t + Mathf.Pow(t, 2) - Mathf.Pow(cVx, 2)*Mathf.Pow(t, 2) - Mathf.Pow(cVy, 2)*Mathf.Pow(t, 2) - Mathf.Pow(cVz, 2)*Mathf.Pow(t, 2) + 
-		           2*currCoordX*cVx*(currCoordY*cVy + currCoordZ*cVz + Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t) - 2*currCoordT*(currCoordX*cVx + currCoordY*cVy + currCoordZ*cVz + Mathf.Sqrt(1 - Mathf.Pow(cVx, 2) - Mathf.Pow(cVy, 2) - Mathf.Pow(cVz, 2))*t)))))/
-		           (-2*ay*az*(B13 - B23*cVx - B33*cVy - B43*cVz)*(-B14 + B24*cVx + B34*cVy + B44*cVz) + Mathf.Pow(ax, 2)*(-Mathf.Pow(B11, 2) + Mathf.Pow(B12, 2) - Mathf.Pow(B21, 2)*Mathf.Pow(cVx, 2) + Mathf.Pow(B22, 2)*Mathf.Pow(cVx, 2) - 2*B21*B31*cVx*cVy + 2*B22*B32*cVx*cVy - Mathf.Pow(B31, 2)*Mathf.Pow(cVy, 2) + Mathf.Pow(B32, 2)*Mathf.Pow(cVy, 2) - 
-		           2*B21*B41*cVx*cVz + 2*B22*B42*cVx*cVz - 2*B31*B41*cVy*cVz + 2*B32*B42*cVy*cVz - Mathf.Pow(B41, 2)*Mathf.Pow(cVz, 2) + Mathf.Pow(B42, 2)*Mathf.Pow(cVz, 2) + 2*B11*(B21*cVx + B31*cVy + B41*cVz) - 2*B12*(B22*cVx + B32*cVy + B42*cVz)) + 
-		           Mathf.Pow(ay, 2)*(-Mathf.Pow(B11, 2) + Mathf.Pow(B13, 2) - Mathf.Pow(B21, 2)*Mathf.Pow(cVx, 2) + Mathf.Pow(B23, 2)*Mathf.Pow(cVx, 2) - 2*B21*B31*cVx*cVy + 2*B23*B33*cVx*cVy - Mathf.Pow(B31, 2)*Mathf.Pow(cVy, 2) + Mathf.Pow(B33, 2)*Mathf.Pow(cVy, 2) - 2*B21*B41*cVx*cVz + 2*B23*B43*cVx*cVz - 2*B31*B41*cVy*cVz + 2*B33*B43*cVy*cVz - Mathf.Pow(B41, 2)*Mathf.Pow(cVz, 2) + 
-		           Mathf.Pow(B43, 2)*Mathf.Pow(cVz, 2) + 2*B11*(B21*cVx + B31*cVy + B41*cVz) - 2*B13*(B23*cVx + B33*cVy + B43*cVz)) + Mathf.Pow(az, 2)*(-Mathf.Pow(B11, 2) + Mathf.Pow(B14, 2) - Mathf.Pow(B21, 2)*Mathf.Pow(cVx, 2) + Mathf.Pow(B24, 2)*Mathf.Pow(cVx, 2) - 2*B21*B31*cVx*cVy + 2*B24*B34*cVx*cVy - Mathf.Pow(B31, 2)*Mathf.Pow(cVy, 2) + Mathf.Pow(B34, 2)*Mathf.Pow(cVy, 2) - 
-		           2*B21*B41*cVx*cVz + 2*B24*B44*cVx*cVz - 2*B31*B41*cVy*cVz + 2*B34*B44*cVy*cVz - Mathf.Pow(B41, 2)*Mathf.Pow(cVz, 2) + Mathf.Pow(B44, 2)*Mathf.Pow(cVz, 2) + 2*B11*(B21*cVx + B31*cVy + B41*cVz) - 2*B14*(B24*cVx + B34*cVy + B44*cVz)) - 
-		           2*ax*(B12 - B22*cVx - B32*cVy - B42*cVz)*(ay*(-B13 + B23*cVx + B33*cVy + B43*cVz) + az*(-B14 + B24*cVx + B34*cVy + B44*cVz)));
-		*/
-		//As these are inverses of get_observer_time() (each valid under certain circumstances), feed the results back into get_observer_time() to find which is valid under these circumstances.
-		float obs_time1 = get_observer_time(a, coordinate_velocity, object_to_coordinate_boost, current_event_coordinate, T1);
-		float obs_time2 = get_observer_time(a, coordinate_velocity, object_to_coordinate_boost, current_event_coordinate, T2);
-		if (Mathf.Abs(observer_time - obs_time2) > Mathf.Abs(observer_time - obs_time1)){
-			return T1;
-		}else{
-			return T2;
-		}
-	}
 }

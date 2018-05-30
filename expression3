@@ -1,0 +1,271 @@
+else if(B0 == 0 && MCRFTime == 0 && t == 0 && aa != 0 && ab < 0){ }
+else if(B0 == 0 && MCRFTime == 0 && t == 0 && aa != 0 && ab > 0){ }
+else if(B0 == 0 && MCRFTime == Sqrt[t*(t*aa + 2*ab)]/ab && -(ab/t) <= aa && aa < 0 && t < 0 && ab < 0){ }
+else if(B0 == 0 && MCRFTime == Sqrt[t*(t*aa + 2*ab)]/ab && -(ab/t) <= aa && aa < 0 && t > 0 && ab > 0){ }
+else if(B0 == 0 && MCRFTime == Sqrt[t*(t*aa + 2*ab)]/ab && t < 0 && ab < 0 && aa > 0){ }
+else if(B0 == 0 && MCRFTime == Sqrt[t*(t*aa + 2*ab)]/ab && t > 0 && aa > 0 && ab > 0){ }
+else if(B0 == 0 && t == 0 && ab == 0 && MCRFTime + 1/Sqrt[-aa] >= 0 && 1/Sqrt[-aa] >= MCRFTime){ }
+else if(B0 == 0 && t == 0 && ab == 0 && aa > 0){ }
+else if(B0 == 0 && MCRFTime + Sqrt[t*(t*aa + 2*ab)]/ab == 0 && -(ab/t) <= aa && aa < 0 && t < 0 && ab < 0){ }
+else if(B0 == 0 && MCRFTime + Sqrt[t*(t*aa + 2*ab)]/ab == 0 && -(ab/t) <= aa && aa < 0 && t > 0 && ab > 0){ }
+else if(B0 == 0 && MCRFTime + Sqrt[t*(t*aa + 2*ab)]/ab == 0 && t < 0 && ab < 0 && aa > 0){ }
+else if(B0 == 0 && MCRFTime + Sqrt[t*(t*aa + 2*ab)]/ab == 0 && t > 0 && aa > 0 && ab > 0){ }
+else if(B0 != 0 && MCRFTime == 0 && t == 0 && aa != 0 && ab == 0){ }
+else if(MCRFTime == 0 && t == 0 && aa == (ab)^2/B0^2 && B0 < 0 && ab < 0){ }
+else if(MCRFTime == 0 && t == 0 && aa == (ab)^2/B0^2 && B0 < 0 && ab > 0){ }
+else if(MCRFTime == 0 && t == 0 && aa == (ab)^2/B0^2 && ab < 0 && B0 > 0){ }
+else if(MCRFTime == 0 && t == 0 && aa == (ab)^2/B0^2 && B0 > 0 && ab > 0){ }
+else if(MCRFTime == 0 && t == 0 && B0 < 0 && ab < 0 && aa > (ab)^2/B0^2){ }
+else if(MCRFTime == 0 && t == 0 && B0 < 0 && aa > (ab)^2/B0^2 && ab > 0){ }
+else if(MCRFTime == 0 && t == 0 && ab < 0 && B0 > 0 && aa > (ab)^2/B0^2){ }
+else if(MCRFTime == 0 && t == 0 && B0 > 0 && aa > (ab)^2/B0^2 && ab > 0){ }
+else if(MCRFTime == t/B0 && t != 0 && aa != 0 && ab == 0 && B0^2/t^2 + aa >= 0){ }
+else if(MCRFTime == t/B0 && t != 0 && aa != 0 && ab == 0 && aa > 0){ }
+else if(MCRFTime == 1/(B0*(1/t + 1/(t + (2*ab)/aa))) && t == (2*B0^2)/ab && aa == (ab)^2/B0^2 && B0 < 0 && ab > 0){ }
+else if(MCRFTime == 1/(B0*(1/t + 1/(t + (2*ab)/aa))) && t == (2*B0^2)/ab && aa == (ab)^2/B0^2 && B0 > 0 && ab > 0){ }
+else if(MCRFTime == 1/(B0*(1/t + 1/(t + (2*ab)/aa))) && aa == (ab)^2/B0^2 && 2*t + B0^2/ab == 0 && B0 < 0 && ab < 0){ }
+else if(MCRFTime == 1/(B0*(1/t + 1/(t + (2*ab)/aa))) && aa == (ab)^2/B0^2 && 2*t + B0^2/ab == 0 && B0 < 0 && ab > 0){ }
+else if(MCRFTime == 1/(B0*(1/t + 1/(t + (2*ab)/aa))) && aa == (ab)^2/B0^2 && 2*t + B0^2/ab == 0 && ab < 0 && B0 > 0){ }
+else if(MCRFTime == 1/(B0*(1/t + 1/(t + (2*ab)/aa))) && aa == (ab)^2/B0^2 && 2*t + B0^2/ab == 0 && B0 > 0 && ab > 0){ }
+else if(MCRFTime == 1/(B0*(1/t + 1/(t + (2*ab)/aa))) && aa == (ab)^2/B0^2 && B0 < 0 && t < 0 && ab < 0){ }
+else if(MCRFTime == 1/(B0*(1/t + 1/(t + (2*ab)/aa))) && aa == (ab)^2/B0^2 && B0 < 0 && t < 0 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0){ }
+else if(MCRFTime == 1/(B0*(1/t + 1/(t + (2*ab)/aa))) && aa == (ab)^2/B0^2 && B0 < 0 && t < (2*B0^2)/ab && t > 0 && ab > 0){ }
+else if(MCRFTime == 1/(B0*(1/t + 1/(t + (2*ab)/aa))) && aa == (ab)^2/B0^2 && B0 < 0 && t + B0^2/ab < 0 && ab < 0 && ab*(B0^2 + 2*t*ab) > 0){ }
+else if(MCRFTime == 1/(B0*(1/t + 1/(t + (2*ab)/aa))) && aa == (ab)^2/B0^2 && B0 < 0 && 4*t + B0^2/ab >= 0 && ab < 0 && ab*(B0^2 + 2*t*ab) < 0){ }
+else if(MCRFTime == 1/(B0*(1/t + 1/(t + (2*ab)/aa))) && aa == (ab)^2/B0^2 && B0 < 0 && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && t > 0){ }
+else if(MCRFTime == 1/(B0*(1/t + 1/(t + (2*ab)/aa))) && aa == (ab)^2/B0^2 && B0 < 0 && ab < 0 && t <= (2*B0^2)/ab){ }
+else if(MCRFTime == 1/(B0*(1/t + 1/(t + (2*ab)/aa))) && aa == (ab)^2/B0^2 && B0 < 0 && ab*(B0^2 + 2*t*ab) < 0 && t + B0^2/ab > 0 && ab > 0){ }
+else if(MCRFTime == 1/(B0*(1/t + 1/(t + (2*ab)/aa))) && aa == (ab)^2/B0^2 && B0 < 0 && t > (2*B0^2)/ab && ab > 0){ }
+else if(MCRFTime == 1/(B0*(1/t + 1/(t + (2*ab)/aa))) && aa == (ab)^2/B0^2 && B0 < 0 && 4*t + B0^2/ab <= 0 && ab > 0 && ab*(B0^2 + 2*t*ab) > 0){ }
+else if(MCRFTime == 1/(B0*(1/t + 1/(t + (2*ab)/aa))) && aa == (ab)^2/B0^2 && t < 0 && ab < 0 && B0 > 0){ }
+else if(MCRFTime == 1/(B0*(1/t + 1/(t + (2*ab)/aa))) && aa == (ab)^2/B0^2 && t < 0 && B0 > 0 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0){ }
+else if(MCRFTime == 1/(B0*(1/t + 1/(t + (2*ab)/aa))) && aa == (ab)^2/B0^2 && t < (2*B0^2)/ab && B0 > 0 && t > 0 && ab > 0){ }
+else if(MCRFTime == 1/(B0*(1/t + 1/(t + (2*ab)/aa))) && aa == (ab)^2/B0^2 && t + B0^2/ab < 0 && ab < 0 && B0 > 0 && ab*(B0^2 + 2*t*ab) > 0){ }
+else if(MCRFTime == 1/(B0*(1/t + 1/(t + (2*ab)/aa))) && aa == (ab)^2/B0^2 && 4*t + B0^2/ab >= 0 && ab < 0 && ab*(B0^2 + 2*t*ab) < 0 && B0 > 0){ }
+else if(MCRFTime == 1/(B0*(1/t + 1/(t + (2*ab)/aa))) && aa == (ab)^2/B0^2 && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && B0 > 0 && t > 0){ }
+else if(MCRFTime == 1/(B0*(1/t + 1/(t + (2*ab)/aa))) && aa == (ab)^2/B0^2 && ab < 0 && B0 > 0 && t <= (2*B0^2)/ab){ }
+else if(MCRFTime == 1/(B0*(1/t + 1/(t + (2*ab)/aa))) && aa == (ab)^2/B0^2 && ab*(B0^2 + 2*t*ab) < 0 && B0 > 0 && t + B0^2/ab > 0 && ab > 0){ }
+else if(MCRFTime == 1/(B0*(1/t + 1/(t + (2*ab)/aa))) && aa == (ab)^2/B0^2 && B0 > 0 && t > (2*B0^2)/ab && ab > 0){ }
+else if(MCRFTime == 1/(B0*(1/t + 1/(t + (2*ab)/aa))) && aa == (ab)^2/B0^2 && B0 > 0 && 4*t + B0^2/ab <= 0 && ab > 0 && ab*(B0^2 + 2*t*ab) > 0){ }
+else if(t == 0 && B0*ab*(1/(B0^2*aa - (ab)^2) + Sqrt[1/((-B0^2)*aa + (ab)^2)^2]) == MCRFTime && B0 < 0 && aa < 0 && ab < 0){ }
+else if(t == 0 && B0*ab*(1/(B0^2*aa - (ab)^2) + Sqrt[1/((-B0^2)*aa + (ab)^2)^2]) == MCRFTime && B0 < 0 && aa < 0 && ab > 0){ }
+else if(t == 0 && B0*ab*(1/(B0^2*aa - (ab)^2) + Sqrt[1/((-B0^2)*aa + (ab)^2)^2]) == MCRFTime && B0 < 0 && aa < (ab)^2/B0^2 && ab < 0 && aa > 0){ }
+else if(t == 0 && B0*ab*(1/(B0^2*aa - (ab)^2) + Sqrt[1/((-B0^2)*aa + (ab)^2)^2]) == MCRFTime && B0 < 0 && aa < (ab)^2/B0^2 && aa > 0 && ab > 0){ }
+else if(t == 0 && B0*ab*(1/(B0^2*aa - (ab)^2) + Sqrt[1/((-B0^2)*aa + (ab)^2)^2]) == MCRFTime && B0 < 0 && ab < 0 && aa + (ab)^2/B0^2 < 0){ }
+else if(t == 0 && B0*ab*(1/(B0^2*aa - (ab)^2) + Sqrt[1/((-B0^2)*aa + (ab)^2)^2]) == MCRFTime && B0 < 0 && aa + (ab)^2/B0^2 < 0 && ab > 0){ }
+else if(t == 0 && B0*ab*(1/(B0^2*aa - (ab)^2) + Sqrt[1/((-B0^2)*aa + (ab)^2)^2]) == MCRFTime && aa < 0 && ab < 0 && B0 > 0){ }
+else if(t == 0 && B0*ab*(1/(B0^2*aa - (ab)^2) + Sqrt[1/((-B0^2)*aa + (ab)^2)^2]) == MCRFTime && aa < 0 && B0 > 0 && ab > 0){ }
+else if(t == 0 && B0*ab*(1/(B0^2*aa - (ab)^2) + Sqrt[1/((-B0^2)*aa + (ab)^2)^2]) == MCRFTime && aa < (ab)^2/B0^2 && ab < 0 && B0 > 0 && aa > 0){ }
+else if(t == 0 && B0*ab*(1/(B0^2*aa - (ab)^2) + Sqrt[1/((-B0^2)*aa + (ab)^2)^2]) == MCRFTime && aa < (ab)^2/B0^2 && B0 > 0 && aa > 0 && ab > 0){ }
+else if(t == 0 && B0*ab*(1/(B0^2*aa - (ab)^2) + Sqrt[1/((-B0^2)*aa + (ab)^2)^2]) == MCRFTime && ab < 0 && aa + (ab)^2/B0^2 < 0 && B0 > 0){ }
+else if(t == 0 && B0*ab*(1/(B0^2*aa - (ab)^2) + Sqrt[1/((-B0^2)*aa + (ab)^2)^2]) == MCRFTime && aa + (ab)^2/B0^2 < 0 && B0 > 0 && ab > 0){ }
+else if(t == 0 && MCRFTime + B0*ab*(Sqrt[1/((-B0^2)*aa + (ab)^2)^2] + 1/((-B0^2)*aa + (ab)^2)) == 0 && B0 < 0 && aa < 0 && ab < 0 && aa + (ab)^2/B0^2 >= 0){ }
+else if(t == 0 && MCRFTime + B0*ab*(Sqrt[1/((-B0^2)*aa + (ab)^2)^2] + 1/((-B0^2)*aa + (ab)^2)) == 0 && B0 < 0 && aa < 0 && aa + (ab)^2/B0^2 >= 0 && ab > 0){ }
+else if(t == 0 && MCRFTime + B0*ab*(Sqrt[1/((-B0^2)*aa + (ab)^2)^2] + 1/((-B0^2)*aa + (ab)^2)) == 0 && B0 < 0 && aa < (ab)^2/B0^2 && ab < 0 && aa > 0){ }
+else if(t == 0 && MCRFTime + B0*ab*(Sqrt[1/((-B0^2)*aa + (ab)^2)^2] + 1/((-B0^2)*aa + (ab)^2)) == 0 && B0 < 0 && aa < (ab)^2/B0^2 && aa > 0 && ab > 0){ }
+else if(t == 0 && MCRFTime + B0*ab*(Sqrt[1/((-B0^2)*aa + (ab)^2)^2] + 1/((-B0^2)*aa + (ab)^2)) == 0 && aa < 0 && ab < 0 && aa + (ab)^2/B0^2 >= 0 && B0 > 0){ }
+else if(t == 0 && MCRFTime + B0*ab*(Sqrt[1/((-B0^2)*aa + (ab)^2)^2] + 1/((-B0^2)*aa + (ab)^2)) == 0 && aa < 0 && aa + (ab)^2/B0^2 >= 0 && B0 > 0 && ab > 0){ }
+else if(t == 0 && MCRFTime + B0*ab*(Sqrt[1/((-B0^2)*aa + (ab)^2)^2] + 1/((-B0^2)*aa + (ab)^2)) == 0 && aa < (ab)^2/B0^2 && ab < 0 && B0 > 0 && aa > 0){ }
+else if(t == 0 && MCRFTime + B0*ab*(Sqrt[1/((-B0^2)*aa + (ab)^2)^2] + 1/((-B0^2)*aa + (ab)^2)) == 0 && aa < (ab)^2/B0^2 && B0 > 0 && aa > 0 && ab > 0){ }
+else if(t == (2*B0^2)/ab && (B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && B0 < 0 && aa < 0 && ab > 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] <= (B0^2 + 2*t*(t*aa + ab))/t^2){ }
+else if(t == (2*B0^2)/ab && (B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && B0 < 0 && aa < (ab)^2/B0^2 && aa > 0 && ab > 0){ }
+else if(t == (2*B0^2)/ab && (B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && aa < 0 && B0 > 0 && ab > 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] <= (B0^2 + 2*t*(t*aa + ab))/t^2){ }
+else if(t == (2*B0^2)/ab && (B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && aa < (ab)^2/B0^2 && B0 > 0 && aa > 0 && ab > 0){ }
+else if(t == (2*B0^2)/ab && (B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && B0^2/t^2 + 2*aa + (2*ab)/t + B0*Sqrt[(B0^2 + 4*t*ab)/t^4] >= 0 && B0 > 0 && ab > 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] > (B0^2 + 2*t*(t*aa + ab))/t^2){ }
+else if(t == (2*B0^2)/ab && MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && B0 < 0 && aa < 0 && ab < 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] <= (B0^2 + 2*t*(t*aa + ab))/t^2){ }
+else if(t == (2*B0^2)/ab && MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && aa < 0 && ab < 0 && B0 > 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] <= (B0^2 + 2*t*(t*aa + ab))/t^2){ }
+else if(t == (2*B0^2)/ab && MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && aa < (ab)^2/B0^2 && ab < 0 && B0 > 0 && aa > 0){ }
+else if(t == (2*B0^2)/ab && MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && ab < 0 && B0^2/t^2 + 2*aa + (2*ab)/t + B0*Sqrt[(B0^2 + 4*t*ab)/t^4] >= 0 && B0 > 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] > (B0^2 + 2*t*(t*aa + ab))/t^2){ }
+else if(t == (2*B0^2)/ab && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && aa < 0 && ab < 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] <= (B0^2 + 2*t*(t*aa + ab))/t^2){ }
+else if(t == (2*B0^2)/ab && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && aa < 0 && ab > 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] <= (B0^2 + 2*t*(t*aa + ab))/t^2){ }
+else if(t == (2*B0^2)/ab && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && aa < (ab)^2/B0^2 && ab < 0 && aa > 0){ }
+else if(t == (2*B0^2)/ab && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && aa < (ab)^2/B0^2 && aa > 0 && ab > 0){ }
+else if(t == (2*B0^2)/ab && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && ab < 0 && (B0^2 + 2*t*(t*aa + ab))/t^2 >= B0*Sqrt[(B0^2 + 4*t*ab)/t^4] && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] > (B0^2 + 2*t*(t*aa + ab))/t^2){ }
+else if(t == (2*B0^2)/ab && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && (B0^2 + 2*t*(t*aa + ab))/t^2 >= B0*Sqrt[(B0^2 + 4*t*ab)/t^4] && ab > 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] > (B0^2 + 2*t*(t*aa + ab))/t^2){ }
+else if(t == (2*B0^2)/ab && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && aa < 0 && ab < 0 && B0 > 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] <= (B0^2 + 2*t*(t*aa + ab))/t^2){ }
+else if(t == (2*B0^2)/ab && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && aa < 0 && B0 > 0 && ab > 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] <= (B0^2 + 2*t*(t*aa + ab))/t^2){ }
+else if(t == (2*B0^2)/ab && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && aa < (ab)^2/B0^2 && B0 > 0 && aa > 0 && ab > 0){ }
+else if(MCRFTime + Sqrt[-(1/aa)] == 0 && B0*t*Sqrt[(B0^2 + 4*t*ab)/t^4] == B0^2/t + 2*t*aa + 2*ab && B0 < 0 && t > (2*B0^2)/ab && ab > 0){ }
+else if(MCRFTime + Sqrt[-(1/aa)] == 0 && B0*t*Sqrt[(B0^2 + 4*t*ab)/t^4] == B0^2/t + 2*t*aa + 2*ab && t < 0 && B0 > 0 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0){ }
+else if(MCRFTime + Sqrt[-(1/aa)] == 0 && B0*t*Sqrt[(B0^2 + 4*t*ab)/t^4] == B0^2/t + 2*t*aa + 2*ab && t < (2*B0^2)/ab && B0 > 0 && t > 0 && ab > 0){ }
+else if(MCRFTime + Sqrt[-(1/aa)] == 0 && B0*t*Sqrt[(B0^2 + 4*t*ab)/t^4] == B0^2/t + 2*t*aa + 2*ab && B0 > 0 && t > (2*B0^2)/ab && ab > 0){ }
+else if(MCRFTime + Sqrt[-(1/aa)] == 0 && (B0^2 + 2*t*(t*aa + ab) - B0*Sqrt[B0^2 + 4*t*ab])/t == 0 && B0 < 0 && t < (2*B0^2)/ab && t > 0 && ab > 0){ }
+else if(MCRFTime + Sqrt[-(1/aa)] == 0 && (B0^2 + 2*t*(t*aa + ab) - B0*Sqrt[B0^2 + 4*t*ab])/t == 0 && B0 < 0 && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && t > 0){ }
+else if(MCRFTime + Sqrt[-(1/aa)] == 0 && B0^2/t + 2*t*aa + 2*ab + B0*t*Sqrt[(B0^2 + 4*t*ab)/t^4] == 0 && B0 < 0 && t < 0 && ab < 0 && t > (2*B0^2)/ab){ }
+else if(MCRFTime + Sqrt[-(1/aa)] == 0 && B0^2/t + 2*t*aa + 2*ab + B0*t*Sqrt[(B0^2 + 4*t*ab)/t^4] == 0 && B0 < 0 && t < (2*B0^2)/ab && ab < 0){ }
+else if(MCRFTime + Sqrt[-(1/aa)] == 0 && B0^2/t + 2*t*aa + 2*ab + B0*t*Sqrt[(B0^2 + 4*t*ab)/t^4] == 0 && t < 0 && ab < 0 && B0 > 0 && t > (2*B0^2)/ab){ }
+else if(MCRFTime + Sqrt[-(1/aa)] == 0 && B0^2/t + 2*t*aa + 2*ab + B0*t*Sqrt[(B0^2 + 4*t*ab)/t^4] == 0 && t < (2*B0^2)/ab && ab < 0 && B0 > 0){ }
+else if(MCRFTime + Sqrt[-(1/aa)] == 0 && 2*t*aa + 2*ab + (B0*(B0 + Sqrt[B0^2 + 4*t*ab]))/t == 0 && B0 < 0 && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && t > 0){ }
+else if(MCRFTime + Sqrt[-(1/aa)] == 0 && 2*t*aa + 2*ab + (B0*(B0 + Sqrt[B0^2 + 4*t*ab]))/t == 0 && t < 0 && B0 > 0 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0){ }
+else if(Sqrt[-(1/aa)] == MCRFTime && B0*t*Sqrt[(B0^2 + 4*t*ab)/t^4] == B0^2/t + 2*t*aa + 2*ab && B0 < 0 && t < 0 && ab < 0 && t > (2*B0^2)/ab){ }
+else if(Sqrt[-(1/aa)] == MCRFTime && B0*t*Sqrt[(B0^2 + 4*t*ab)/t^4] == B0^2/t + 2*t*aa + 2*ab && B0 < 0 && t < (2*B0^2)/ab && ab < 0){ }
+else if(Sqrt[-(1/aa)] == MCRFTime && B0*t*Sqrt[(B0^2 + 4*t*ab)/t^4] == B0^2/t + 2*t*aa + 2*ab && t < 0 && ab < 0 && B0 > 0 && t > (2*B0^2)/ab){ }
+else if(Sqrt[-(1/aa)] == MCRFTime && B0*t*Sqrt[(B0^2 + 4*t*ab)/t^4] == B0^2/t + 2*t*aa + 2*ab && t < (2*B0^2)/ab && ab < 0 && B0 > 0){ }
+else if(Sqrt[-(1/aa)] == MCRFTime && (B0^2 + 2*t*(t*aa + ab) - B0*Sqrt[B0^2 + 4*t*ab])/t == 0 && B0 < 0 && t < 0 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0){ }
+else if(Sqrt[-(1/aa)] == MCRFTime && (B0^2 + 2*t*(t*aa + ab) - B0*Sqrt[B0^2 + 4*t*ab])/t == 0 && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && B0 > 0 && t > 0){ }
+else if(Sqrt[-(1/aa)] == MCRFTime && B0^2/t + 2*t*aa + 2*ab + B0*t*Sqrt[(B0^2 + 4*t*ab)/t^4] == 0 && B0 < 0 && t < 0 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0){ }
+else if(Sqrt[-(1/aa)] == MCRFTime && B0^2/t + 2*t*aa + 2*ab + B0*t*Sqrt[(B0^2 + 4*t*ab)/t^4] == 0 && B0 < 0 && t < (2*B0^2)/ab && t > 0 && ab > 0){ }
+else if(Sqrt[-(1/aa)] == MCRFTime && B0^2/t + 2*t*aa + 2*ab + B0*t*Sqrt[(B0^2 + 4*t*ab)/t^4] == 0 && B0 < 0 && t > (2*B0^2)/ab && ab > 0){ }
+else if(Sqrt[-(1/aa)] == MCRFTime && B0^2/t + 2*t*aa + 2*ab + B0*t*Sqrt[(B0^2 + 4*t*ab)/t^4] == 0 && B0 > 0 && t > (2*B0^2)/ab && ab > 0){ }
+else if(Sqrt[-(1/aa)] == MCRFTime && 2*t*aa + 2*ab + (B0*(B0 + Sqrt[B0^2 + 4*t*ab]))/t == 0 && t < (2*B0^2)/ab && B0 > 0 && t > 0 && ab > 0){ }
+else if(Sqrt[-(1/aa)] == MCRFTime && 2*t*aa + 2*ab + (B0*(B0 + Sqrt[B0^2 + 4*t*ab]))/t == 0 && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && B0 > 0 && t > 0){ }
+else if(t + B0^2/ab == 0 && (B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && B0 < 0 && ab > 0 && aa + (B0^2 + 2*t*ab)/t^2 > 0){ }
+else if(t + B0^2/ab == 0 && MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && B0 < 0 && ab < 0 && aa + (B0^2 + 2*t*ab)/t^2 > 0){ }
+else if(t + B0^2/ab == 0 && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && ab < 0 && B0 > 0 && aa + (B0^2 + 2*t*ab)/t^2 > 0){ }
+else if(t + B0^2/ab == 0 && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 > 0 && ab > 0 && aa + (B0^2 + 2*t*ab)/t^2 > 0){ }
+else if(2*t + B0^2/ab == 0 && (B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && B0 < 0 && aa < (ab)^2/B0^2 && aa > 0 && ab > 0){ }
+else if(2*t + B0^2/ab == 0 && (B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && aa < (ab)^2/B0^2 && B0 > 0 && aa > 0 && ab > 0){ }
+else if(2*t + B0^2/ab == 0 && MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && B0 < 0 && aa < (ab)^2/B0^2 && ab < 0 && aa > 0){ }
+else if(2*t + B0^2/ab == 0 && MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && aa < (ab)^2/B0^2 && ab < 0 && B0 > 0 && aa > 0){ }
+else if(2*t + B0^2/ab == 0 && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && aa < (ab)^2/B0^2 && ab < 0 && aa > 0){ }
+else if(2*t + B0^2/ab == 0 && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && aa < (ab)^2/B0^2 && aa > 0 && ab > 0){ }
+else if(2*t + B0^2/ab == 0 && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && aa < (ab)^2/B0^2 && ab < 0 && B0 > 0 && aa > 0){ }
+else if(2*t + B0^2/ab == 0 && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && aa < (ab)^2/B0^2 && B0 > 0 && aa > 0 && ab > 0){ }
+else if(2*t + B0^2/ab == 0 && (B0*t*aa + ab*(B0 - Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == MCRFTime && ab < 0 && B0 > 0 && aa > (ab)^2/B0^2){ }
+else if(2*t + B0^2/ab == 0 && (B0*(B0*MCRFTime - t)*aa - ab*(B0 + MCRFTime*ab - Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == 0 && B0 > 0 && aa > (ab)^2/B0^2 && ab > 0){ }
+else if(2*t + B0^2/ab == 0 && (B0*t*aa + ab*(B0 + Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == MCRFTime && B0 < 0 && aa > (ab)^2/B0^2 && ab > 0){ }
+else if(2*t + B0^2/ab == 0 && (B0*(B0*MCRFTime - t)*aa - ab*(B0 + MCRFTime*ab + Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == 0 && B0 < 0 && ab < 0 && aa > (ab)^2/B0^2){ }
+else if(B0^2/t + t*aa + 2*ab == 0 && MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && B0 < 0 && t + B0^2/ab < 0 && ab < 0 && ab*(B0^2 + 2*t*ab) > 0){ }
+else if(B0^2/t + t*aa + 2*ab == 0 && MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && B0 < 0 && 4*t + B0^2/ab >= 0 && ab < 0 && ab*(B0^2 + 2*t*ab) < 0){ }
+else if(B0^2/t + t*aa + 2*ab == 0 && MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && B0 < 0 && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && t > 0){ }
+else if(B0^2/t + t*aa + 2*ab == 0 && MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && t + B0^2/ab < 0 && ab < 0 && B0 > 0 && ab*(B0^2 + 2*t*ab) > 0){ }
+else if(B0^2/t + t*aa + 2*ab == 0 && MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && 4*t + B0^2/ab >= 0 && ab < 0 && ab*(B0^2 + 2*t*ab) < 0 && B0 > 0){ }
+else if(B0^2/t + t*aa + 2*ab == 0 && MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && B0 > 0 && t > 0){ }
+else if(B0^2/t + t*aa + 2*ab == 0 && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && t < 0 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0){ }
+else if(B0^2/t + t*aa + 2*ab == 0 && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && ab*(B0^2 + 2*t*ab) < 0 && t + B0^2/ab > 0 && ab > 0){ }
+else if(B0^2/t + t*aa + 2*ab == 0 && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && 4*t + B0^2/ab <= 0 && ab > 0 && ab*(B0^2 + 2*t*ab) > 0){ }
+else if(B0^2/t + t*aa + 2*ab == 0 && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && t < 0 && B0 > 0 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0){ }
+else if(B0^2/t + t*aa + 2*ab == 0 && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && ab*(B0^2 + 2*t*ab) < 0 && B0 > 0 && t + B0^2/ab > 0 && ab > 0){ }
+else if(B0^2/t + t*aa + 2*ab == 0 && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 > 0 && 4*t + B0^2/ab <= 0 && ab > 0 && ab*(B0^2 + 2*t*ab) > 0){ }
+else if(B0*t*Sqrt[(B0^2 + 4*t*ab)/t^4] == B0^2/t + 2*t*aa + 2*ab && (B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && t < 0 && B0 > 0 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0){ }
+else if(B0*t*Sqrt[(B0^2 + 4*t*ab)/t^4] == B0^2/t + 2*t*aa + 2*ab && (B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && t < (2*B0^2)/ab && B0 > 0 && t > 0 && ab > 0){ }
+else if(B0*t*Sqrt[(B0^2 + 4*t*ab)/t^4] == B0^2/t + 2*t*aa + 2*ab && (B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && B0 > 0 && t > (2*B0^2)/ab && ab > 0){ }
+else if(B0*t*Sqrt[(B0^2 + 4*t*ab)/t^4] == B0^2/t + 2*t*aa + 2*ab && MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && t < 0 && ab < 0 && B0 > 0 && t > (2*B0^2)/ab){ }
+else if(B0*t*Sqrt[(B0^2 + 4*t*ab)/t^4] == B0^2/t + 2*t*aa + 2*ab && MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && t < (2*B0^2)/ab && ab < 0 && B0 > 0){ }
+else if((B0^2 + 2*t*(t*aa + ab) - B0*Sqrt[B0^2 + 4*t*ab])/t == 0 && MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && B0 > 0 && t > 0){ }
+else if((B0^2 + 2*t*(t*aa + ab) - B0*Sqrt[B0^2 + 4*t*ab])/t == 0 && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && t < 0 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0){ }
+else if((B0^2 + 2*t*(t*aa + ab) - B0*Sqrt[B0^2 + 4*t*ab])/t == 0 && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && t > 0){ }
+else if(B0^2/t + 2*t*aa + 2*ab + B0*t*Sqrt[(B0^2 + 4*t*ab)/t^4] == 0 && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && t < 0 && ab < 0 && t > (2*B0^2)/ab){ }
+else if(B0^2/t + 2*t*aa + 2*ab + B0*t*Sqrt[(B0^2 + 4*t*ab)/t^4] == 0 && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && t < 0 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0){ }
+else if(B0^2/t + 2*t*aa + 2*ab + B0*t*Sqrt[(B0^2 + 4*t*ab)/t^4] == 0 && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && t < (2*B0^2)/ab && ab < 0){ }
+else if(B0^2/t + 2*t*aa + 2*ab + B0*t*Sqrt[(B0^2 + 4*t*ab)/t^4] == 0 && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && t < (2*B0^2)/ab && t > 0 && ab > 0){ }
+else if(B0^2/t + 2*t*aa + 2*ab + B0*t*Sqrt[(B0^2 + 4*t*ab)/t^4] == 0 && MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && t > (2*B0^2)/ab && ab > 0){ }
+else if((B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && 2*t*aa + 2*ab + (B0*(B0 + Sqrt[B0^2 + 4*t*ab]))/t == 0 && t < 0 && B0 > 0 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0){ }
+else if((B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && B0 < 0 && t < 0 && aa < 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] < (B0^2 + 2*t*(t*aa + ab))/t^2 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0){ }
+else if((B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && B0 < 0 && t < 0 && aa < (ab)^2/B0^2 && aa > 0 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0){ }
+else if((B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && B0 < 0 && t < 0 && t^2*(B0^2 + 2*t*(t*aa + ab) - B0*Sqrt[B0^2 + 4*t*ab]) < 0 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0 && aa + (B0^2 + 2*t*ab)/t^2 > 0){ }
+else if((B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && B0 < 0 && t < (2*B0^2)/ab && aa < 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] < (B0^2 + 2*t*(t*aa + ab))/t^2 && t > 0 && ab > 0){ }
+else if((B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && B0 < 0 && t < (2*B0^2)/ab && aa < (ab)^2/B0^2 && t > 0 && aa > 0 && ab > 0){ }
+else if((B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && B0 < 0 && aa < 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] < (B0^2 + 2*t*(t*aa + ab))/t^2 && t > (2*B0^2)/ab && ab > 0){ }
+else if((B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && B0 < 0 && aa < 0 && 4*t + B0^2/ab <= 0 && ab > 0 && ab*(B0^2 + 2*t*ab) > 0 && aa + (B0^2 + 2*t*ab)/t^2 > 0){ }
+else if((B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && B0 < 0 && aa < (ab)^2/B0^2 && ab*(B0^2 + 2*t*ab) < 0 && t + B0^2/ab > 0 && ab > 0 && aa + (B0^2 + 2*t*ab)/t^2 > 0){ }
+else if((B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && B0 < 0 && aa < (ab)^2/B0^2 && t > (2*B0^2)/ab && aa > 0 && ab > 0){ }
+else if((B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && B0 < 0 && aa < (ab)^2/B0^2 && aa > 0 && 4*t + B0^2/ab <= 0 && ab > 0 && ab*(B0^2 + 2*t*ab) > 0){ }
+else if((B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && t < 0 && aa < 0 && B0 > 0 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0 && t^2*(B0^2 + 2*t*(t*aa + ab) - Sqrt[B0^4 + 4*B0^2*t*ab]) > 0){ }
+else if((B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && t < 0 && aa < (ab)^2/B0^2 && B0 > 0 && aa > 0 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0){ }
+else if((B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && t < 0 && t^2*(B0^2 + 2*t*(t*aa + ab) - Sqrt[B0^4 + 4*B0^2*t*ab]) < 0 && B0 > 0 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0 && t^2*(2*t*(t*aa + ab) + B0*(B0 + Sqrt[B0^2 + 4*t*ab])) > 0){ }
+else if((B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && t < 0 && t^2*(2*t*(t*aa + ab) + B0*(B0 + Sqrt[B0^2 + 4*t*ab])) < 0 && B0 > 0 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0 && aa + (B0^2 + 2*t*ab)/t^2 > 0){ }
+else if((B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && t < (2*B0^2)/ab && aa < 0 && B0 > 0 && t > 0 && ab > 0 && t^2*(B0^2 + 2*t*(t*aa + ab) - Sqrt[B0^4 + 4*B0^2*t*ab]) > 0){ }
+else if((B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && t < (2*B0^2)/ab && aa < (ab)^2/B0^2 && B0 > 0 && t > 0 && aa > 0 && ab > 0){ }
+else if((B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && t < (2*B0^2)/ab && t^2*(B0^2 + 2*t*(t*aa + ab) - Sqrt[B0^4 + 4*B0^2*t*ab]) < 0 && B0 > 0 && t > 0 && ab > 0 && t^2*(2*t*(t*aa + ab) + B0*(B0 + Sqrt[B0^2 + 4*t*ab])) > 0){ }
+else if((B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && aa < 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] < (B0^2 + 2*t*(t*aa + ab))/t^2 && B0 > 0 && t > (2*B0^2)/ab && ab > 0){ }
+else if((B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && aa < 0 && B0 > 0 && ab > 0 && B0^2 + t^2*aa + 2*t*ab > 0 && B0^2 + 4*t*ab <= 0){ }
+else if((B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && aa < (ab)^2/B0^2 && ab*(B0^2 + 2*t*ab) < 0 && B0 > 0 && t + B0^2/ab > 0 && ab > 0 && aa + (B0^2 + 2*t*ab)/t^2 > 0){ }
+else if((B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && aa < (ab)^2/B0^2 && B0 > 0 && t > (2*B0^2)/ab && aa > 0 && ab > 0){ }
+else if((B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && aa < (ab)^2/B0^2 && B0 > 0 && aa > 0 && 4*t + B0^2/ab <= 0 && ab > 0 && ab*(B0^2 + 2*t*ab) > 0){ }
+else if((B0*(t*aa + ab))/(B0^2*aa - (ab)^2) + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] == MCRFTime && B0 > 0 && t > (2*B0^2)/ab && ab > 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] > (B0^2 + 2*t*(t*aa + ab))/t^2 && t^2*(B0^2 + 2*t*(t*aa + ab) + B0*t^2*Sqrt[(B0^2 + 4*t*ab)/t^4]) > 0){ }
+else if(MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && 2*t*aa + 2*ab + (B0*(B0 + Sqrt[B0^2 + 4*t*ab]))/t == 0 && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && B0 > 0 && t > 0){ }
+else if(MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && B0 < 0 && t < 0 && aa < 0 && ab < 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] < (B0^2 + 2*t*(t*aa + ab))/t^2 && t > (2*B0^2)/ab){ }
+else if(MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && B0 < 0 && t < 0 && aa < (ab)^2/B0^2 && ab < 0 && aa > 0){ }
+else if(MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && B0 < 0 && t < (2*B0^2)/ab && aa < 0 && ab < 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] < (B0^2 + 2*t*(t*aa + ab))/t^2){ }
+else if(MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && B0 < 0 && aa < 0 && 4*t + B0^2/ab >= 0 && ab < 0 && ab*(B0^2 + 2*t*ab) < 0 && aa + (B0^2 + 2*t*ab)/t^2 > 0){ }
+else if(MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && B0 < 0 && aa < 0 && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] < (B0^2 + 2*t*(t*aa + ab))/t^2 && t > 0){ }
+else if(MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && B0 < 0 && aa < (ab)^2/B0^2 && t + B0^2/ab < 0 && ab < 0 && ab*(B0^2 + 2*t*ab) > 0 && aa + (B0^2 + 2*t*ab)/t^2 > 0){ }
+else if(MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && B0 < 0 && aa < (ab)^2/B0^2 && 4*t + B0^2/ab >= 0 && ab < 0 && ab*(B0^2 + 2*t*ab) < 0 && aa > 0){ }
+else if(MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && B0 < 0 && aa < (ab)^2/B0^2 && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && t > 0 && aa > 0){ }
+else if(MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && B0 < 0 && aa < (ab)^2/B0^2 && ab < 0 && t <= (2*B0^2)/ab && aa > 0){ }
+else if(MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && B0 < 0 && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && t^2*(B0^2 + 2*t*(t*aa + ab) - B0*Sqrt[B0^2 + 4*t*ab]) < 0 && t > 0 && aa + (B0^2 + 2*t*ab)/t^2 > 0){ }
+else if(MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && t < 0 && aa < 0 && ab < 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] < (B0^2 + 2*t*(t*aa + ab))/t^2 && B0 > 0 && t > (2*B0^2)/ab){ }
+else if(MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && t < 0 && aa < (ab)^2/B0^2 && ab < 0 && B0 > 0 && t > (2*B0^2)/ab && aa > 0){ }
+else if(MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && t < 0 && ab < 0 && B0 > 0 && t > (2*B0^2)/ab && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] > (B0^2 + 2*t*(t*aa + ab))/t^2 && t^2*(B0^2 + 2*t*(t*aa + ab) + B0*t^2*Sqrt[(B0^2 + 4*t*ab)/t^4]) > 0){ }
+else if(MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && t < (2*B0^2)/ab && aa < 0 && ab < 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] < (B0^2 + 2*t*(t*aa + ab))/t^2 && B0 > 0){ }
+else if(MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && t < (2*B0^2)/ab && aa < (ab)^2/B0^2 && ab < 0 && B0 > 0 && aa > 0){ }
+else if(MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && t < (2*B0^2)/ab && ab < 0 && B0 > 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] > (B0^2 + 2*t*(t*aa + ab))/t^2 && t^2*(B0^2 + 2*t*(t*aa + ab) + B0*t^2*Sqrt[(B0^2 + 4*t*ab)/t^4]) > 0){ }
+else if(MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && aa < 0 && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && B0 > 0 && t > 0 && t^2*(B0^2 + 2*t*(t*aa + ab) - Sqrt[B0^4 + 4*B0^2*t*ab]) > 0){ }
+else if(MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && aa < 0 && ab < 0 && B0 > 0 && B0^2 + t^2*aa + 2*t*ab > 0 && B0^2 + 4*t*ab <= 0){ }
+else if(MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && aa < (ab)^2/B0^2 && t + B0^2/ab < 0 && ab < 0 && B0 > 0 && ab*(B0^2 + 2*t*ab) > 0 && aa + (B0^2 + 2*t*ab)/t^2 > 0){ }
+else if(MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && aa < (ab)^2/B0^2 && 4*t + B0^2/ab >= 0 && ab < 0 && ab*(B0^2 + 2*t*ab) < 0 && B0 > 0 && aa > 0){ }
+else if(MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && aa < (ab)^2/B0^2 && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && B0 > 0 && t > 0 && aa > 0){ }
+else if(MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && t^2*(B0^2 + 2*t*(t*aa + ab) - Sqrt[B0^4 + 4*B0^2*t*ab]) < 0 && B0 > 0 && t > 0 && t^2*(2*t*(t*aa + ab) + B0*(B0 + Sqrt[B0^2 + 4*t*ab])) > 0){ }
+else if(MCRFTime + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && t^2*(2*t*(t*aa + ab) + B0*(B0 + Sqrt[B0^2 + 4*t*ab])) < 0 && B0 > 0 && t > 0 && aa + (B0^2 + 2*t*ab)/t^2 > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && 2*t*aa + 2*ab + (B0*(B0 + Sqrt[B0^2 + 4*t*ab]))/t == 0 && B0 < 0 && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && t > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && t < 0 && aa < 0 && ab < 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] < (B0^2 + 2*t*(t*aa + ab))/t^2 && t > (2*B0^2)/ab){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && t < 0 && aa < 0 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0 && t^2*(B0^2 + 2*t*(t*aa + ab) - Sqrt[B0^4 + 4*B0^2*t*ab]) > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && t < 0 && aa < (ab)^2/B0^2 && ab < 0 && t > (2*B0^2)/ab && aa > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && t < 0 && aa < (ab)^2/B0^2 && aa > 0 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && t < 0 && ab < 0 && t > (2*B0^2)/ab && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] > (B0^2 + 2*t*(t*aa + ab))/t^2 && (B0^2 + 2*t*(t*aa + ab))/t^2 > B0*Sqrt[(B0^2 + 4*t*ab)/t^4]){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && t < 0 && t^2*(B0^2 + 2*t*(t*aa + ab) - B0*Sqrt[B0^2 + 4*t*ab]) < 0 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0 && aa + (B0^2 + 2*t*ab)/t^2 > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && t < 0 && t^2*(B0^2 + 2*t*(t*aa + ab) - Sqrt[B0^4 + 4*B0^2*t*ab]) < 0 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0 && t^2*(B0^2 + 2*t*(t*aa + ab) - B0*Sqrt[B0^2 + 4*t*ab]) > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && t < (2*B0^2)/ab && aa < 0 && ab < 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] < (B0^2 + 2*t*(t*aa + ab))/t^2){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && t < (2*B0^2)/ab && aa < 0 && t > 0 && ab > 0 && t^2*(B0^2 + 2*t*(t*aa + ab) - Sqrt[B0^4 + 4*B0^2*t*ab]) > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && t < (2*B0^2)/ab && aa < (ab)^2/B0^2 && ab < 0 && aa > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && t < (2*B0^2)/ab && aa < (ab)^2/B0^2 && t > 0 && aa > 0 && ab > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && t < (2*B0^2)/ab && ab < 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] > (B0^2 + 2*t*(t*aa + ab))/t^2 && (B0^2 + 2*t*(t*aa + ab))/t^2 > B0*Sqrt[(B0^2 + 4*t*ab)/t^4]){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && t < (2*B0^2)/ab && t^2*(B0^2 + 2*t*(t*aa + ab) - Sqrt[B0^4 + 4*B0^2*t*ab]) < 0 && t > 0 && ab > 0 && t^2*(B0^2 + 2*t*(t*aa + ab) - B0*Sqrt[B0^2 + 4*t*ab]) > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && aa < 0 && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && t > 0 && t^2*(B0^2 + 2*t*(t*aa + ab) - Sqrt[B0^4 + 4*B0^2*t*ab]) > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && aa < 0 && ab < 0 && B0^2 + t^2*aa + 2*t*ab > 0 && B0^2 + 4*t*ab <= 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && aa < 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] < (B0^2 + 2*t*(t*aa + ab))/t^2 && t > (2*B0^2)/ab && ab > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && aa < 0 && ab > 0 && B0^2 + t^2*aa + 2*t*ab > 0 && B0^2 + 4*t*ab <= 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && aa < (ab)^2/B0^2 && t + B0^2/ab < 0 && ab < 0 && ab*(B0^2 + 2*t*ab) > 0 && aa + (B0^2 + 2*t*ab)/t^2 > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && aa < (ab)^2/B0^2 && 4*t + B0^2/ab >= 0 && ab < 0 && ab*(B0^2 + 2*t*ab) < 0 && aa > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && aa < (ab)^2/B0^2 && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && t > 0 && aa > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && aa < (ab)^2/B0^2 && ab*(B0^2 + 2*t*ab) < 0 && t + B0^2/ab > 0 && ab > 0 && aa + (B0^2 + 2*t*ab)/t^2 > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && aa < (ab)^2/B0^2 && t > (2*B0^2)/ab && aa > 0 && ab > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && aa < (ab)^2/B0^2 && aa > 0 && 4*t + B0^2/ab <= 0 && ab > 0 && ab*(B0^2 + 2*t*ab) > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && t^2*(B0^2 + 2*t*(t*aa + ab) - B0*Sqrt[B0^2 + 4*t*ab]) < 0 && t > 0 && aa + (B0^2 + 2*t*ab)/t^2 > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && t^2*(B0^2 + 2*t*(t*aa + ab) - Sqrt[B0^4 + 4*B0^2*t*ab]) < 0 && t > 0 && t^2*(B0^2 + 2*t*(t*aa + ab) - B0*Sqrt[B0^2 + 4*t*ab]) > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && B0 < 0 && t > (2*B0^2)/ab && ab > 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] > (B0^2 + 2*t*(t*aa + ab))/t^2 && (B0^2 + 2*t*(t*aa + ab))/t^2 > B0*Sqrt[(B0^2 + 4*t*ab)/t^4]){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && t < 0 && aa < 0 && ab < 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] < (B0^2 + 2*t*(t*aa + ab))/t^2 && B0 > 0 && t > (2*B0^2)/ab){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && t < 0 && aa < 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] < (B0^2 + 2*t*(t*aa + ab))/t^2 && B0 > 0 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && t < 0 && aa < (ab)^2/B0^2 && ab < 0 && B0 > 0 && aa > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && t < 0 && aa < (ab)^2/B0^2 && B0 > 0 && aa > 0 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && t < 0 && t^2*(2*t*(t*aa + ab) + B0*(B0 + Sqrt[B0^2 + 4*t*ab])) < 0 && B0 > 0 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0 && aa + (B0^2 + 2*t*ab)/t^2 > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && t < (2*B0^2)/ab && aa < 0 && ab < 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] < (B0^2 + 2*t*(t*aa + ab))/t^2 && B0 > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && t < (2*B0^2)/ab && aa < 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] < (B0^2 + 2*t*(t*aa + ab))/t^2 && B0 > 0 && t > 0 && ab > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && t < (2*B0^2)/ab && aa < (ab)^2/B0^2 && B0 > 0 && t > 0 && aa > 0 && ab > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && aa < 0 && 4*t + B0^2/ab >= 0 && ab < 0 && ab*(B0^2 + 2*t*ab) < 0 && B0 > 0 && aa + (B0^2 + 2*t*ab)/t^2 > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && aa < 0 && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] < (B0^2 + 2*t*(t*aa + ab))/t^2 && B0 > 0 && t > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && aa < 0 && Sqrt[(B0^4 + 4*B0^2*t*ab)/t^4] < (B0^2 + 2*t*(t*aa + ab))/t^2 && B0 > 0 && t > (2*B0^2)/ab && ab > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && aa < 0 && B0 > 0 && 4*t + B0^2/ab <= 0 && ab > 0 && ab*(B0^2 + 2*t*ab) > 0 && aa + (B0^2 + 2*t*ab)/t^2 > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && aa < (ab)^2/B0^2 && t + B0^2/ab < 0 && ab < 0 && B0 > 0 && ab*(B0^2 + 2*t*ab) > 0 && aa + (B0^2 + 2*t*ab)/t^2 > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && aa < (ab)^2/B0^2 && 4*t + B0^2/ab >= 0 && ab < 0 && ab*(B0^2 + 2*t*ab) < 0 && B0 > 0 && aa > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && aa < (ab)^2/B0^2 && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && B0 > 0 && t > 0 && aa > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && aa < (ab)^2/B0^2 && ab < 0 && B0 > 0 && t <= (2*B0^2)/ab && aa > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && aa < (ab)^2/B0^2 && ab*(B0^2 + 2*t*ab) < 0 && B0 > 0 && t + B0^2/ab > 0 && ab > 0 && aa + (B0^2 + 2*t*ab)/t^2 > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && aa < (ab)^2/B0^2 && B0 > 0 && t > (2*B0^2)/ab && aa > 0 && ab > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && aa < (ab)^2/B0^2 && B0 > 0 && aa > 0 && 4*t + B0^2/ab <= 0 && ab > 0 && ab*(B0^2 + 2*t*ab) > 0){ }
+else if(MCRFTime + ab*Sqrt[(B0^2 + t^2*aa + 2*t*ab)/((-B0^2)*aa + (ab)^2)^2] + (B0*(t*aa + ab))/((-B0^2)*aa + (ab)^2) == 0 && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && t^2*(2*t*(t*aa + ab) + B0*(B0 + Sqrt[B0^2 + 4*t*ab])) < 0 && B0 > 0 && t > 0 && aa + (B0^2 + 2*t*ab)/t^2 > 0){ }
+else if((B0*t*aa + ab*(B0 - Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == MCRFTime && t < 0 && ab < 0 && B0 > 0 && aa > (ab)^2/B0^2){ }
+else if((B0*t*aa + ab*(B0 - Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == MCRFTime && t + B0^2/ab < 0 && ab < 0 && B0 > 0 && aa > (ab)^2/B0^2 && ab*(B0^2 + 2*t*ab) > 0){ }
+else if((B0*t*aa + ab*(B0 - Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == MCRFTime && 4*t + B0^2/ab >= 0 && ab < 0 && ab*(B0^2 + 2*t*ab) < 0 && B0 > 0 && aa > (ab)^2/B0^2){ }
+else if((B0*t*aa + ab*(B0 - Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == MCRFTime && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && B0 > 0 && t > 0 && aa > (ab)^2/B0^2){ }
+else if((B0*t*aa + ab*(B0 - Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == MCRFTime && ab < 0 && B0 > 0 && t <= (2*B0^2)/ab && aa > (ab)^2/B0^2){ }
+else if((B0*t*aa + ab*(B0 - Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == MCRFTime && ab < 0 && B0 > 0 && aa > (ab)^2/B0^2 && t + B0^2/ab > 0){ }
+else if((B0*(B0*MCRFTime - t)*aa - ab*(B0 + MCRFTime*ab - Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == 0 && t < 0 && B0 > 0 && aa > (ab)^2/B0^2 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0){ }
+else if((B0*(B0*MCRFTime - t)*aa - ab*(B0 + MCRFTime*ab - Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == 0 && t >= (2*B0^2)/ab && B0 > 0 && aa > (ab)^2/B0^2 && ab > 0){ }
+else if((B0*(B0*MCRFTime - t)*aa - ab*(B0 + MCRFTime*ab - Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == 0 && t + B0^2/ab < 0 && B0 > 0 && aa > (ab)^2/B0^2 && ab > 0){ }
+else if((B0*(B0*MCRFTime - t)*aa - ab*(B0 + MCRFTime*ab - Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == 0 && ab*(B0^2 + 2*t*ab) < 0 && B0 > 0 && aa > (ab)^2/B0^2 && t + B0^2/ab > 0 && ab > 0){ }
+else if((B0*(B0*MCRFTime - t)*aa - ab*(B0 + MCRFTime*ab - Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == 0 && B0 > 0 && t > 0 && aa > (ab)^2/B0^2 && ab > 0){ }
+else if((B0*(B0*MCRFTime - t)*aa - ab*(B0 + MCRFTime*ab - Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == 0 && B0 > 0 && aa > (ab)^2/B0^2 && 4*t + B0^2/ab <= 0 && ab > 0 && ab*(B0^2 + 2*t*ab) > 0){ }
+else if((B0*t*aa + ab*(B0 + Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == MCRFTime && B0 < 0 && t < 0 && aa > (ab)^2/B0^2 && ab > 0 && ab*(B0^2 + 4*t*ab) > 0){ }
+else if((B0*t*aa + ab*(B0 + Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == MCRFTime && B0 < 0 && t >= (2*B0^2)/ab && aa > (ab)^2/B0^2 && ab > 0){ }
+else if((B0*t*aa + ab*(B0 + Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == MCRFTime && B0 < 0 && t + B0^2/ab < 0 && aa > (ab)^2/B0^2 && ab > 0){ }
+else if((B0*t*aa + ab*(B0 + Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == MCRFTime && B0 < 0 && ab*(B0^2 + 2*t*ab) < 0 && aa > (ab)^2/B0^2 && t + B0^2/ab > 0 && ab > 0){ }
+else if((B0*t*aa + ab*(B0 + Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == MCRFTime && B0 < 0 && t > 0 && aa > (ab)^2/B0^2 && ab > 0){ }
+else if((B0*t*aa + ab*(B0 + Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == MCRFTime && B0 < 0 && aa > (ab)^2/B0^2 && 4*t + B0^2/ab <= 0 && ab > 0 && ab*(B0^2 + 2*t*ab) > 0){ }
+else if((B0*(B0*MCRFTime - t)*aa - ab*(B0 + MCRFTime*ab + Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == 0 && B0 < 0 && t < 0 && ab < 0 && aa > (ab)^2/B0^2){ }
+else if((B0*(B0*MCRFTime - t)*aa - ab*(B0 + MCRFTime*ab + Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == 0 && B0 < 0 && t + B0^2/ab < 0 && ab < 0 && aa > (ab)^2/B0^2 && ab*(B0^2 + 2*t*ab) > 0){ }
+else if((B0*(B0*MCRFTime - t)*aa - ab*(B0 + MCRFTime*ab + Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == 0 && B0 < 0 && 4*t + B0^2/ab >= 0 && ab < 0 && ab*(B0^2 + 2*t*ab) < 0 && aa > (ab)^2/B0^2){ }
+else if((B0*(B0*MCRFTime - t)*aa - ab*(B0 + MCRFTime*ab + Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == 0 && B0 < 0 && ab < 0 && ab*(B0^2 + 4*t*ab) < 0 && t > 0 && aa > (ab)^2/B0^2){ }
+else if((B0*(B0*MCRFTime - t)*aa - ab*(B0 + MCRFTime*ab + Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == 0 && B0 < 0 && ab < 0 && t <= (2*B0^2)/ab && aa > (ab)^2/B0^2){ }
+((B0*(B0*MCRFTime - t)*aa - ab*(B0 + MCRFTime*ab + Sqrt[B0^2 + t^2*aa + 2*t*ab]))/(B0^2*aa - (ab)^2) == 0 && B0 < 0 && ab < 0 && aa > (ab)^2/B0^2 && t + B0^2/ab > 0)
