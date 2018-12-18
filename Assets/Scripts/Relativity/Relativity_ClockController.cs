@@ -14,18 +14,18 @@ public class Relativity_ClockController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		RC = GetComponent<Relativity_Controller>();
-		time = RC.Proper_Time;
+		time = RC.ProperTime;
 		if (TextMeshObject != null)
 			offset = TextMeshObject.transform.position - transform.position;
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-		if (time < pauseTime && RC.Proper_Time >= pauseTime && pauseAtTime)
+		if (time < pauseTime && RC.ProperTime >= pauseTime && pauseAtTime)
 		{
 			RC.Observer.GetComponent<Relativity_Observer>().FreezeTime = true;
 		}
-		time = RC.Proper_Time;
+		time = RC.ProperTime;
 		double sec = time/60 % 1;
 		double min = time/(60*12);
 		if (SecondHand != null)
@@ -34,7 +34,7 @@ public class Relativity_ClockController : MonoBehaviour {
 			MinuteHand.transform.localEulerAngles = new Vector3(0,0,(float)min*360f);
 		if (TextMeshObject != null){
 			TextMeshObject.GetComponent<TextMesh>().text = ((float)time).ToString("F2") + "s";
-			TextMeshObject.transform.position = new Vector3(RC.Current_Event.y, RC.Current_Event.z, RC.Current_Event.w) + offset;
+			TextMeshObject.transform.position = new Vector3(RC.CurrentEvent.y, RC.CurrentEvent.z, RC.CurrentEvent.w) + offset;
 		}
 
 	}

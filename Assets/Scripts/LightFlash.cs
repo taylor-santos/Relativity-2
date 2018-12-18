@@ -27,7 +27,7 @@ public class LightFlash : MonoBehaviour {
 			lp.Observer = GetComponent<Relativity_Controller>().Observer;
 			lp.coordinateTimeStart = obs.CoordinateTime;
 		}
-		if (TimedFlash && RC.Proper_Time >= FlashAtProperTime)
+		if (TimedFlash && RC.ProperTime >= FlashAtProperTime)
 		{
 			if (RepeatFlash)
 			{
@@ -38,8 +38,8 @@ public class LightFlash : MonoBehaviour {
 			GameObject lightPrefab = Instantiate(Light, transform.position, Quaternion.Euler(0,0,0)) as GameObject;
 			Relativity_PropagateLight lp = lightPrefab.GetComponent<Relativity_PropagateLight>();
 			lp.Observer = GetComponent<Relativity_Controller>().Observer;
-			double offset = RC.Proper_Time/Mathf.Sqrt(RC.Current_Velocity.sqrMagnitude) - obs.CoordinateTime;
-			double CoordinateTimeStart = FlashAtProperTime/Mathf.Sqrt(RC.Current_Velocity.sqrMagnitude) - offset;
+			double offset = RC.ProperTime/Mathf.Sqrt(RC.Velocity.sqrMagnitude) - obs.CoordinateTime;
+			double CoordinateTimeStart = FlashAtProperTime/Mathf.Sqrt(RC.Velocity.sqrMagnitude) - offset;
 			lp.coordinateTimeStart = CoordinateTimeStart;
 			//lightPrefab.transform.position = transform.position + RC.Current_Velocity * (float)(CoordinateTimeStart-obs.CoordinateTime);
 		}
