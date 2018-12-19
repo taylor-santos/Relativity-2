@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class Plane {
@@ -30,6 +31,11 @@ public class Matrix {
 		Transformation = _Transformation;
 		Translation = Vector4.zero;
 	}
+	public Matrix(Matrix other) {
+		Transformation = other.Transformation;
+		Translation = other.Translation;
+	}
+
 	public Matrix Inverse() {
 		Matrix4x4 inv = Transformation.inverse;
 		return new Matrix(inv, -(inv * Translation));
@@ -43,10 +49,13 @@ public class Matrix {
 	public static Matrix operator *(Matrix lhs, Matrix rhs) {
 		Matrix ret = new Matrix();
 		ret.Transformation = lhs.Transformation * rhs.Transformation;
+		ret.Translation = lhs.Translation + lhs.Transformation * rhs.Translation;
+		/*
 		ret.Translation.x = lhs.Translation.x + rhs.Translation.x * lhs.Transformation[0, 0] + rhs.Translation.y * lhs.Transformation[0, 1] + rhs.Translation.z * lhs.Transformation[0, 2] + rhs.Translation.w * lhs.Transformation[0, 3];
 		ret.Translation.y = lhs.Translation.y + rhs.Translation.x * lhs.Transformation[1, 0] + rhs.Translation.y * lhs.Transformation[1, 1] + rhs.Translation.z * lhs.Transformation[1, 2] + rhs.Translation.w * lhs.Transformation[1, 3];
 		ret.Translation.z = lhs.Translation.z + rhs.Translation.x * lhs.Transformation[2, 0] + rhs.Translation.y * lhs.Transformation[2, 1] + rhs.Translation.z * lhs.Transformation[2, 2] + rhs.Translation.w * lhs.Transformation[2, 3];
 		ret.Translation.w = lhs.Translation.w + rhs.Translation.x * lhs.Transformation[3, 0] + rhs.Translation.y * lhs.Transformation[3, 1] + rhs.Translation.z * lhs.Transformation[3, 2] + rhs.Translation.w * lhs.Transformation[3, 3];
+		*/
 		return ret;
 	}
 	public static Vector4 operator *(Matrix lhs, Vector4 rhs) {
@@ -90,50 +99,57 @@ public class Relativity_Controller : MonoBehaviour {
 
 	Vector4 GetState(float observerTime) {
 		Vector4 localObserverEvent = Vector4.zero;
-		Matrix coordinateToObserverBoost = new Matrix(LorentzBoost(observerScript.velocity), CombineTemporalAndSpatial(0, -Observer.transform.position));
-		Matrix observerToCoordinateBoost = coordinateToObserverBoost.Inverse();
+		// To transform from observer to coordinate, translate observer's event by observer.position, then apply the lorentz transformation on the resulting event.
+		// Therefore, coordinateToObserverBoost = boost (observer.velocity) to observer frame, then translate by -observer position.
+		// Then observerToCoordinateBoost = coordinateToObserverBoost.Inverse();
+		Matrix coordinateToObserverBoost = new Matrix(); // (LorentzBoost(observerScript.velocity), CombineTemporalAndSpatial(0, -Observer.transform.position));
+		Matrix observerToCoordinateBoost = new Matrix(LorentzBoost(-observerScript.velocity)); // coordinateToObserverBoost.Inverse();
+		float calculatedTime = 0;
 		if (observerTime > 0) {
 			for (int i = 0; i < observerScript.accelerations.Count; i++) {
 				Vector3 A = observerScript.accelerations[i];
 				float T = observerScript.durations[i];
+				bool lastAccel = false;
 				if (observerTime < GetTemporalComponent(localObserverEvent) + T) {
 					T = observerTime - GetTemporalComponent(localObserverEvent);
-					float t = Sinh(T * A.magnitude) / A.magnitude;
-					Debug.Log("t = " + t);
-					Debug.Log("T = " + T);
-					Vector3 velocity = A * t / Mathf.Sqrt(1 + t * t * A.sqrMagnitude);
-					float gamma = Mathf.Sqrt(1 + t * t * A.sqrMagnitude);
-					Debug.Log("y = " + gamma);
-					Vector3 displacement = A * (Mathf.Sqrt(1 + t * t * A.sqrMagnitude) - 1) / A.sqrMagnitude;
-					Debug.Log("d = " + displacement.x);
-					Vector3 x = A * Mathf.Sqrt(1 + t * t * A.sqrMagnitude) / A.sqrMagnitude;
-					Debug.Log("ds2 = " + (-t * t + x.x * x.x)); // = (1/A)^2
-					Matrix M = new Matrix(LorentzBoost(velocity), CombineTemporalAndSpatial(-t + T, displacement));
-					coordinateToObserverBoost *= M;
-					observerToCoordinateBoost = coordinateToObserverBoost.Inverse();	
+					lastAccel = true;
 				}
+				localObserverEvent = CombineTemporalAndSpatial(T, Vector3.zero);
+				double aSqr = Math.Pow(A.x, 2) + Math.Pow(A.y, 2) + Math.Pow(A.z, 2);
+				double a = Math.Sqrt(aSqr);
+				float t = (float)(Math.Sinh(T * a) / a);
+				Vector3 velocity = A * t / Mathf.Sqrt(1 + t * t * A.sqrMagnitude);
+				float gamma = Mathf.Sqrt(1 + t * t * A.sqrMagnitude);
+				Vector3 displacement = A * (float)((Math.Sqrt(1 + t * t * aSqr) - 1) / aSqr);
+				Vector3 x = A * Mathf.Sqrt(1 + t * t * A.sqrMagnitude) / A.sqrMagnitude;
+				//Matrix M = new Matrix(LorentzBoost(-velocity), CombineTemporalAndSpatial(-t + T, -displacement));
+				Matrix M = new Matrix(LorentzBoost(velocity), CombineTemporalAndSpatial(-t, displacement));
+				Matrix MInv = M.Inverse();
+				observerToCoordinateBoost *= MInv;
+				calculatedTime += T;
+				if (lastAccel) break;
 			}
 		}
-		localObserverEvent = CombineTemporalAndSpatial(observerTime, Vector3.zero);
+		localObserverEvent = CombineTemporalAndSpatial(observerTime - calculatedTime, Vector3.zero);
 		Plane simulPlane = new Plane {
-			Distance = observerTime
+			Distance = observerTime - calculatedTime
 		};
-
 		Vector4 coordinateObserverEvent = observerToCoordinateBoost * localObserverEvent;
-		Debug.Log(coordinateObserverEvent.x + ", " + coordinateObserverEvent.y + ", " + coordinateObserverEvent.z + ", " + coordinateObserverEvent.w);
-		Debug.Log(coordinateToObserverBoost * coordinateObserverEvent);
+		Vector3 coe = GetSpatialComponent(coordinateObserverEvent);
+		coe.z += GetTemporalComponent(coordinateObserverEvent);
+		Debug.DrawRay(coe, Vector3.up, Color.white, 1000);
 		simulPlane = observerToCoordinateBoost.InvTransposePlaneMultiplication(simulPlane);
 		Vector3 normal = GetSpatialComponent(simulPlane.Normal);
 		normal.z += GetTemporalComponent(simulPlane.Normal);
 		float di = 10;
 		for (float i = -10; i < 10; i += di) {
-			Vector4 e1 = observerToCoordinateBoost * CombineTemporalAndSpatial(i + observerTime, Vector3.zero);
-			Vector4 e2 = observerToCoordinateBoost * CombineTemporalAndSpatial(i + di + observerTime, Vector3.zero);
+			Vector4 e1 = observerToCoordinateBoost * CombineTemporalAndSpatial(i + observerTime - calculatedTime, Vector3.zero);
+			Vector4 e2 = observerToCoordinateBoost * CombineTemporalAndSpatial(i + di + observerTime - calculatedTime, Vector3.zero);
 			Vector3 v1 = GetSpatialComponent(e1);
 			v1.z += GetTemporalComponent(e1);
 			Vector3 v2 = GetSpatialComponent(e2);
 			v2.z += GetTemporalComponent(e2);
-			Debug.DrawLine(v1, v2, Random.ColorHSV());
+			Debug.DrawLine(v1, v2);
 		}
 		plane.transform.up = -normal;
 		plane.transform.position = normal.normalized * simulPlane.Distance;
