@@ -3,76 +3,504 @@ using System;
 using UnityEngine;
 
 public class Plane {
-	public Vector4 Normal;
-	public float Distance;
+	public Vector4d Normal;
+	public double Distance;
 	public Plane() {
-		Normal = Vector4.zero;
-		Normal.x = 1;
+		Normal = new Vector4d {
+			t = 1
+		};
 		Distance = 0;
 	}
-	public Plane(Vector4 _Normal, float _Distance) {
+	public Plane(Vector4d _Normal, double _Distance) {
 		Normal = _Normal;
 		Distance = _Distance;
 	}
 }
+[Serializable]
+public class Vector3d {
+	public double x, y, z;
 
-public class Matrix {
-	public Matrix4x4 Transformation;
-	public Vector4 Translation;
-	public Matrix() {
-		Transformation = Matrix4x4.identity;
-		Translation = Vector3.zero;
+	public double Magnitude() { return Math.Sqrt(x* x + y* y + z* z); }
+	public double SqrMagnitude() { return x * x + y * y + z * z; }
+	public double this[int index] {
+		get {
+			switch (index) {
+				case 0: return x;
+				case 1: return y;
+				case 2: return z;
+				default: throw new ArgumentOutOfRangeException();
+			}
+		}
+		set {
+			switch (index) {
+				case 0: x = value; break;
+				case 1: y = value; break;
+				case 2: z = value; break;
+				default: throw new ArgumentOutOfRangeException();
+			}
+		}
 	}
-	public Matrix(Matrix4x4 _Transformation, Vector4 _Translation) {
+
+	public Vector3d() {
+		 x = y = z = 0;
+	}
+	public Vector3d(double x_, double y_, double z_) {
+		x = x_;
+		y = y_;
+		z = z_;
+	}
+	public Vector3d(Vector3d other) {
+		x = other.x;
+		y = other.y;
+		z = other.z;
+	}
+	public Vector3d Normalized() {
+		double magnitude = Magnitude();
+		return new Vector3d(
+			x / magnitude,
+			y / magnitude,
+			z / magnitude
+		);
+	}
+	public static double operator *(Vector3d lhs, Vector3d rhs) {
+		return
+			lhs.x * rhs.x +
+			lhs.y * rhs.y +
+			lhs.z * lhs.z;
+	}
+	public static Vector3d operator +(Vector3d lhs, Vector3d rhs) {
+		return new Vector3d {
+			x = lhs.x + rhs.x,
+			y = lhs.y + rhs.y,
+			z = lhs.z + rhs.z
+		};
+	}
+	public static Vector3d operator *(double d, Vector3d v) {
+		return new Vector3d {
+			x = d * v.x,
+			y = d * v.y,
+			z = d * v.z
+		};
+	}
+	public static Vector3d operator *(Vector3d v, double d) {
+		return d * v;
+	}
+	public static Vector3d operator /(Vector3d v, double d) {
+		return new Vector3d {
+			x = v.x / d,
+			y = v.y / d,
+			z = v.z / d
+		};
+	}
+	public static Vector3d operator -(Vector3d v) {
+		return new Vector3d {
+			x = -v.x,
+			y = -v.y,
+			z = -v.z
+		};
+	}
+}
+[Serializable]
+public class Vector4d {
+	public double t, x, y, z;
+
+	public double this[int index] {
+		get {
+			switch(index) {
+				case 0: return t;
+				case 1: return x;
+				case 2: return y;
+				case 3: return z;
+				default: throw new ArgumentOutOfRangeException();
+			}
+		}
+		set {
+			switch (index) {
+				case 0: t = value; break;
+				case 1: x = value; break;
+				case 2: y = value; break;
+				case 3: z = value; break;
+				default: throw new ArgumentOutOfRangeException();
+			}
+		}
+	}
+
+	public double Magnitude() { return Math.Sqrt(t * t + x * x + y * y + z * z); }
+	public double SqrMagnitude() { return t * t + x * x + y * y + z * z; }
+
+	public Vector4d() {
+		t = x = y = z = 0;
+	}
+	public Vector4d(double t_, double x_, double y_, double z_) {
+		t = t_;
+		x = x_;
+		y = y_;
+		z = z_;
+	}
+	public Vector4d(Vector4d other) {
+		t = other.t;
+		x = other.x;
+		y = other.y;
+		z = other.z;
+	}
+	public Vector4d Normalized() {
+		double magnitude = Magnitude();
+		return new Vector4d(
+			t / magnitude,
+			x / magnitude,
+			y / magnitude,
+			z / magnitude
+		);
+	}
+	public static double operator* (Vector4d lhs, Vector4d rhs) {
+		return
+			lhs.t * rhs.t +
+			lhs.x * rhs.x +
+			lhs.y * rhs.y +
+			lhs.z * lhs.z;
+	}
+	public static Vector4d operator+ (Vector4d lhs, Vector4d rhs) {
+		return new Vector4d {
+			t = lhs.t + rhs.t,
+			x = lhs.x + rhs.x,
+			y = lhs.y + rhs.y,
+			z = lhs.z + rhs.z
+		};
+	}
+	public static Vector4d operator* (double d, Vector4d v) {
+		return new Vector4d {
+			t = d * v.t,
+			x = d * v.x,
+			y = d * v.y,
+			z = d * v.z
+		};
+	}
+	public static Vector4d operator *(Vector4d v, double d) {
+		return d * v;
+	}
+	public static Vector4d operator- (Vector4d v) {
+		return new Vector4d {
+			t = -v.t,
+			x = -v.x,
+			y = -v.y,
+			z = -v.z
+		};
+	}
+}
+
+public class Matrix4d {
+	public double
+		m00, m10, m20, m30,
+		m01, m11, m21, m31,
+		m02, m12, m22, m32,
+		m03, m13, m23, m33;
+
+	public Matrix4d() { }
+	public Matrix4d(Vector4d column0, Vector4d column1, Vector4d column2, Vector4d column3) {
+		m00 = column0.t; m01 = column1.t; m02 = column2.t; m03 = column3.t;
+		m10 = column0.x; m11 = column1.x; m12 = column2.x; m13 = column3.x;
+		m20 = column0.y; m21 = column1.y; m22 = column2.y; m23 = column3.y;
+		m30 = column0.z; m31 = column1.z; m32 = column2.z; m33 = column3.z;
+	}
+	public double this[int row, int column] {
+		get {
+			return this[row + column * 4];
+		}
+		set {
+			this[row + column * 4] = value;
+		}
+	}
+	public double this[int index] {
+		get {
+			switch (index) {
+				case 0: return m00;
+				case 1: return m10;
+				case 2: return m20;
+				case 3: return m30;
+				case 4: return m01;
+				case 5: return m11;
+				case 6: return m21;
+				case 7: return m31;
+				case 8: return m02;
+				case 9: return m12;
+				case 10: return m22;
+				case 11: return m32;
+				case 12: return m03;
+				case 13: return m13;
+				case 14: return m23;
+				case 15: return m33;
+				default:
+					throw new IndexOutOfRangeException("Invalid matrix index!");
+			}
+		}
+		set {
+			switch (index) {
+				case 0: m00 = value; break;
+				case 1: m10 = value; break;
+				case 2: m20 = value; break;
+				case 3: m30 = value; break;
+				case 4: m01 = value; break;
+				case 5: m11 = value; break;
+				case 6: m21 = value; break;
+				case 7: m31 = value; break;
+				case 8: m02 = value; break;
+				case 9: m12 = value; break;
+				case 10: m22 = value; break;
+				case 11: m32 = value; break;
+				case 12: m03 = value; break;
+				case 13: m13 = value; break;
+				case 14: m23 = value; break;
+				case 15: m33 = value; break;
+
+				default:
+					throw new IndexOutOfRangeException("Invalid matrix index!");
+			}
+		}
+	}
+	public static Matrix4d operator *(Matrix4d lhs, Matrix4d rhs) {
+		Matrix4d res = new Matrix4d {
+			m00 = lhs.m00 * rhs.m00 + lhs.m01 * rhs.m10 + lhs.m02 * rhs.m20 + lhs.m03 * rhs.m30,
+			m01 = lhs.m00 * rhs.m01 + lhs.m01 * rhs.m11 + lhs.m02 * rhs.m21 + lhs.m03 * rhs.m31,
+			m02 = lhs.m00 * rhs.m02 + lhs.m01 * rhs.m12 + lhs.m02 * rhs.m22 + lhs.m03 * rhs.m32,
+			m03 = lhs.m00 * rhs.m03 + lhs.m01 * rhs.m13 + lhs.m02 * rhs.m23 + lhs.m03 * rhs.m33,
+
+			m10 = lhs.m10 * rhs.m00 + lhs.m11 * rhs.m10 + lhs.m12 * rhs.m20 + lhs.m13 * rhs.m30,
+			m11 = lhs.m10 * rhs.m01 + lhs.m11 * rhs.m11 + lhs.m12 * rhs.m21 + lhs.m13 * rhs.m31,
+			m12 = lhs.m10 * rhs.m02 + lhs.m11 * rhs.m12 + lhs.m12 * rhs.m22 + lhs.m13 * rhs.m32,
+			m13 = lhs.m10 * rhs.m03 + lhs.m11 * rhs.m13 + lhs.m12 * rhs.m23 + lhs.m13 * rhs.m33,
+
+			m20 = lhs.m20 * rhs.m00 + lhs.m21 * rhs.m10 + lhs.m22 * rhs.m20 + lhs.m23 * rhs.m30,
+			m21 = lhs.m20 * rhs.m01 + lhs.m21 * rhs.m11 + lhs.m22 * rhs.m21 + lhs.m23 * rhs.m31,
+			m22 = lhs.m20 * rhs.m02 + lhs.m21 * rhs.m12 + lhs.m22 * rhs.m22 + lhs.m23 * rhs.m32,
+			m23 = lhs.m20 * rhs.m03 + lhs.m21 * rhs.m13 + lhs.m22 * rhs.m23 + lhs.m23 * rhs.m33,
+
+			m30 = lhs.m30 * rhs.m00 + lhs.m31 * rhs.m10 + lhs.m32 * rhs.m20 + lhs.m33 * rhs.m30,
+			m31 = lhs.m30 * rhs.m01 + lhs.m31 * rhs.m11 + lhs.m32 * rhs.m21 + lhs.m33 * rhs.m31,
+			m32 = lhs.m30 * rhs.m02 + lhs.m31 * rhs.m12 + lhs.m32 * rhs.m22 + lhs.m33 * rhs.m32,
+			m33 = lhs.m30 * rhs.m03 + lhs.m31 * rhs.m13 + lhs.m32 * rhs.m23 + lhs.m33 * rhs.m33
+		};
+
+		return res;
+	}
+	public static Vector4d operator *(Matrix4d lhs, Vector4d vector) {
+		Vector4d res = new Vector4d {
+			t = lhs.m00 * vector.t + lhs.m01 * vector.x + lhs.m02 * vector.y + lhs.m03 * vector.z,
+			x = lhs.m10 * vector.t + lhs.m11 * vector.x + lhs.m12 * vector.y + lhs.m13 * vector.z,
+			y = lhs.m20 * vector.t + lhs.m21 * vector.x + lhs.m22 * vector.y + lhs.m23 * vector.z,
+			z = lhs.m30 * vector.t + lhs.m31 * vector.x + lhs.m32 * vector.y + lhs.m33 * vector.z
+		};
+		return res;
+	}
+
+	public Matrix4d Inverse() {
+		Matrix4d result = new Matrix4d();
+		result[0] = this[5] * this[10] * this[15] -
+			this[5] * this[11] * this[14] -
+			this[9] * this[6] * this[15] +
+			this[9] * this[7] * this[14] +
+			this[13] * this[6] * this[11] -
+			this[13] * this[7] * this[10];
+
+		result[4] = -this[4] * this[10] * this[15] +
+			this[4] * this[11] * this[14] +
+			this[8] * this[6] * this[15] -
+			this[8] * this[7] * this[14] -
+			this[12] * this[6] * this[11] +
+			this[12] * this[7] * this[10];
+
+		result[8] = this[4] * this[9] * this[15] -
+			this[4] * this[11] * this[13] -
+			this[8] * this[5] * this[15] +
+			this[8] * this[7] * this[13] +
+			this[12] * this[5] * this[11] -
+			this[12] * this[7] * this[9];
+
+		result[12] = -this[4] * this[9] * this[14] +
+			this[4] * this[10] * this[13] +
+			this[8] * this[5] * this[14] -
+			this[8] * this[6] * this[13] -
+			this[12] * this[5] * this[10] +
+			this[12] * this[6] * this[9];
+
+		result[1] = -this[1] * this[10] * this[15] +
+			this[1] * this[11] * this[14] +
+			this[9] * this[2] * this[15] -
+			this[9] * this[3] * this[14] -
+			this[13] * this[2] * this[11] +
+			this[13] * this[3] * this[10];
+
+		result[5] = this[0] * this[10] * this[15] -
+			this[0] * this[11] * this[14] -
+			this[8] * this[2] * this[15] +
+			this[8] * this[3] * this[14] +
+			this[12] * this[2] * this[11] -
+			this[12] * this[3] * this[10];
+
+		result[9] = -this[0] * this[9] * this[15] +
+			this[0] * this[11] * this[13] +
+			this[8] * this[1] * this[15] -
+			this[8] * this[3] * this[13] -
+			this[12] * this[1] * this[11] +
+			this[12] * this[3] * this[9];
+
+		result[13] = this[0] * this[9] * this[14] -
+			this[0] * this[10] * this[13] -
+			this[8] * this[1] * this[14] +
+			this[8] * this[2] * this[13] +
+			this[12] * this[1] * this[10] -
+			this[12] * this[2] * this[9];
+
+		result[2] = this[1] * this[6] * this[15] -
+			this[1] * this[7] * this[14] -
+			this[5] * this[2] * this[15] +
+			this[5] * this[3] * this[14] +
+			this[13] * this[2] * this[7] -
+			this[13] * this[3] * this[6];
+
+		result[6] = -this[0] * this[6] * this[15] +
+			this[0] * this[7] * this[14] +
+			this[4] * this[2] * this[15] -
+			this[4] * this[3] * this[14] -
+			this[12] * this[2] * this[7] +
+			this[12] * this[3] * this[6];
+
+		result[10] = this[0] * this[5] * this[15] -
+			this[0] * this[7] * this[13] -
+			this[4] * this[1] * this[15] +
+			this[4] * this[3] * this[13] +
+			this[12] * this[1] * this[7] -
+			this[12] * this[3] * this[5];
+
+		result[14] = -this[0] * this[5] * this[14] +
+			this[0] * this[6] * this[13] +
+			this[4] * this[1] * this[14] -
+			this[4] * this[2] * this[13] -
+			this[12] * this[1] * this[6] +
+			this[12] * this[2] * this[5];
+
+		result[3] = -this[1] * this[6] * this[11] +
+			this[1] * this[7] * this[10] +
+			this[5] * this[2] * this[11] -
+			this[5] * this[3] * this[10] -
+			this[9] * this[2] * this[7] +
+			this[9] * this[3] * this[6];
+
+		result[7] = this[0] * this[6] * this[11] -
+			this[0] * this[7] * this[10] -
+			this[4] * this[2] * this[11] +
+			this[4] * this[3] * this[10] +
+			this[8] * this[2] * this[7] -
+			this[8] * this[3] * this[6];
+
+		result[11] = -this[0] * this[5] * this[11] +
+			this[0] * this[7] * this[9] +
+			this[4] * this[1] * this[11] -
+			this[4] * this[3] * this[9] -
+			this[8] * this[1] * this[7] +
+			this[8] * this[3] * this[5];
+
+		result[15] = this[0] * this[5] * this[10] -
+			this[0] * this[6] * this[9] -
+			this[4] * this[1] * this[10] +
+			this[4] * this[2] * this[9] +
+			this[8] * this[1] * this[6] -
+			this[8] * this[2] * this[5];
+
+		double det = this[0] * result[0] + this[1] * result[4] + this[2] * result[8] + this[3] * result[12];
+
+		if (det == 0)
+			return new Matrix4d();
+
+		det = 1.0 / det;
+
+		for (int i = 0; i < 16; i++)
+			result[i] *= det;
+
+		return result;
+	}
+	public Matrix4d Transpose() {
+		Matrix4d result = new Matrix4d {
+			m00 = m00,
+			m01 = m10,
+			m02 = m20,
+			m03 = m30,
+			m10 = m01,
+			m11 = m11,
+			m12 = m21,
+			m13 = m31,
+			m20 = m02,
+			m21 = m12,
+			m22 = m22,
+			m23 = m32,
+			m30 = m03,
+			m31 = m13,
+			m32 = m23,
+			m33 = m33
+		};
+		return result;
+	}
+
+	public static Matrix4d Identity() {
+		return new Matrix4d() {
+			m00 = 1,
+			m11 = 1,
+			m22 = 1,
+			m33 = 1
+		};
+	}
+}
+
+public class Matrix5d {
+	public Matrix4d Transformation;
+	public Vector4d Translation;
+	public Matrix5d() {
+		Transformation = Matrix4d.Identity();
+		Translation = new Vector4d();
+	}
+	public Matrix5d(Matrix4d _Transformation, Vector4d _Translation) {
 		Transformation = _Transformation;
 		Translation = _Translation;
 	}
-	public Matrix(Matrix4x4 _Transformation) {
+	public Matrix5d(Matrix4d _Transformation) {
 		Transformation = _Transformation;
-		Translation = Vector4.zero;
+		Translation = new Vector4d();
 	}
-	public Matrix(Matrix other) {
+	public Matrix5d(Matrix5d other) {
 		Transformation = other.Transformation;
 		Translation = other.Translation;
 	}
 
-	public Matrix Inverse() {
-		Matrix4x4 inv = Transformation.inverse;
-		return new Matrix(inv, -(inv * Translation));
+	public Matrix5d Inverse() {
+		Matrix4d inv = Transformation.Inverse();
+		return new Matrix5d(inv, -(inv * Translation));
 	}
 	public Plane InvTransposePlaneMultiplication(Plane p) {
-		Vector4 O = this * (p.Normal * p.Distance);
-		Vector4 N = (Transformation.inverse.transpose * p.Normal).normalized;
-		float d = Vector4.Dot(O, N);
+		Vector4d O = this * (p.Normal.Normalized() * p.Distance);
+		Vector4d N = (Transformation.Inverse().Transpose() * p.Normal).Normalized();
+		double d = O * N;
 		return new Plane(N, d);
 	}
-	public static Matrix operator *(Matrix lhs, Matrix rhs) {
-		Matrix ret = new Matrix();
+	public static Matrix5d operator *(Matrix5d lhs, Matrix5d rhs) {
+		Matrix5d ret = new Matrix5d();
 		ret.Transformation = lhs.Transformation * rhs.Transformation;
 		ret.Translation = lhs.Translation + lhs.Transformation * rhs.Translation;
-		/*
-		ret.Translation.x = lhs.Translation.x + rhs.Translation.x * lhs.Transformation[0, 0] + rhs.Translation.y * lhs.Transformation[0, 1] + rhs.Translation.z * lhs.Transformation[0, 2] + rhs.Translation.w * lhs.Transformation[0, 3];
-		ret.Translation.y = lhs.Translation.y + rhs.Translation.x * lhs.Transformation[1, 0] + rhs.Translation.y * lhs.Transformation[1, 1] + rhs.Translation.z * lhs.Transformation[1, 2] + rhs.Translation.w * lhs.Transformation[1, 3];
-		ret.Translation.z = lhs.Translation.z + rhs.Translation.x * lhs.Transformation[2, 0] + rhs.Translation.y * lhs.Transformation[2, 1] + rhs.Translation.z * lhs.Transformation[2, 2] + rhs.Translation.w * lhs.Transformation[2, 3];
-		ret.Translation.w = lhs.Translation.w + rhs.Translation.x * lhs.Transformation[3, 0] + rhs.Translation.y * lhs.Transformation[3, 1] + rhs.Translation.z * lhs.Transformation[3, 2] + rhs.Translation.w * lhs.Transformation[3, 3];
-		*/
 		return ret;
 	}
-	public static Vector4 operator *(Matrix lhs, Vector4 rhs) {
+	public static Vector4d operator *(Matrix5d lhs, Vector4d rhs) {
 		return lhs.Translation + lhs.Transformation * rhs;
 	}
 }
 
 public class Relativity_Controller : MonoBehaviour {
 	public GameObject Observer;
-	public Vector3 InitialVelocity; //Velocity relative to coordinate frame
-	public float ProperTimeOffset;
-	public List<Vector3> ProperAccelerations;
-	public List<float> AccelerationDurations;
-	public List<Vector3> AccelerationOffsets;
-	public Vector4 CurrentEvent;
-	public float ProperTime;
-	public Vector3 Velocity;
+	public Vector3d InitialVelocity; //Velocity relative to coordinate frame
+	public double ProperTimeOffset;
+	public List<Vector3d> ProperAccelerations;
+	public List<double> AccelerationDurations;
+	public List<Vector3d> AccelerationOffsets;
+	public Vector4d CurrentEvent;
+	public double ProperTime;
+	public Vector3d Velocity;
 
 	private Relativity_Observer observerScript;
 	private GameObject plane;
@@ -84,171 +512,130 @@ public class Relativity_Controller : MonoBehaviour {
 	}
 
 	void FixedUpdate() {
-		float observerTime = observerScript.CoordinateTime;
+		double observerTime = observerScript.CoordinateTime;
 		CurrentEvent = GetState(observerTime);
-		float di = 0.01f;
-		Vector3 A = observerScript.accelerations[0];
-		for (float i = 0; i+di < Sinh(observerScript.durations[0] * A.magnitude)/A.magnitude; i += di) {
-			Vector3 d1 = A * (-1 + Mathf.Sqrt(1 + i * i * A.sqrMagnitude)) / A.sqrMagnitude;
-			Vector3 d2 = A * (-1 + Mathf.Sqrt(1 + (i+di) * (i+di) * A.sqrMagnitude)) / A.sqrMagnitude;
-			d1.z += i;
-			d2.z += i + di;
-			Debug.DrawLine(d1, d2);
-		}
 	}
 
-	Vector4 GetState(float observerTime) {
-		Vector4 localObserverEvent = Vector4.zero;
+	Vector4d GetState(double observerTime) {
+		Vector4d localObserverEvent = new Vector4d();
 		// To transform from observer to coordinate, translate observer's event by observer.position, then apply the lorentz transformation on the resulting event.
 		// Therefore, coordinateToObserverBoost = boost (observer.velocity) to observer frame, then translate by -observer position.
 		// Then observerToCoordinateBoost = coordinateToObserverBoost.Inverse();
-		Matrix coordinateToObserverBoost = new Matrix(); // (LorentzBoost(observerScript.velocity), CombineTemporalAndSpatial(0, -Observer.transform.position));
-		Matrix observerToCoordinateBoost = new Matrix(LorentzBoost(-observerScript.velocity)); // coordinateToObserverBoost.Inverse();
-		float calculatedTime = 0;
+		Vector3d observerVelocity = new Vector3d((double)observerScript.velocity.x, (double)observerScript.velocity.y, (double)observerScript.velocity.z);
+		Matrix5d observerToCoordinateBoost = new Matrix5d(LorentzBoost(-observerVelocity)); // coordinateToObserverBoost.Inverse();
+		double calculatedTime = 0;
 		if (observerTime > 0) {
 			for (int i = 0; i < observerScript.accelerations.Count; i++) {
-				Vector3 A = observerScript.accelerations[i];
-				float T = observerScript.durations[i];
+				Vector3d A = new Vector3d((double)observerScript.accelerations[i].x, (double)observerScript.accelerations[i].y, (double)observerScript.accelerations[i].z);
+				double ASqr = A.SqrMagnitude();
+				double T = observerScript.durations[i];
 				bool lastAccel = false;
 				if (observerTime < GetTemporalComponent(localObserverEvent) + T) {
 					T = observerTime - GetTemporalComponent(localObserverEvent);
 					lastAccel = true;
 				}
-				localObserverEvent = CombineTemporalAndSpatial(T, Vector3.zero);
+				localObserverEvent = CombineTemporalAndSpatial(T, new Vector3d());
 				double aSqr = Math.Pow(A.x, 2) + Math.Pow(A.y, 2) + Math.Pow(A.z, 2);
 				double a = Math.Sqrt(aSqr);
-				float t = (float)(Math.Sinh(T * a) / a);
-				Vector3 velocity = A * t / Mathf.Sqrt(1 + t * t * A.sqrMagnitude);
-				float gamma = Mathf.Sqrt(1 + t * t * A.sqrMagnitude);
-				Vector3 displacement = A * (float)((Math.Sqrt(1 + t * t * aSqr) - 1) / aSqr);
-				Vector3 x = A * Mathf.Sqrt(1 + t * t * A.sqrMagnitude) / A.sqrMagnitude;
-				//Matrix M = new Matrix(LorentzBoost(-velocity), CombineTemporalAndSpatial(-t + T, -displacement));
-				Matrix M = new Matrix(LorentzBoost(velocity), CombineTemporalAndSpatial(-t, displacement));
-				Matrix MInv = M.Inverse();
+				double t = Math.Sinh(T * a) / a;
+				Vector3d velocity = A * t / Math.Sqrt(1 + t * t * ASqr);
+				Vector3d displacement = A * (Math.Sqrt(1 + t * t * aSqr) - 1) / aSqr;
+				Matrix5d M = new Matrix5d(LorentzBoost(velocity), CombineTemporalAndSpatial(-t, displacement));
+				Matrix5d MInv = M.Inverse();
 				observerToCoordinateBoost *= MInv;
 				calculatedTime += T;
 				if (lastAccel) break;
 			}
 		}
-		localObserverEvent = CombineTemporalAndSpatial(observerTime - calculatedTime, Vector3.zero);
+		localObserverEvent = CombineTemporalAndSpatial(observerTime - calculatedTime, new Vector3d());
 		Plane simulPlane = new Plane {
 			Distance = observerTime - calculatedTime
 		};
-		Vector4 coordinateObserverEvent = observerToCoordinateBoost * localObserverEvent;
-		Vector3 coe = GetSpatialComponent(coordinateObserverEvent);
+		Vector4d coordinateObserverEvent = observerToCoordinateBoost * localObserverEvent;
+		Vector3d coe = GetSpatialComponent(coordinateObserverEvent);
 		coe.z += GetTemporalComponent(coordinateObserverEvent);
-		Debug.DrawRay(coe, Vector3.up, Color.white, 1000);
+		Debug.DrawRay(new Vector3((float)coe.x, (float)coe.y, (float)coe.z), Vector3.up, Color.white, 1000);
 		simulPlane = observerToCoordinateBoost.InvTransposePlaneMultiplication(simulPlane);
-		Vector3 normal = GetSpatialComponent(simulPlane.Normal);
+		Vector3d normal = GetSpatialComponent(simulPlane.Normal);
 		normal.z += GetTemporalComponent(simulPlane.Normal);
+		plane.transform.up = -new Vector3((float)normal.x, (float)normal.y, (float)normal.z);
+		Vector3d pos = normal.Normalized() * simulPlane.Distance;
+		plane.transform.position = new Vector3((float)pos.x, (float)pos.y, (float)pos.z);
 		float di = 10;
 		for (float i = -10; i < 10; i += di) {
-			Vector4 e1 = observerToCoordinateBoost * CombineTemporalAndSpatial(i + observerTime - calculatedTime, Vector3.zero);
-			Vector4 e2 = observerToCoordinateBoost * CombineTemporalAndSpatial(i + di + observerTime - calculatedTime, Vector3.zero);
-			Vector3 v1 = GetSpatialComponent(e1);
+			Vector4d e1 = observerToCoordinateBoost * CombineTemporalAndSpatial(i + observerTime - calculatedTime, new Vector3d());
+			Vector4d e2 = observerToCoordinateBoost * CombineTemporalAndSpatial(i + di + observerTime - calculatedTime, new Vector3d());
+			Vector3d v1 = GetSpatialComponent(e1);
 			v1.z += GetTemporalComponent(e1);
-			Vector3 v2 = GetSpatialComponent(e2);
+			Vector3d v2 = GetSpatialComponent(e2);
 			v2.z += GetTemporalComponent(e2);
-			Debug.DrawLine(v1, v2);
+			Debug.DrawLine(new Vector3((float)v1.x, (float)v1.y, (float)v1.z), new Vector3((float)v2.x, (float)v2.y, (float)v2.z));
 		}
-		plane.transform.up = -normal;
-		plane.transform.position = normal.normalized * simulPlane.Distance;
-		return Vector4.zero;
+		return new Vector4d();
 	}
 
-	Vector3 VelocityToProper(Vector3 v) {
-		return v / Mathf.Sqrt(1f - v.sqrMagnitude);
+	Vector3d VelocityToProper(Vector3d v) {
+		return v / Math.Sqrt(1.0 - v.SqrMagnitude());
 	}
 
-	Vector3 ProperToVelocity(Vector3 v) {
-		return v / Mathf.Sqrt(1f + v.sqrMagnitude);
+	Vector3d ProperToVelocity(Vector3d v) {
+		return v / Math.Sqrt(1.0 + v.SqrMagnitude());
 	}
 
-	Vector3 AddVelocity(Vector3 v, Vector3 u) {
+	Vector3d AddVelocity(Vector3d v, Vector3d u) {
 		//Einstein Velocity Addition
-		if (v.sqrMagnitude == 0)
+		if (v.SqrMagnitude() == 0)
 			return u;
-		if (u.sqrMagnitude == 0)
+		if (u.SqrMagnitude() == 0)
 			return v;
-		float gamma = Lorentz(v);
-		return 1f / (1 + Vector3.Dot(u, v)) * (v + u * InvLorentz(v) + gamma / (1f + gamma) * Vector3.Dot(u, v) * v);
+		double gamma = Lorentz(v);
+		return 1.0 / (1 + u * v) * (v + u * InvLorentz(v) + gamma / (1f + gamma) * (u * v) * v);
 	}
 
-	Vector3 AddProperVelocity(Vector3 v, Vector3 u) {
-		float Bu = 1 / Mathf.Sqrt(1f + u.sqrMagnitude);
-		float Bv = 1 / Mathf.Sqrt(1f + v.sqrMagnitude);
-		return v + u + (Bv / (1 + Bv) * Vector3.Dot(v, u) + (1 - Bu) / Bu) * v;
+	Vector3d AddProperVelocity(Vector3d v, Vector3d u) {
+		double Bu = 1 / Math.Sqrt(1.0 + u.SqrMagnitude());
+		double Bv = 1 / Math.Sqrt(1.0 + v.SqrMagnitude());
+		return v + u + (Bv / (1 + Bv) * (v * u) + (1 - Bu) / Bu) * v;
 	}
 
-	float Lorentz(Vector3 v) {
+	double Lorentz(Vector3d v) {
 		//Lorentz Factor
-		return 1f / Mathf.Sqrt(1 - v.sqrMagnitude);
+		return 1.0 / Math.Sqrt(1.0 - v.SqrMagnitude());
 	}
 
-	float InvLorentz(Vector3 v) {
+	double InvLorentz(Vector3d v) {
 		//Reciprocal Lorentz Factor
-		return Mathf.Sqrt(1 - v.sqrMagnitude);
+		return Math.Sqrt(1 - v.SqrMagnitude());
 	}
 
-	float Sinh(float x) {
-		return (Mathf.Pow(Mathf.Exp(1), x) - Mathf.Pow(Mathf.Exp(1), -x)) / 2;
-	}
-
-	float Cosh(float x) {
-		return (Mathf.Pow(Mathf.Exp(1), x) + Mathf.Pow(Mathf.Exp(1), -x)) / 2;
-	}
-
-	float Tanh(float x) {
-		return Sinh(x) / Cosh(x);
-	}
-
-	float ASinh(float x) {
-		return Mathf.Log(x + Mathf.Sqrt(1 + Mathf.Pow(x, 2)));
-	}
-
-	float ACosh(float x) {
-		return Mathf.Log(x + Mathf.Sqrt(Mathf.Pow(x, 2) - 1));
-	}
-
-	float ATanh(float x) {
-		return (Mathf.Log(1 + x) - Mathf.Log(1 - x)) / 2;
-	}
-
-	Matrix4x4 LorentzBoost(Vector3 v) {
+	Matrix4d LorentzBoost(Vector3d v) {
 		//Computes the Lorentz Boost for a given 3-velocity
-		float βSqr = v.sqrMagnitude;
+		double βSqr = v.SqrMagnitude();
 		if (βSqr == 0f) {
-			return Matrix4x4.identity;
+			return Matrix4d.Identity();
 		}
-		float βx = v.x;
-		float βy = v.y;
-		float βz = v.z;
-		float gamma = Lorentz(v);
-		Matrix4x4 boost = new Matrix4x4(
-			new Vector4(gamma, -gamma * βx, -gamma * βy, -gamma * βz),
-			new Vector4(-βx * gamma, (gamma - 1) * (βx * βx) / (βSqr) + 1, (gamma - 1) * (βx * βy) / (βSqr), (gamma - 1) * (βx * βz) / (βSqr)),
-			new Vector4(-βy * gamma, (gamma - 1) * (βy * βx) / (βSqr), (gamma - 1) * (βy * βy) / (βSqr) + 1, (gamma - 1) * (βy * βz) / (βSqr)),
-			new Vector4(-βz * gamma, (gamma - 1) * (βz * βx) / (βSqr), (gamma - 1) * (βz * βy) / (βSqr), (gamma - 1) * (βz * βz) / (βSqr) + 1)
+		double βx = v.x;
+		double βy = v.y;
+		double βz = v.z;
+		double gamma = Lorentz(v);
+		Matrix4d boost = new Matrix4d(
+			new Vector4d(gamma, -gamma * βx, -gamma * βy, -gamma * βz),
+			new Vector4d(-βx * gamma, (gamma - 1) * (βx * βx) / (βSqr) + 1, (gamma - 1) * (βx * βy) / (βSqr), (gamma - 1) * (βx * βz) / (βSqr)),
+			new Vector4d(-βy * gamma, (gamma - 1) * (βy * βx) / (βSqr), (gamma - 1) * (βy * βy) / (βSqr) + 1, (gamma - 1) * (βy * βz) / (βSqr)),
+			new Vector4d(-βz * gamma, (gamma - 1) * (βz * βx) / (βSqr), (gamma - 1) * (βz * βy) / (βSqr), (gamma - 1) * (βz * βz) / (βSqr) + 1)
 		);
 		return boost;
 	}
 
-	Vector4 CombineTemporalAndSpatial(float t, Vector3 p) {
-		return new Vector4(t, p.x, p.y, p.z);
+	Vector4d CombineTemporalAndSpatial(double t, Vector3d p) {
+		return new Vector4d(t, p.x, p.y, p.z);
 	}
 
-	float GetTemporalComponent(Vector4 v) {
-		return v.x;
+	double GetTemporalComponent(Vector4d v) {
+		return v.t;
 	}
 
-	Vector3 GetSpatialComponent(Vector4 v) {
-		return new Vector3(v.y, v.z, v.w);
-	}
-
-	Vector3 AddTimeToZAxis(Vector4 e, float t) {
-		//Add new z value to vector v's z-axis
-		Vector3 v = GetSpatialComponent(e);
-		v.z += GetTemporalComponent(e) + t;
-		return v;
+	Vector3d GetSpatialComponent(Vector4d v) {
+		return new Vector3d(v.x, v.y, v.z);
 	}
 }
