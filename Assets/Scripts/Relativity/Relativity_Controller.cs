@@ -54,6 +54,11 @@ public class Vector3d {
 		y = other.y;
 		z = other.z;
 	}
+	public Vector3d(Vector3 other) {
+		x = other.x;
+		y = other.y;
+		z = other.z;
+	}
 	public Vector3d Normalized() {
 		double magnitude = Magnitude();
 		return new Vector3d(
@@ -61,6 +66,9 @@ public class Vector3d {
 			y / magnitude,
 			z / magnitude
 		);
+	}
+	public Vector3 Vector3() {
+		return new Vector3((float)x, (float)y, (float)z);
 	}
 	public static double operator *(Vector3d lhs, Vector3d rhs) {
 		return
@@ -131,17 +139,31 @@ public class Vector4d {
 	public Vector4d() {
 		t = x = y = z = 0;
 	}
-	public Vector4d(double t_, double x_, double y_, double z_) {
-		t = t_;
-		x = x_;
-		y = y_;
-		z = z_;
+	public Vector4d(double t, double x, double y, double z) {
+		this.t = t;
+		this.x = x;
+		this.y = y;
+		this.z = z;
 	}
 	public Vector4d(Vector4d other) {
 		t = other.t;
 		x = other.x;
 		y = other.y;
 		z = other.z;
+	}
+	public Vector4d(Vector4 other) {
+		//Place the V4d's t coordinate in the x-position of Vector4 so matrix multiplication works correctly.
+		//The spacial components then fill out the (y,z,w) positions respectively
+		t = other.x;
+		x = other.y;
+		y = other.z;
+		z = other.w;
+	}
+	public Vector4d(double t, Vector3d s) {
+		this.t = t;
+		x = s.x;
+		y = s.y;
+		z = s.z;
 	}
 	public Vector4d Normalized() {
 		double magnitude = Magnitude();
@@ -151,6 +173,12 @@ public class Vector4d {
 			y / magnitude,
 			z / magnitude
 		);
+	}
+	public Vector4 Vector4() {
+		return new Vector4((float)t, (float)x, (float)y, (float)z);
+	}
+	public Vector3d Space() {
+		return new Vector3d(x, y, z);
 	}
 	public static double operator* (Vector4d lhs, Vector4d rhs) {
 		return
@@ -500,20 +528,34 @@ public class Relativity_Controller : MonoBehaviour {
 	public List<Vector3d> AccelerationOffsets;
 	public Vector4d CurrentEvent;
 	public double ProperTime;
-	public Vector3d Velocity;
 
 	private Relativity_Observer observerScript;
 	private GameObject plane;
+	private GameObject sphere;
 
 	void Start() {
 		observerScript = Observer.GetComponent<Relativity_Observer>();
 		plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
 		plane.name = name + " Simultaneity Plane";
+		sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+		sphere.name = name + " Observer Representation";
 	}
 
 	void FixedUpdate() {
 		double observerTime = observerScript.CoordinateTime;
+		DrawWorldline();
 		CurrentEvent = GetState(observerTime);
+		/*
+		float di = 1f;
+		Vector3 A = observerScript.accelerations[0];
+		for (float i = 0; i + di < Math.Sinh(observerScript.durations[0] * A.magnitude) / A.magnitude; i += di) {
+			Vector3 d1 = A * (-1 + Mathf.Sqrt(1 + i * i * A.sqrMagnitude)) / A.sqrMagnitude;
+			Vector3 d2 = A * (-1 + Mathf.Sqrt(1 + (i + di) * (i + di) * A.sqrMagnitude)) / A.sqrMagnitude;
+			d1.z += i;
+			d2.z += i + di;
+			Debug.DrawLine(d1, d2);
+		}
+		*/
 	}
 
 	Vector4d GetState(double observerTime) {
@@ -521,57 +563,127 @@ public class Relativity_Controller : MonoBehaviour {
 		// To transform from observer to coordinate, translate observer's event by observer.position, then apply the lorentz transformation on the resulting event.
 		// Therefore, coordinateToObserverBoost = boost (observer.velocity) to observer frame, then translate by -observer position.
 		// Then observerToCoordinateBoost = coordinateToObserverBoost.Inverse();
-		Vector3d observerVelocity = new Vector3d((double)observerScript.velocity.x, (double)observerScript.velocity.y, (double)observerScript.velocity.z);
-		Matrix5d observerToCoordinateBoost = new Matrix5d(LorentzBoost(-observerVelocity)); // coordinateToObserverBoost.Inverse();
+		Vector3d observerVelocity = new Vector3d(observerScript.velocity);
+		Matrix5d observerToCoordinateBoost = new Matrix5d(LorentzBoost(observerVelocity), new Vector4d(0, -new Vector3d(Observer.transform.position))).Inverse();
+
 		double calculatedTime = 0;
 		if (observerTime > 0) {
 			for (int i = 0; i < observerScript.accelerations.Count; i++) {
-				Vector3d A = new Vector3d((double)observerScript.accelerations[i].x, (double)observerScript.accelerations[i].y, (double)observerScript.accelerations[i].z);
-				double ASqr = A.SqrMagnitude();
+				Vector3d A = new Vector3d(observerScript.accelerations[i]);
 				double T = observerScript.durations[i];
 				bool lastAccel = false;
-				if (observerTime < GetTemporalComponent(localObserverEvent) + T) {
-					T = observerTime - GetTemporalComponent(localObserverEvent);
+				if (observerTime < localObserverEvent.t + T) {
+					T = observerTime - localObserverEvent.t;
 					lastAccel = true;
 				}
-				localObserverEvent = CombineTemporalAndSpatial(T, new Vector3d());
-				double aSqr = Math.Pow(A.x, 2) + Math.Pow(A.y, 2) + Math.Pow(A.z, 2);
-				double a = Math.Sqrt(aSqr);
+				localObserverEvent = new Vector4d(T, new Vector3d());
+				double aSqr = A.SqrMagnitude();
+				double a = A.Magnitude();
 				double t = Math.Sinh(T * a) / a;
-				Vector3d velocity = A * t / Math.Sqrt(1 + t * t * ASqr);
+				Vector3d velocity = A * t / Math.Sqrt(1 + t * t * aSqr);
 				Vector3d displacement = A * (Math.Sqrt(1 + t * t * aSqr) - 1) / aSqr;
-				Matrix5d M = new Matrix5d(LorentzBoost(velocity), CombineTemporalAndSpatial(-t, displacement));
+				Matrix5d M = new Matrix5d(LorentzBoost(velocity), new Vector4d(-t, displacement));
 				Matrix5d MInv = M.Inverse();
 				observerToCoordinateBoost *= MInv;
 				calculatedTime += T;
 				if (lastAccel) break;
 			}
 		}
-		localObserverEvent = CombineTemporalAndSpatial(observerTime - calculatedTime, new Vector3d());
+		localObserverEvent = new Vector4d(observerTime - calculatedTime, new Vector3d());
+
+		Matrix5d coordinateToObjectStartBoost = new Matrix5d(LorentzBoost(InitialVelocity), new Vector4d(0, -new Vector3d(transform.position)));
+		Matrix5d observerToObjectStartBoost = coordinateToObjectStartBoost * observerToCoordinateBoost;
+
+
 		Plane simulPlane = new Plane {
 			Distance = observerTime - calculatedTime
 		};
-		Vector4d coordinateObserverEvent = observerToCoordinateBoost * localObserverEvent;
-		Vector3d coe = GetSpatialComponent(coordinateObserverEvent);
-		coe.z += GetTemporalComponent(coordinateObserverEvent);
-		Debug.DrawRay(new Vector3((float)coe.x, (float)coe.y, (float)coe.z), Vector3.up, Color.white, 1000);
-		simulPlane = observerToCoordinateBoost.InvTransposePlaneMultiplication(simulPlane);
-		Vector3d normal = GetSpatialComponent(simulPlane.Normal);
-		normal.z += GetTemporalComponent(simulPlane.Normal);
-		plane.transform.up = -new Vector3((float)normal.x, (float)normal.y, (float)normal.z);
-		Vector3d pos = normal.Normalized() * simulPlane.Distance;
-		plane.transform.position = new Vector3((float)pos.x, (float)pos.y, (float)pos.z);
-		float di = 10;
-		for (float i = -10; i < 10; i += di) {
-			Vector4d e1 = observerToCoordinateBoost * CombineTemporalAndSpatial(i + observerTime - calculatedTime, new Vector3d());
-			Vector4d e2 = observerToCoordinateBoost * CombineTemporalAndSpatial(i + di + observerTime - calculatedTime, new Vector3d());
-			Vector3d v1 = GetSpatialComponent(e1);
-			v1.z += GetTemporalComponent(e1);
-			Vector3d v2 = GetSpatialComponent(e2);
-			v2.z += GetTemporalComponent(e2);
-			Debug.DrawLine(new Vector3((float)v1.x, (float)v1.y, (float)v1.z), new Vector3((float)v2.x, (float)v2.y, (float)v2.z));
+		Vector4d coordinateObserverEvent = observerToObjectStartBoost * localObserverEvent;
+		Vector3d coe = coordinateObserverEvent.Space();
+		coe.z += coordinateObserverEvent.t;
+		Debug.DrawRay(coe.Vector3(), Vector3.up, Color.white);
+		simulPlane = observerToObjectStartBoost.InvTransposePlaneMultiplication(simulPlane);
+		Vector4d normal4 = simulPlane.Normal.Normalized();
+		Vector3d normal3 = normal4.Space();
+		normal3.z += normal4.t;
+		
+		plane.transform.position = coe.Vector3();
+
+		plane.transform.LookAt(coe.Vector3() - normal3.Vector3(), Vector3.up);
+		plane.transform.Rotate(90f, 0, 0, Space.Self);
+
+		double d = simulPlane.Distance / normal4.t;
+		Debug.DrawRay(new Vector3(0, 0, (float)d), Vector3.up, Color.red);
+		Vector4d eventInObjectFrame = new Vector4d(d, new Vector3d());
+		Vector4d eventInObserverFrame = observerToObjectStartBoost.Inverse() * eventInObjectFrame;
+
+		Vector3d drawInObserverFrame = eventInObserverFrame.Space();
+		drawInObserverFrame.z += eventInObserverFrame.t + calculatedTime;
+
+		sphere.transform.position = drawInObserverFrame.Vector3();
+		Debug.DrawRay(drawInObserverFrame.Vector3(), Vector3.up, Color.white, 10);
+
+		/*
+		double di = 10;
+		for (double i = -10; i < 10; i += di) {
+			Vector4d e1 = observerToObjectStartBoost * new Vector4d(i + observerTime - calculatedTime, new Vector3d());
+			Vector4d e2 = observerToObjectStartBoost * new Vector4d(i + di + observerTime - calculatedTime, new Vector3d());
+			Vector3d v1 = e1.Space();
+			v1.z += e1.t;
+			Vector3d v2 = e2.Space();
+			v2.z += e2.t;
+			Debug.DrawLine(v1.Vector3(), v2.Vector3());
 		}
+		*/
 		return new Vector4d();
+	}
+
+	void DrawWorldline() {
+		double dT = 0.5;
+		for (double properTime = 0; properTime < 100.0; properTime += dT) {
+			Matrix5d objectToCoordinateBoost = new Matrix5d(LorentzBoost(InitialVelocity), new Vector4d(0.0, -new Vector3d(transform.position))).Inverse();
+			double calculatedTime = 0.0;
+			for (int i=0; i<ProperAccelerations.Count; i++) {
+				Vector3d A = ProperAccelerations[i];
+				double T = AccelerationDurations[i];
+				bool lastAccel = false;
+				if (properTime - calculatedTime <= AccelerationDurations[i]) {
+					T = properTime - calculatedTime;
+					lastAccel = true;
+				}
+				double aSqr = A.SqrMagnitude();
+				double a = A.Magnitude();
+				double t = Math.Sinh(T * a) / a;
+				Vector3d velocity = A * t / Math.Sqrt(1 + t * t * aSqr);
+				Vector3d displacement = A * (Math.Sqrt(1 + t * t * aSqr) - 1) / aSqr;
+				Matrix5d M = new Matrix5d(LorentzBoost(velocity), new Vector4d(-t, displacement));
+				Matrix5d MInv = M.Inverse();
+				objectToCoordinateBoost *= MInv;
+				calculatedTime += T;
+				if (lastAccel) break;
+			}
+			Vector4d localObjectEvent = new Vector4d(properTime - calculatedTime, new Vector3d());
+
+			Matrix5d coordinateToObserverStartBoost = new Matrix5d(LorentzBoost(-new Vector3d(observerScript.velocity)), new Vector4d(0, new Vector3d(Observer.transform.position))).Inverse();
+			Matrix5d objectToObserverStartBoost = coordinateToObserverStartBoost * objectToCoordinateBoost;
+			Vector4d currentObjectEvent = objectToObserverStartBoost * localObjectEvent;
+			if (currentObjectEvent.t > 0) {
+				for (int i = 0; i < observerScript.accelerations.Count; i++) {
+					Vector3d A = new Vector3d(observerScript.accelerations[i]);
+					double t = currentObjectEvent.t;
+					Vector3d X = currentObjectEvent.Space();
+					double aSqr = A.SqrMagnitude();
+					double a = A.Magnitude();
+
+					double t2 = t / Math.Sqrt(-t * t * aSqr + (1 + A * X) * (1 + A * X));
+					double T2 = Math.ASinh
+					if (t2 <= observerScript.durations[i])
+				}
+			}
+			Vector3d drawInObserverFrame = currentObjectEvent.Space();
+			drawInObserverFrame.z += currentObjectEvent.t;
+			Debug.DrawRay(drawInObserverFrame.Vector3(), Vector3.up, Color.white);
+		}
 	}
 
 	Vector3d VelocityToProper(Vector3d v) {
@@ -608,6 +720,10 @@ public class Relativity_Controller : MonoBehaviour {
 		return Math.Sqrt(1 - v.SqrMagnitude());
 	}
 
+	double ASinh(double z) {
+		return Math.Log(z + Math.Sqrt(1 + z * z));
+	}
+
 	Matrix4d LorentzBoost(Vector3d v) {
 		//Computes the Lorentz Boost for a given 3-velocity
 		double βSqr = v.SqrMagnitude();
@@ -625,17 +741,5 @@ public class Relativity_Controller : MonoBehaviour {
 			new Vector4d(-βz * gamma, (gamma - 1) * (βz * βx) / (βSqr), (gamma - 1) * (βz * βy) / (βSqr), (gamma - 1) * (βz * βz) / (βSqr) + 1)
 		);
 		return boost;
-	}
-
-	Vector4d CombineTemporalAndSpatial(double t, Vector3d p) {
-		return new Vector4d(t, p.x, p.y, p.z);
-	}
-
-	double GetTemporalComponent(Vector4d v) {
-		return v.t;
-	}
-
-	Vector3d GetSpatialComponent(Vector4d v) {
-		return new Vector3d(v.x, v.y, v.z);
 	}
 }
