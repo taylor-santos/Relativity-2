@@ -526,7 +526,6 @@ public class Matrix5d {
 }
 
 public class Relativity_Controller : MonoBehaviour {
-	public bool mode = false;
 	public double deltaT = 0.5;
 	public GameObject Observer;
 	public Vector3d InitialVelocity; //Velocity relative to coordinate frame
@@ -728,7 +727,6 @@ public class Relativity_Controller : MonoBehaviour {
 			Vector4d prevTr = new Vector4d();
 			int i = 0;
 			double a = 1.0;
-			Plane simulPlane = new Plane { Distance = observerTime };
 			double prevT = 0;
 			for (; i < observerScript.accelerations.Count; i++) {
 				Vector3d A = new Vector3d(observerScript.accelerations[i]);
@@ -748,27 +746,14 @@ public class Relativity_Controller : MonoBehaviour {
 				//Vector4d newTr = new Vector4d(, new Vector3d());
 				//Matrix5d Tr = new Matrix5d(Matrix4d.Identity(), prevTr);
 				Matrix5d M = new Matrix5d(LorentzBoost(velocity), new Vector4d(-t + T, displacement));
-				if (mode) {
-					observerToCoordinateBoost *= new Matrix5d(Matrix4d.Identity(), prevTr) * M.Inverse() * new Matrix5d(Matrix4d.Identity(), new Vector4d(-calculatedTime, new Vector3d()));
-					prevTr = new Vector4d(T+prevT, new Vector3d());
-				} else {
-					observerToCoordinateBoost *= new Matrix5d(Matrix4d.Identity(), prevTr) * M.Inverse();
-					prevTr = new Vector4d(T, new Vector3d());
-				}
+				observerToCoordinateBoost *= new Matrix5d(Matrix4d.Identity(), prevTr) * M.Inverse() * new Matrix5d(Matrix4d.Identity(), new Vector4d(-calculatedTime, new Vector3d()));
+				prevTr = new Vector4d(T+prevT, new Vector3d());
 				//observerToCoordinateBoost *= MInv * Tr;// * observerToCoordinateBoost;
 				//Debug.Log(simulPlane2.Normal.Space() * displacement + simulPlane2.Normal.t * t - simulPlane2.Distance);
 				//observerToCoordinateBoost *= new Matrix5d(Matrix4d.Identity(), new Vector4d(-prevObserverTime, new Vector3d { x = observerTime }));
-				if (mode) {
-					localObserver = new Vector4d {
-						t = observerTime
-					};
-					simulPlane = new Plane { Distance = observerTime };
-				} else {
-					localObserver = new Vector4d {
-						t = observerTime - calculatedTime
-					};
-					simulPlane = new Plane { Distance = observerTime - calculatedTime };
-				}
+				localObserver = new Vector4d {
+					t = observerTime
+				};
 				prevT = T;
 				if (lastAccel) break;
 			}
@@ -781,29 +766,12 @@ public class Relativity_Controller : MonoBehaviour {
 			Vector4d up = observerToObjectBoost.MultiplyDirection(new Vector4d { y = 1 });
 			Vector4d forward = observerToObjectBoost.MultiplyDirection(new Vector4d { t = 1 });
 			*/
-			Vector4d right = observerToObjectBoost.Inverse().MultiplyDirection(new Vector4d { x = 1 });
-			Vector4d up = observerToObjectBoost.Inverse().MultiplyDirection(new Vector4d { y = 1 });
-			Vector4d forward = observerToObjectBoost.Inverse().MultiplyDirection(new Vector4d { t = 1 });
-			Vector4d origin = observerToObjectBoost * localObserver;
-
-
-			Debug.DrawRay(origin.Draw(), right.Draw() / (float)a, Color.red);
-			Debug.DrawRay(origin.Draw(), up.Draw() * (float)deltaT, Color.green);
-			Debug.DrawRay(origin.Draw(), forward.Draw() * (float)deltaT, Color.blue);
-			Debug.DrawRay(origin.Draw(), -right.Draw() / (float)a, Color.red);
-			Debug.DrawRay(origin.Draw(), -up.Draw() * (float)deltaT, Color.green);
-			Debug.DrawRay(origin.Draw(), -forward.Draw() * (float)deltaT, Color.blue);
-
 			
-			simulPlane = observerToObjectBoost.InvTransposePlaneMultiplication(simulPlane);
 
-
-			/*
-			double properTime = 0;
+			Plane simulPlane = observerToObjectBoost.InvTransposePlaneMultiplication(new Plane { Distance = observerTime });
 			calculatedTime = 0;
-			int accelIndex = 0;
-			for (accelIndex = 0; accelIndex < ProperAccelerations.Count; accelIndex++) {
-				Vector3d A = ProperAccelerations[accelIndex];
+			for (i=0; i<ProperAccelerations.Count; i++) {
+				Vector3d A = ProperAccelerations[i];
 				Vector4d N = simulPlane.Normal.Normalized();
 				Vector3d nX = N.Space();
 				double nXSqr = nX.SqrMagnitude();
@@ -812,7 +780,7 @@ public class Relativity_Controller : MonoBehaviour {
 				double d = simulPlane.Distance;
 				double d2 = d * d;
 				double aSqr = A.SqrMagnitude();
-				double a = Math.Sqrt(aSqr);
+				a = Math.Sqrt(aSqr);
 				double AnX = A * nX;
 				double AnX2 = AnX * AnX;
 				double t2;
@@ -834,73 +802,45 @@ public class Relativity_Controller : MonoBehaviour {
 				} else {
 					break;
 				}
-				properTime = ASinh(t2 * a) / a;
-				if (0 < properTime && properTime <= AccelerationDurations[accelIndex]) {
-					Vector3d velocity = A * t2 / Math.Sqrt(1 + t2 * t2 * aSqr);
-					Vector3d displacement = A * (Math.Sqrt(1 + t2 * t2 * aSqr) - 1) / aSqr;
-					Matrix5d M = new Matrix5d(LorentzBoost(velocity), new Vector4d(-t2 + properTime, displacement));
-					observerToObjectBoost = M * observerToObjectBoost;
-					break;
-				} else if (0 < properTime) {
-					properTime = AccelerationDurations[accelIndex];
-					t2 = Math.Sinh(properTime * a) / a;
-					calculatedTime += t2;
-					Vector3d velocity = A * t2 / Math.Sqrt(1 + t2 * t2 * aSqr);
-					Vector3d displacement = A * (Math.Sqrt(1 + t2 * t2 * aSqr) - 1) / aSqr;
-
-					Matrix5d M = new Matrix5d(LorentzBoost(velocity), new Vector4d(-t2, displacement));
-
-					observerToObjectBoost = M * observerToObjectBoost;
-					//simulPlane = M.InvTransposePlaneMultiplication(simulPlane);
-					
-					simulPlane = new Plane {
-						Distance = observerTime - calculatedTime
-					};
-					simulPlane = observerToObjectBoost.InvTransposePlaneMultiplication(simulPlane);
-				} else {
-					break;
-				}
+				double properTime = ASinh(t2 * a) / a;
+				if (properTime < 0) break;
+				bool lastAccel = properTime <= AccelerationDurations[i];
+				properTime = Math.Min(properTime, AccelerationDurations[i]);
+				t2 = Math.Sinh(properTime * a) / a;
+				Vector3d velocity = A * t2 / Math.Sqrt(1 + t2 * t2 * aSqr);
+				Vector3d displacement = A * (Math.Sqrt(1 + t2 * t2 * aSqr) - 1) / aSqr;
+				Matrix5d M = new Matrix5d(LorentzBoost(velocity), new Vector4d(-t2 + properTime, displacement));
+				observerToObjectBoost = M * observerToObjectBoost;
+				calculatedTime += properTime;
+				if (lastAccel) break;
 			}
-			*/
 
 			Vector4d objObserver = observerToObjectBoost * localObserver;
-			Debug.DrawRay(objObserver.Draw(), Vector3.up, Color.HSVToRGB((float)(observerTime / maxT + i / 3.0) % 1f, 1, 1));
+			//Debug.DrawRay(objObserver.Draw(), Vector3.up, Color.HSVToRGB((float)(observerTime / maxT + 0 / 3.0) % 1f, 1, 1));
+
+			Vector4d right = observerToObjectBoost.Inverse().MultiplyDirection(new Vector4d { x = 1 });
+			Vector4d up = observerToObjectBoost.Inverse().MultiplyDirection(new Vector4d { y = 1 });
+			Vector4d forward = observerToObjectBoost.Inverse().MultiplyDirection(new Vector4d { t = 1 });
+			Vector4d origin = observerToObjectBoost * localObserver;
+
+
+			Debug.DrawRay(origin.Draw(), right.Draw() / (float)a, Color.red);
+			Debug.DrawRay(origin.Draw(), up.Draw() * (float)deltaT, Color.green);
+			Debug.DrawRay(origin.Draw(), forward.Draw() * (float)deltaT, Color.blue);
+			Debug.DrawRay(origin.Draw(), -right.Draw() / (float)a, Color.red);
+			Debug.DrawRay(origin.Draw(), -up.Draw() * (float)deltaT, Color.green);
+			Debug.DrawRay(origin.Draw(), -forward.Draw() * (float)deltaT, Color.blue);
+
+			simulPlane = observerToObjectBoost.InvTransposePlaneMultiplication(new Plane { Distance = observerTime });
 
 			double simulPlaneT = simulPlane.Normal.t;
 			Vector4d localObject = new Vector4d {
 				t = simulPlane.Distance / simulPlaneT
 			};
-			Debug.DrawRay(localObject.Draw(), Vector3.up, Color.HSVToRGB((float)(observerTime / maxT + i / 3.0) % 1f, 1, 1));
+			Debug.DrawRay(localObject.Draw(), Vector3.up*0.3f, Color.HSVToRGB((float)(observerTime / maxT + i / 3.0) % 1f, 1, 1));
 
 			Vector4d objInObserverFrame = observerToObjectBoost.Inverse() * localObject;
-			//Debug.DrawRay(objInObserverFrame.Draw(), Vector3.up, Color.HSVToRGB((float)(observerTime / maxT + i / 3.0) % 1f, 1, 1));
-
-			/*
-			Plane simulPlane = new Plane {
-				Distance = observerTime
-			};
-			simulPlane = observerToObjectBoost.InvTransposePlaneMultiplication(simulPlane);
-			Vector4d planeRay = simulPlane.Normal * simulPlane.Distance;
-			Vector3d planeDraw = planeRay.Space();
-			planeDraw.z += planeRay.t;
-
-			Debug.DrawRay(planeDraw.Vector3(), 100 * Vector3.Cross(planeDraw.Vector3(), Vector3.up), Color.HSVToRGB((float)(observerTime / maxT), 1, 1));
-			Debug.DrawRay(planeDraw.Vector3(), -100 * Vector3.Cross(planeDraw.Vector3(), Vector3.up), Color.HSVToRGB((float)(observerTime / maxT), 1, 1));
-
-			double simulPlaneT = simulPlane.Normal.Normalized().t;
-			Vector4d localObjectEvent = new Vector4d {
-				t = simulPlane.Distance / simulPlaneT
-			};
-			Vector3d localObjectDraw = localObjectEvent.Space();
-			localObjectDraw.z += localObjectEvent.t;
-			Debug.DrawRay(localObjectDraw.Vector3(), -Vector3.up, Color.HSVToRGB((float)(observerTime / maxT), 1, 1));
-			//Debug.DrawLine(localObjectDraw.Vector3(), objObserverDraw.Vector3(), Color.HSVToRGB((float)(observerTime / maxT), 1, 1));
-
-			Vector4d obsObject = observerToObjectBoost.Inverse() * localObjectEvent;
-			Vector3d obsObjectDraw = obsObject.Space();
-			obsObjectDraw.z += obsObject.t;
-			Debug.DrawRay(obsObjectDraw.Vector3(), Vector3.up * 2);
-			*/
+			Debug.DrawRay(objInObserverFrame.Draw(), Vector3.up*2, Color.HSVToRGB((float)(observerTime / maxT + i / 3.0) % 1f, 1, 1));
 		}
 	}
 
