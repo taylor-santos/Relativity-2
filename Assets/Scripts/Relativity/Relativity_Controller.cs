@@ -107,6 +107,9 @@ public class Vector3d {
 			z = -v.z
 		};
 	}
+	public static Vector3d operator -(Vector3d lhs, Vector3d rhs) {
+		return lhs + (-rhs);
+	}
 }
 [Serializable]
 public class Vector4d {
@@ -216,6 +219,9 @@ public class Vector4d {
 			y = -v.y,
 			z = -v.z
 		};
+	}
+	public static Vector4d operator -(Vector4d lhs, Vector4d rhs) {
+		return lhs + (-rhs);
 	}
 }
 
@@ -526,6 +532,7 @@ public class Matrix5d {
 }
 
 public class Relativity_Controller : MonoBehaviour {
+	public bool lightCone = false;
 	public double deltaT = 0.5;
 	public GameObject Observer;
 	public Vector3d InitialVelocity; //Velocity relative to coordinate frame
@@ -553,7 +560,10 @@ public class Relativity_Controller : MonoBehaviour {
 			deltaT = 0.01;
 		}
 		double observerTime = observerScript.CoordinateTime;
-		DrawWorldline();
+		if (lightCone)
+			DrawLightConeWorldline();
+		else
+			DrawWorldline();
 		//CurrentEvent = GetState(observerTime);
 		/*
 		float di = 1f;
@@ -628,8 +638,7 @@ public class Relativity_Controller : MonoBehaviour {
 		drawInObserverFrame.z += eventInObserverFrame.t + calculatedTime;
 
 		sphere.transform.position = drawInObserverFrame.Vector3();
-		Debug.DrawRay(drawInObserverFrame.Vector3(), Vector3.up, Color.white, 10);
-
+		//Debug.DrawRay(drawInObserverFrame.Vector3(), Vector3.up, Color.white, 10);
 		/*
 		double di = 10;
 		for (double i = -10; i < 10; i += di) {
@@ -646,7 +655,213 @@ public class Relativity_Controller : MonoBehaviour {
 	}
 
 	void DrawWorldline() {
-		double maxT = 10;
+		double maxT = 70;
+		/*
+		for (double properTime = 0; properTime < 20.0; properTime += dT) {
+			Matrix5d objectToCoordinateBoost = new Matrix5d(LorentzBoost(InitialVelocity), new Vector4d(0.0, -new Vector3d(transform.position))).Inverse();
+			double calculatedTime = 0.0;
+			for (int i=0; i<ProperAccelerations.Count; i++) {
+				Vector3d A = ProperAccelerations[i];
+				double T = AccelerationDurations[i];
+				bool lastAccel = false;
+				if (properTime - calculatedTime <= AccelerationDurations[i]) {
+					T = properTime - calculatedTime;
+					lastAccel = true;
+				}
+				double aSqr = A.SqrMagnitude();
+				double a = A.Magnitude();
+				double t = Math.Sinh(T * a) / a;
+				Vector3d velocity = A * t / Math.Sqrt(1 + t * t * aSqr);
+				Vector3d displacement = A * (Math.Sqrt(1 + t * t * aSqr) - 1) / aSqr;
+				Matrix5d M = new Matrix5d(LorentzBoost(velocity), new Vector4d(-t, displacement));
+				Matrix5d MInv = M.Inverse();
+				objectToCoordinateBoost *= MInv;
+				calculatedTime += T;
+				if (lastAccel) break;
+			}
+			Vector4d localObjectEvent = new Vector4d(properTime - calculatedTime, new Vector3d());
+			Matrix5d coordinateToObserverStartBoost = new Matrix5d(LorentzBoost(-new Vector3d(observerScript.velocity)), new Vector4d(0, new Vector3d(Observer.transform.position))).Inverse();
+			Matrix5d objectToObserverBoost = coordinateToObserverStartBoost * objectToCoordinateBoost;
+			Vector4d currentObjectEvent = objectToObserverBoost * localObjectEvent;
+			if (currentObjectEvent.t > 0) {
+				for (int i = 0; i < observerScript.accelerations.Count; i++) {
+					Vector3d A = new Vector3d(observerScript.accelerations[i]);
+					Vector3d X = currentObjectEvent.Space();
+					double t = currentObjectEvent.t;
+					double aSqr = A.SqrMagnitude();
+					double a = Math.Sqrt(aSqr);
+					double t2 = 0;
+					if (A*A < Math.Pow(1 + A*X, 2)/(t*t)) {
+						if (t != 0) {
+							t2 = Math.Abs(t) / Math.Sqrt(-t * t * aSqr + Math.Pow(1 + A * X, 2));
+							if ((A * X > -1 && t < 0) || (A * X < -1 && t > 0)) {
+								t2 = -t2;
+							}
+						}
+						Vector3d velocity = A * t2 / Math.Sqrt(1 + t2 * t2 * aSqr);
+						Vector3d displacement = A * (Math.Sqrt(1 + t2 * t2 * aSqr) - 1) / aSqr;
+						double T = ASinh(t2 * a) / a;
+						Matrix5d M = new Matrix5d(LorentzBoost(velocity), new Vector4d(-t2+T, displacement));
+						//Matrix5d MInv = M.Inverse();
+						objectToObserverBoost = M * objectToObserverBoost;
+					} else {
+						// Rindler Horizon
+						// Debug.Log("Horizon " + A.x + " " + A.y + " " + A.z + " | " + X.x + " " + X.y + " " + X.z + " | " + t);
+					}
+				}
+			}
+			currentObjectEvent = objectToObserverBoost * localObjectEvent;
+			Vector3d drawInObserverFrame = currentObjectEvent.Space();
+			drawInObserverFrame.z += currentObjectEvent.t;
+			Debug.DrawRay(drawInObserverFrame.Vector3(), Vector3.up, Color.green);
+		}
+		*/
+		bool first = true;
+
+		Matrix5d initialBoost = new Matrix5d(LorentzBoost(InitialVelocity), new Vector4d(0, new Vector3d(-transform.position))) * new Matrix5d(LorentzBoost(new Vector3d(observerScript.velocity)), new Vector4d(0, new Vector3d(-Observer.transform.position))).Inverse();
+		Vector4d back = initialBoost.Inverse().MultiplyDirection(new Vector4d { t = -1 });
+		Vector4d center = initialBoost * new Vector4d();
+		//Debug.DrawRay(center.Draw(), back.Draw() * 1000);
+
+		for (double observerTime = 0; observerTime < maxT; observerTime += deltaT) {
+			Vector3d observerVelocity = new Vector3d(observerScript.velocity);
+			Matrix5d observerToCoordinateBoost = new Matrix5d(LorentzBoost(observerVelocity), new Vector4d(0, new Vector3d(-Observer.transform.position))).Inverse();
+			Vector4d localObserver = new Vector4d {
+				t = observerTime
+			};
+			Vector4d coordObserver = observerToCoordinateBoost * localObserver;
+			//Debug.DrawRay(coordObserverDraw.Vector3(), Vector3.up, Color.cyan);
+			double calculatedTime = 0;
+			Vector4d prevTr = new Vector4d();
+			int i = 0;
+			double a = 1.0;
+			double prevT = 0;
+			for (; i < observerScript.accelerations.Count; i++) {
+				Vector3d A = new Vector3d(observerScript.accelerations[i]);
+				double T = observerScript.durations[i];
+				bool lastAccel = false;
+				calculatedTime += prevT;
+				if (observerTime < calculatedTime + T) {
+					T = observerTime - calculatedTime;
+					lastAccel = true;
+				}
+
+				double aSqr = A.SqrMagnitude();
+				a = A.Magnitude();
+				double t = Math.Sinh(T * a) / a;
+				Vector3d velocity = A * t / Math.Sqrt(1 + t * t * aSqr);
+				Vector3d displacement = A * (Math.Sqrt(1 + t * t * aSqr) - 1) / aSqr;
+				//Vector4d newTr = new Vector4d(, new Vector3d());
+				//Matrix5d Tr = new Matrix5d(Matrix4d.Identity(), prevTr);
+				Matrix5d M = new Matrix5d(LorentzBoost(velocity), new Vector4d(-t + T, displacement));
+				observerToCoordinateBoost *= new Matrix5d(Matrix4d.Identity(), prevTr) * M.Inverse() * new Matrix5d(Matrix4d.Identity(), new Vector4d(-calculatedTime, new Vector3d()));
+				prevTr = new Vector4d(T + prevT, new Vector3d());
+				//observerToCoordinateBoost *= MInv * Tr;// * observerToCoordinateBoost;
+				//Debug.Log(simulPlane2.Normal.Space() * displacement + simulPlane2.Normal.t * t - simulPlane2.Distance);
+				//observerToCoordinateBoost *= new Matrix5d(Matrix4d.Identity(), new Vector4d(-prevObserverTime, new Vector3d { x = observerTime }));
+				localObserver = new Vector4d {
+					t = observerTime
+				};
+				prevT = T;
+				if (lastAccel) break;
+			}
+			//localObserverEvent = new Vector4d(observerTime - calculatedTime, new Vector3d());
+			Matrix5d coordinateToObjectBoost = new Matrix5d(LorentzBoost(InitialVelocity), new Vector4d(0, new Vector3d(-transform.position)));
+			Matrix5d observerToObjectBoost = coordinateToObjectBoost * observerToCoordinateBoost;
+
+			/*
+			Vector4d right = observerToObjectBoost.MultiplyDirection(new Vector4d { x = 1 });
+			Vector4d up = observerToObjectBoost.MultiplyDirection(new Vector4d { y = 1 });
+			Vector4d forward = observerToObjectBoost.MultiplyDirection(new Vector4d { t = 1 });
+			*/
+
+
+			Plane simulPlane = observerToObjectBoost.InvTransposePlaneMultiplication(new Plane { Distance = observerTime });
+			double simulPlaneT = simulPlane.Normal.t;
+			Vector4d localObject = new Vector4d {
+				t = simulPlane.Distance / simulPlaneT
+			};
+			calculatedTime = 0;
+			Matrix5d prevBoost = new Matrix5d();
+			Vector3 offset = Vector3.zero;
+			for (i = 0; i < ProperAccelerations.Count; i++) {
+				Vector3d A = ProperAccelerations[i];
+				Vector4d N = simulPlane.Normal.Normalized();
+				Vector3d nX = N.Space();
+				double nXSqr = nX.SqrMagnitude();
+				double nT = N.t;
+				double nT2 = nT * nT;
+				double d = simulPlane.Distance;
+				double d2 = d * d;
+				double aSqr = A.SqrMagnitude();
+
+				double AnX = A * nX;
+				double AnX2 = AnX * AnX;
+				double t2;
+				//Find intersection time t2 between simulPlane and worldline of particle under proper acceleration A:
+				if (d == 0 && nT == 0 && AnX != 0 && nXSqr >= 0 && aSqr > 0) {
+					t2 = 0;
+				} else if (AnX == 0 && d >= 0 && nT != 0 && nXSqr >= 0 && aSqr > 0) {
+					t2 = d / nT;
+				} else if (aSqr == AnX2 / nT2 && nXSqr >= 0 && nT != 0 && ((d >= 0 && ((nT2 + 2 * d * AnX >= 0 && AnX < 0) || AnX > 0)) || (nT2 + d * AnX > 0 && AnX < 0 && nT2 + 2 * d * AnX < 0))) {
+					t2 = 1 / (nT * (1 / d + 1 / (d + (2 * AnX) / aSqr)));
+				} else if (nXSqr >= 0 && AnX > 0 && nT == 0 && d > 0 && aSqr > 0) {
+					t2 = -(Math.Sqrt(d * (d * aSqr + 2 * AnX)) / AnX);
+				} else if (nXSqr >= 0 && AnX > 0 && nT == 0 && d > 0 && aSqr > 0) {
+					t2 = Math.Sqrt((d * (d * aSqr + 2 * AnX)) / AnX2);
+				} else if (nXSqr >= 0 && ((AnX < 0 && ((nT2 + 2 * d * AnX < 0 && ((nT2 + d * AnX > 0 && nT != 0 && (nT2 + d2 * aSqr + 2 * d * AnX == 0 || (nT2 + d2 * aSqr + 2 * d * AnX > 0 && nT2 * aSqr < AnX2))) || (nT2 * aSqr > AnX2 && nT < 0))) || (d >= 0 && ((nT < 0 && ((aSqr > 0 && nT2 + 2 * d * AnX >= 0 && nT2 * aSqr < AnX2) || nT2 * aSqr > AnX2)) || (nT > 0 && aSqr > 0 && nT2 + 2 * d * AnX >= 0 && nT2 * aSqr < AnX2))) || (nT < 0 && nT2 + d * AnX <= 0 && nT2 * aSqr > AnX2))) || (d >= 0 && AnX > 0 && ((nT != 0 && aSqr > 0 && nT2 * aSqr < AnX2) || (nT > 0 && nT2 * aSqr > AnX2))))) {
+					t2 = -((Math.Abs(AnX) * Math.Sqrt(nT2 + d2 * aSqr + 2 * d * AnX)) / Math.Abs((-nT2) * aSqr + AnX2)) + (nT * (d * aSqr + AnX)) / (nT2 * aSqr - AnX2);
+				} else if (nXSqr >= 0 && ((nT != 0 && nT2 * aSqr < AnX2 && ((aSqr > 0 && d >= 0 && ((nT2 + 2 * d * AnX >= 0 && AnX < 0) || AnX > 0)) || (AnX < 0 && nT2 + 2 * d * AnX < 0 && nT2 + d * AnX > 0 && nT2 + d2 * aSqr + 2 * d * AnX > 0))) || (nT2 * aSqr > AnX2 && ((d >= 0 && ((nT < 0 && AnX > 0) || (nT > 0 && AnX < 0))) || (nT > 0 && AnX < 0 && (nT2 + 2 * d * AnX < 0 || nT2 + d * AnX <= 0)))))) {
+					t2 = (Math.Abs(AnX) * Math.Sqrt(nT2 + d2 * aSqr + 2 * d * AnX)) / Math.Abs((-nT2) * aSqr + AnX2) + (nT * (d * aSqr + AnX)) / (nT2 * aSqr - AnX2);
+				} else {
+					break;
+				}
+				double accel = Math.Sqrt(aSqr);
+				double properTime = ASinh(t2 * accel) / accel;
+				if (properTime < 0) break;
+				bool lastAccel = properTime <= AccelerationDurations[i];
+				properTime = Math.Min(properTime, AccelerationDurations[i]);
+				t2 = Math.Sinh(properTime * accel) / accel;
+				Vector3d velocity = A * t2 / Math.Sqrt(1 + t2 * t2 * aSqr);
+				Vector3d displacement = A * (Math.Sqrt(1 + t2 * t2 * aSqr) - 1) / aSqr;
+				localObject = new Vector4d(t2, displacement);
+				//Matrix5d M = new Matrix5d(LorentzBoost(velocity), new Vector4d(-t2 + properTime, displacement));
+				observerToObjectBoost = prevBoost * observerToObjectBoost;
+				simulPlane = observerToObjectBoost.InvTransposePlaneMultiplication(new Plane { Distance = observerTime });
+				//prevBoost = new Matrix5d(LorentzBoost(velocity), new Vector4d(-t2, -displacement));
+				prevBoost = new Matrix5d(LorentzBoost(velocity), new Vector4d(-t2, displacement));// -t2, -displacement));
+				calculatedTime += properTime;
+				if (lastAccel) break;
+				simulPlane = prevBoost.InvTransposePlaneMultiplication(simulPlane);
+				offset += Vector3.up * 2;
+			}
+			//Debug.DrawRay(Vector3.zero, simulPlane.Normal.Draw().normalized * (float)simulPlane.Distance);
+			Vector4d objObserver = observerToObjectBoost * localObserver;
+			//Debug.DrawRay(objObserver.Draw(), Vector3.up, Color.HSVToRGB((float)(observerTime / maxT + 0 / 3.0) % 1f, 1, 1));
+
+			Vector4d right = observerToObjectBoost.Inverse().MultiplyDirection(new Vector4d { x = 1 });
+			Vector4d up = observerToObjectBoost.Inverse().MultiplyDirection(new Vector4d { y = 1 });
+			Vector4d forward = observerToObjectBoost.Inverse().MultiplyDirection(new Vector4d { t = 1 });
+			Vector4d origin = observerToObjectBoost * localObserver;
+
+			/*
+			Debug.DrawRay(offset + origin.Draw(), right.Draw() / (float)a, Color.red);
+			Debug.DrawRay(offset + origin.Draw(), up.Draw() * (float)deltaT, Color.green);
+			Debug.DrawRay(offset + origin.Draw(), forward.Draw() * (float)deltaT, Color.blue);
+			Debug.DrawRay(offset + origin.Draw(), -right.Draw()/ (float)a, Color.red);
+			Debug.DrawRay(offset + origin.Draw(), -up.Draw() * (float)deltaT, Color.green);
+			Debug.DrawRay(offset + origin.Draw(), -forward.Draw() * (float)deltaT, Color.blue);
+			*/
+
+			//Debug.DrawRay(offset + localObject.Draw(), Vector3.up*0.3f, Color.HSVToRGB((float)(observerTime / maxT + i / 3.0) % 1f, 1, 1));
+
+			Vector4d objInObserverFrame = observerToObjectBoost.Inverse() * localObject;
+			Debug.DrawRay(objInObserverFrame.Draw(), Vector3.up * 2, Color.HSVToRGB((float)(observerTime / maxT + i / 3.0) % 1f, 1, 1));
+		}
+	}
+
+	void DrawLightConeWorldline() {
+		double maxT = 100;
 		/*
 		for (double properTime = 0; properTime < 20.0; properTime += dT) {
 			Matrix5d objectToCoordinateBoost = new Matrix5d(LorentzBoost(InitialVelocity), new Vector4d(0.0, -new Vector3d(transform.position))).Inverse();
@@ -713,7 +928,7 @@ public class Relativity_Controller : MonoBehaviour {
 		Matrix5d initialBoost = new Matrix5d(LorentzBoost(InitialVelocity), new Vector4d(0, new Vector3d(-transform.position))) * new Matrix5d(LorentzBoost(new Vector3d(observerScript.velocity)), new Vector4d(0, new Vector3d(-Observer.transform.position))).Inverse();
 		Vector4d back = initialBoost.Inverse().MultiplyDirection(new Vector4d { t = -1 });
 		Vector4d center = initialBoost * new Vector4d();
-		Debug.DrawRay(center.Draw(), back.Draw()*1000);
+		Debug.DrawRay(center.Draw(), back.Draw() * 1000);
 
 		for (double observerTime = 0; observerTime < maxT; observerTime += deltaT) {
 			Vector3d observerVelocity = new Vector3d(observerScript.velocity);
@@ -737,7 +952,7 @@ public class Relativity_Controller : MonoBehaviour {
 					T = observerTime - calculatedTime;
 					lastAccel = true;
 				}
-				
+
 				double aSqr = A.SqrMagnitude();
 				a = A.Magnitude();
 				double t = Math.Sinh(T * a) / a;
@@ -747,7 +962,7 @@ public class Relativity_Controller : MonoBehaviour {
 				//Matrix5d Tr = new Matrix5d(Matrix4d.Identity(), prevTr);
 				Matrix5d M = new Matrix5d(LorentzBoost(velocity), new Vector4d(-t + T, displacement));
 				observerToCoordinateBoost *= new Matrix5d(Matrix4d.Identity(), prevTr) * M.Inverse() * new Matrix5d(Matrix4d.Identity(), new Vector4d(-calculatedTime, new Vector3d()));
-				prevTr = new Vector4d(T+prevT, new Vector3d());
+				prevTr = new Vector4d(T + prevT, new Vector3d());
 				//observerToCoordinateBoost *= MInv * Tr;// * observerToCoordinateBoost;
 				//Debug.Log(simulPlane2.Normal.Space() * displacement + simulPlane2.Normal.t * t - simulPlane2.Distance);
 				//observerToCoordinateBoost *= new Matrix5d(Matrix4d.Identity(), new Vector4d(-prevObserverTime, new Vector3d { x = observerTime }));
@@ -766,17 +981,21 @@ public class Relativity_Controller : MonoBehaviour {
 			Vector4d up = observerToObjectBoost.MultiplyDirection(new Vector4d { y = 1 });
 			Vector4d forward = observerToObjectBoost.MultiplyDirection(new Vector4d { t = 1 });
 			*/
-			
+
 
 			Plane simulPlane = observerToObjectBoost.InvTransposePlaneMultiplication(new Plane { Distance = observerTime });
 			double simulPlaneT = simulPlane.Normal.t;
 			Vector4d localObject = new Vector4d {
 				t = simulPlane.Distance / simulPlaneT
 			};
+			Vector4d observerInObjectFrame = observerToObjectBoost * localObserver;
+			localObject = new Vector4d {
+				t = observerInObjectFrame.t - observerInObjectFrame.Space().Magnitude()
+			};
 			calculatedTime = 0;
 			Matrix5d prevBoost = new Matrix5d();
 			Vector3 offset = Vector3.zero;
-			for (i=0; i<ProperAccelerations.Count; i++) {
+			for (i = 0; i < ProperAccelerations.Count; i++) {
 				Vector3d A = ProperAccelerations[i];
 				Vector4d N = simulPlane.Normal.Normalized();
 				Vector3d nX = N.Space();
@@ -786,10 +1005,11 @@ public class Relativity_Controller : MonoBehaviour {
 				double d = simulPlane.Distance;
 				double d2 = d * d;
 				double aSqr = A.SqrMagnitude();
-				
+
 				double AnX = A * nX;
 				double AnX2 = AnX * AnX;
 				double t2;
+				/*
 				//Find intersection time t2 between simulPlane and worldline of particle under proper acceleration A:
 				if (d == 0 && nT == 0 && AnX != 0 && nXSqr >= 0 && aSqr > 0) {
 					t2 = 0;
@@ -808,6 +1028,122 @@ public class Relativity_Controller : MonoBehaviour {
 				} else {
 					break;
 				}
+				*/
+				observerInObjectFrame = observerToObjectBoost * localObserver;
+				double T = observerInObjectFrame.t;
+				Vector3d X = observerInObjectFrame.Space();
+				double xSqr = X.SqrMagnitude();
+				X = new Vector3d { x = 10 };
+				T = 13;
+				double AX = A * X;
+				double T2 = T * T;
+				double T3 = T2 * T;
+				double T4 = T2 * T2;
+				/*
+				if ((T > 0 && ((aSqr < (1 + AX) * (1 + AX) / T2 && ((aSqr > 0 && ((1 + AX > 0 && AX < xSqr / T2 && ((xSqr > 0 && xSqr < T2) || xSqr > T2)) || (1 + AX < 0 && ((xSqr > 0 && xSqr < T2) || (xSqr > T2 && xSqr / (T2 - xSqr) < AX))))) || (AX < xSqr / (T2 - xSqr) && ((xSqr > 0 && xSqr < T2 && xSqr / T2 < AX && (4 * (1 + AX) * (T2 * AX - xSqr)) / (T2 + xSqr) * (T2 + xSqr) < aSqr) || (xSqr > T2 && (T2 + xSqr) / (T2 - xSqr) < AX && (4 * (T2 * AX - xSqr - AX * xSqr)) / (T2 - xSqr) * (T2 - xSqr) < aSqr))) || ((4 * (1 + AX) * (T2 * AX - xSqr)) / (T2 + xSqr) * (T2 + xSqr) < aSqr && ((xSqr > 0 && xSqr < T2 && ((AX < (2 * xSqr) / (T2 - xSqr) && xSqr / (T2 - xSqr) < AX) || (AX < (T4 + 6 * T2 * xSqr + xSqr * xSqr) / (3 * T4 - 2 * T2 * xSqr - xSqr * xSqr) && (2 * xSqr) / (T2 - xSqr) < AX))) || (AX > xSqr / T2 && xSqr > T2))))) || (aSqr < (4 * (1 + AX) * (T2 * AX - xSqr)) / (T2 + xSqr) * (T2 + xSqr) && ((xSqr > 0 && xSqr < T2 && ((aSqr > 0 && AX < xSqr / (T2 - xSqr) && xSqr / T2 < AX) || (AX < (2 * xSqr) / (T2 - xSqr) && xSqr / (T2 - xSqr) < AX && (4 * (T2 * AX - xSqr - AX * xSqr)) / (T2 - xSqr) * (T2 - xSqr) < aSqr))) || (aSqr > 0 && AX > xSqr / T2 && xSqr > T2))) || (aSqr > (1 + AX) * (1 + AX) / T2 && ((xSqr > T2 && ((AX < xSqr / (T2 - xSqr) && (T2 + xSqr) / (T2 - xSqr) < AX) || AX < (T2 + xSqr) / (T2 - xSqr) || (1 + AX < 0 && xSqr / (T2 - xSqr) < AX))) || (1 + AX < 0 && xSqr < T2 && xSqr > 0))))) || (T < 0 && ((aSqr < (1 + AX) * (1 + AX) / T2 && ((aSqr > 0 && 1 + AX > 0 && AX < xSqr / T2 && ((xSqr > 0 && xSqr < T2) || xSqr > T2)) || (xSqr > 0 && xSqr < T2 && (((4 * (1 + AX) * (T2 * AX - xSqr)) / (T2 + xSqr) * (T2 + xSqr) < aSqr && ((AX < (2 * xSqr) / (T2 - xSqr) && xSqr / T2 < AX) || (AX < (T4 + 6 * T2 * xSqr + xSqr * xSqr) / (3 * T4 - 2 * T2 * xSqr - xSqr * xSqr) && (2 * xSqr) / (T2 - xSqr) < AX))) || (AX < (T2 + xSqr) / (T2 - xSqr) && (4 * (T2 * AX - xSqr - AX * xSqr)) / (T2 - xSqr) * (T2 - xSqr) < aSqr && (T4 + 6 * T2 * xSqr + xSqr * xSqr) / (3 * T4 - 2 * T2 * xSqr - xSqr * xSqr) < AX))) || ((4 * (1 + AX) * (T2 * AX - xSqr)) / (T2 + xSqr) * (T2 + xSqr) < aSqr && AX > xSqr / T2 && xSqr > T2))) || (xSqr > 0 && aSqr < (4 * (1 + AX) * (T2 * AX - xSqr)) / (T2 + xSqr) * (T2 + xSqr) && xSqr < T2 && (((1 + AX) * (1 + AX) / T2 < aSqr && ((AX < (T2 + xSqr) / (T2 - xSqr) && (T4 + 6 * T2 * xSqr + xSqr * xSqr) / (3 * T4 - 2 * T2 * xSqr - xSqr * xSqr) < AX) || AX > (T2 + xSqr) / (T2 - xSqr))) || (AX < (T4 + 6 * T2 * xSqr + xSqr * xSqr) / (3 * T4 - 2 * T2 * xSqr - xSqr * xSqr) && (2 * xSqr) / (T2 - xSqr) < AX && (4 * (T2 * AX - xSqr - AX * xSqr)) / (T2 - xSqr) * (T2 - xSqr) < aSqr)))))) {
+					t2 = (T * Math.Abs((-T2) * aSqr + (1 + AX) * (1 + AX)) * (-2 * (1 + AX) + aSqr * (T2 - xSqr)) + Math.Abs(1 + AX) * ((-T2) * aSqr + (1 + AX) * (1 + AX)) * Math.Sqrt(aSqr * (T2 - xSqr) * (T2 - xSqr) + 4 * (xSqr + AX * (-T2 + xSqr)))) / (2 * Math.Abs((-T2) * aSqr + (1 + AX) * (1 + AX)) * (T2 * aSqr - (1 + AX) * (1 + AX)));
+				} else if ((T > 0 && ((aSqr < (1 + AX) * (1 + AX) / T2 && ((xSqr > T2 && ((AX < xSqr / (T2 - xSqr) && (T2 + xSqr) / (T2 - xSqr) < AX && (4 * (T2 * AX - xSqr - AX * xSqr)) / (T2 - xSqr) * (T2 - xSqr) < aSqr) || (aSqr > 0 && 1 + AX < 0 && xSqr / (T2 - xSqr) < AX))) || (1 + AX < 0 && xSqr < T2 && aSqr > 0 && xSqr > 0))) || (aSqr < (4 * (1 + AX) * (T2 * AX - xSqr)) / (T2 + xSqr) * (T2 + xSqr) && ((xSqr > 0 && xSqr < T2 && ((aSqr > 0 && AX < xSqr / (T2 - xSqr) && xSqr / T2 < AX) || (AX < (2 * xSqr) / (T2 - xSqr) && xSqr / (T2 - xSqr) < AX && (4 * (T2 * AX - xSqr - AX * xSqr)) / (T2 - xSqr) * (T2 - xSqr) < aSqr))) || (aSqr > 0 && AX > xSqr / T2 && xSqr > T2))) || (aSqr > (1 + AX) * (1 + AX) / T2 && ((1 + AX > 0 && AX < xSqr / T2 && ((xSqr > 0 && xSqr < T2) || xSqr > T2)) || (xSqr > 0 && xSqr < T2 && ((AX < xSqr / (T2 - xSqr) && xSqr / T2 < AX) || (T2 * AX < (2 + AX) * xSqr && (1 + AX) * xSqr < T2 * AX) || (3 * T4 * AX < T4 + 6 * T2 * xSqr + 2 * T2 * AX * xSqr + xSqr * xSqr + AX * xSqr * xSqr && (2 + AX) * xSqr < T2 * AX))) || (AX > xSqr / T2 && xSqr > T2))) || (xSqr < T2 && aSqr > (4 * (1 + AX) * (T2 * AX - xSqr)) / (T2 + xSqr) * (T2 + xSqr) && AX > (T4 + 6 * T2 * xSqr + xSqr * xSqr) / (3 * T4 - 2 * T2 * xSqr - xSqr * xSqr) && xSqr > 0))) || (xSqr > 0 && T < 0 && xSqr < T2 && (4 * (T2 * AX - xSqr - AX * xSqr)) / (T2 - xSqr) * (T2 - xSqr) < aSqr && ((aSqr < (4 * (1 + AX) * (T2 * AX - xSqr)) / (T2 + xSqr) * (T2 + xSqr) && AX < (T4 + 6 * T2 * xSqr + xSqr * xSqr) / (3 * T4 - 2 * T2 * xSqr - xSqr * xSqr) && (2 * xSqr) / (T2 - xSqr) < AX) || (aSqr < (1 + AX) * (1 + AX) / T2 && AX < (T2 + xSqr) / (T2 - xSqr) && (T4 + 6 * T2 * xSqr + xSqr * xSqr) / (3 * T4 - 2 * T2 * xSqr - xSqr * xSqr) < AX)))) {
+					t2 = (-2 * T * (1 + AX) + T * aSqr * (T2 - xSqr) + (Math.Abs(1 + AX) * (T2 * aSqr - (1 + AX) * (1 + AX)) * Math.Sqrt(aSqr * (T2 - xSqr) * (T2 - xSqr) + 4 * (xSqr + AX * (-T2 + xSqr)))) / Math.Abs((-T2) * aSqr + (1 + AX) * (1 + AX))) / (2 * T2 * aSqr - 2 * (1 + AX) * (1 + AX));
+				} else {
+					break;
+				}
+				*/
+
+				if (T == 0 && xSqr == 0 && AX == 0 && aSqr > 0) {
+					t2 = 0;
+					localObject = new Vector4d(t2, A * (Math.Sqrt(1 + t2 * t2 * aSqr) - 1) / aSqr);
+					Vector4d objInObserver = observerToObjectBoost.Inverse() * localObject;
+					Debug.DrawLine(localObserver.Draw(), objInObserver.Draw(), Color.red);
+					Debug.Log(t2);
+				}
+				if (aSqr == 1 / T2 && AX == 0 && xSqr == 0 && T != 0) {
+					t2 = (3 * T) / 4;
+					localObject = new Vector4d(t2, A * (Math.Sqrt(1 + t2 * t2 * aSqr) - 1) / aSqr);
+					Vector4d objInObserver = observerToObjectBoost.Inverse() * localObject;
+					Debug.DrawLine(localObserver.Draw(), objInObserver.Draw(), Color.red);
+					Debug.Log(t2);
+				}
+				if (AX == -1 && T != 0 && aSqr > 0 && (T2 <= xSqr || xSqr > 0)) {
+					t2 = (1 / 2) * (T - xSqr / T);
+					localObject = new Vector4d(t2, A * (Math.Sqrt(1 + t2 * t2 * aSqr) - 1) / aSqr);
+					Vector4d objInObserver = observerToObjectBoost.Inverse() * localObject;
+					Debug.DrawLine(localObserver.Draw(), objInObserver.Draw(), Color.red);
+					Debug.Log(t2);
+				}
+				if ((1 + AX) * (1 + AX) / T2 == aSqr && T != 0 && ((T2 == xSqr && 1 + AX != 0) || (T2 > xSqr && xSqr > 0 && (1 + AX < 0 || (1 + AX > 0 && AX <= xSqr / (T2 - xSqr)) || (AX > xSqr / (T2 - xSqr) && AX < (T2 + xSqr) / (T2 - xSqr)))) || (T2 < xSqr && (1 + AX > 0 || (1 + AX < 0 && AX >= xSqr / (T2 - xSqr)) || (AX < xSqr / (T2 - xSqr) && AX > (T2 + xSqr) / (T2 - xSqr)))))) {
+					t2 = -(((T2 - xSqr) * (3 + 2 * AX - AX * AX + aSqr * xSqr)) / (4 * T * (-1 + AX * AX - aSqr * xSqr)));
+					localObject = new Vector4d(t2, A * (Math.Sqrt(1 + t2 * t2 * aSqr) - 1) / aSqr);
+					Vector4d objInObserver = observerToObjectBoost.Inverse() * localObject;
+					Debug.DrawLine(localObserver.Draw(), objInObserver.Draw(), Color.red);
+					Debug.Log(t2);
+				}
+				if (T == 0 && xSqr > 0 && AX > -1 && aSqr > 0) {
+					t2 = -(Math.Sqrt(xSqr * (4 + 4 * AX + aSqr * xSqr)) / (2 + 2 * AX));
+					localObject = new Vector4d(t2, A * (Math.Sqrt(1 + t2 * t2 * aSqr) - 1) / aSqr);
+					Vector4d objInObserver = observerToObjectBoost.Inverse() * localObject;
+					Debug.DrawLine(localObserver.Draw(), objInObserver.Draw(), Color.red);
+					Debug.Log(t2);
+				}
+				if (T == 0 && xSqr > 0 && AX > -1 && aSqr > 0) {
+					t2 = Math.Sqrt(xSqr * (4 + 4 * AX + aSqr * xSqr)) / (2 + 2 * AX);
+					localObject = new Vector4d(t2, A * (Math.Sqrt(1 + t2 * t2 * aSqr) - 1) / aSqr);
+					Vector4d objInObserver = observerToObjectBoost.Inverse() * localObject;
+					Debug.DrawLine(localObserver.Draw(), objInObserver.Draw(), Color.red);
+					Debug.Log(t2);
+				}
+				if (AX == 0 && xSqr == 0 && ((0 < aSqr && aSqr < 1 / T2 && T != 0) || (aSqr > 1 / T2 && T < 0))) {
+					t2 = (1 / 2) * (-Math.Sqrt((T4 * aSqr) / (-1 + T2 * aSqr) * (-1 + T2 * aSqr)) + (T * (-2 + T2 * aSqr)) / (-1 + T2 * aSqr));
+					localObject = new Vector4d(t2, A * (Math.Sqrt(1 + t2 * t2 * aSqr) - 1) / aSqr);
+					Vector4d objInObserver = observerToObjectBoost.Inverse() * localObject;
+					Debug.DrawLine(localObserver.Draw(), objInObserver.Draw(), Color.red);
+					Debug.Log(t2);
+				}
+				if (AX == 0 && xSqr == 0 && ((0 < aSqr && aSqr < 1 / T2 && T != 0) || (T > 0 && aSqr > 1 / T2))) {
+					t2 = (1 / 2) * (Math.Sqrt((T4 * aSqr) / (-1 + T2 * aSqr) * (-1 + T2 * aSqr)) + (T * (-2 + T2 * aSqr)) / (-1 + T2 * aSqr));
+					localObject = new Vector4d(t2, A * (Math.Sqrt(1 + t2 * t2 * aSqr) - 1) / aSqr);
+					Vector4d objInObserver = observerToObjectBoost.Inverse() * localObject;
+					Debug.DrawLine(localObserver.Draw(), objInObserver.Draw(), Color.red);
+					Debug.Log(t2);
+				}
+				if ((T2 == xSqr && ((aSqr > 0 && T != 0 && aSqr < (1 + AX) * (1 + AX) / T2 && 1 + AX != 0) || (aSqr > (1 + AX) * (1 + AX) / T2 && ((1 + AX > 0 && T < 0) || (T > 0 && 1 + AX < 0))))) || (AX == (T2 + xSqr) / (T2 - xSqr) && aSqr + (4 * ((-T2) * AX + xSqr + AX * xSqr)) / (T2 - xSqr) * (T2 - xSqr) > 0 && ((xSqr > 0 && T < 0 && xSqr < T2) || (T > 0 && xSqr > T2))) || (aSqr + (4 * ((-T2) * AX + xSqr + AX * xSqr)) / (T2 - xSqr) * (T2 - xSqr) == 0 && T != 0 && ((xSqr > 0 && xSqr < T2 && T2 * AX < T2 + xSqr + AX * xSqr && (1 + AX) * xSqr < T2 * AX) || (xSqr > T2 && AX < xSqr / (T2 - xSqr) && (T2 + xSqr) / (T2 - xSqr) < AX))) || (xSqr > 0 && xSqr < T2 && ((aSqr < (1 + AX) * (1 + AX) / T2 && ((aSqr > 0 && T != 0 && (1 + AX < 0 || (1 + AX > 0 && AX <= xSqr / (T2 - xSqr)))) || (AX < (T2 + xSqr) / (T2 - xSqr) && xSqr / (T2 - xSqr) < AX && (4 * (T2 * AX - xSqr - AX * xSqr)) / (T2 - xSqr) * (T2 - xSqr) < aSqr && T != 0))) || (aSqr > (1 + AX) * (1 + AX) / T2 && ((T < 0 && ((AX < (T2 + xSqr) / (T2 - xSqr) && xSqr / (T2 - xSqr) < AX) || (1 + AX > 0 && AX <= xSqr / (T2 - xSqr)) || AX > (T2 + xSqr) / (T2 - xSqr))) || (T > 0 && 1 + AX < 0))))) || (xSqr > T2 && ((aSqr < (1 + AX) * (1 + AX) / T2 && T != 0 && ((aSqr > 0 && (1 + AX > 0 || xSqr / (T2 - xSqr) <= AX) && 1 + AX != 0) || (AX < xSqr / (T2 - xSqr) && (T2 + xSqr) / (T2 - xSqr) < AX && (4 * (T2 * AX - xSqr - AX * xSqr)) / (T2 - xSqr) * (T2 - xSqr) < aSqr))) || (aSqr > (1 + AX) * (1 + AX) / T2 && ((T < 0 && 1 + AX > 0) || (T > 0 && ((AX < xSqr / (T2 - xSqr) && (T2 + xSqr) / (T2 - xSqr) < AX) || AX < (T2 + xSqr) / (T2 - xSqr) || (1 + AX < 0 && xSqr / (T2 - xSqr) <= AX)))))))) {
+					t2 = (T * Math.Abs((-T2) * aSqr + (1 + AX) * (1 + AX)) * (-2 * (1 + AX) + aSqr * (T2 - xSqr)) + Math.Abs(1 + AX) * ((-T2) * aSqr + (1 + AX) * (1 + AX)) * Math.Sqrt(aSqr * (T2 - xSqr) * (T2 - xSqr) + 4 * (xSqr + AX * (-T2 + xSqr)))) / (2 * Math.Abs((-T2) * aSqr + (1 + AX) * (1 + AX)) * (T2 * aSqr - (1 + AX) * (1 + AX)));
+					localObject = new Vector4d(t2, A * (Math.Sqrt(1 + t2 * t2 * aSqr) - 1) / aSqr);
+					Vector4d objInObserver = observerToObjectBoost.Inverse() * localObject;
+					Debug.DrawLine(localObserver.Draw(), objInObserver.Draw(), Color.cyan);
+					Debug.DrawRay(objInObserver.Draw(), Vector3.up);
+					Debug.Log(t2);
+				}
+				if ((T2 == xSqr && ((aSqr > 0 && T != 0 && aSqr < (1 + AX) * (1 + AX) / T2 && 1 + AX != 0) || (aSqr > (1 + AX) * (1 + AX) / T2 && ((T < 0 && 1 + AX < 0) || (T > 0 && 1 + AX > 0))))) || (AX == (T2 + xSqr) / (T2 - xSqr) && aSqr + (4 * ((-T2) * AX + xSqr + AX * xSqr)) / (T2 - xSqr) * (T2 - xSqr) > 0 && ((T > 0 && xSqr > 0 && xSqr < T2) || (xSqr > T2 && T < 0))) || (xSqr > 0 && xSqr < T2 && ((aSqr < (1 + AX) * (1 + AX) / T2 && ((aSqr > 0 && T != 0 && (1 + AX < 0 || (1 + AX > 0 && AX <= xSqr / (T2 - xSqr)))) || (AX < (T2 + xSqr) / (T2 - xSqr) && xSqr / (T2 - xSqr) < AX && (4 * (T2 * AX - xSqr - AX * xSqr)) / (T2 - xSqr) * (T2 - xSqr) < aSqr && T != 0))) || (aSqr > (1 + AX) * (1 + AX) / T2 && ((T < 0 && 1 + AX < 0) || (T > 0 && ((AX < (T2 + xSqr) / (T2 - xSqr) && xSqr / (T2 - xSqr) < AX) || (1 + AX > 0 && AX <= xSqr / (T2 - xSqr)) || AX > (T2 + xSqr) / (T2 - xSqr))))))) || (xSqr > T2 && ((aSqr < (1 + AX) * (1 + AX) / T2 && T != 0 && ((aSqr > 0 && (1 + AX > 0 || xSqr / (T2 - xSqr) <= AX) && 1 + AX != 0) || (AX < xSqr / (T2 - xSqr) && (T2 + xSqr) / (T2 - xSqr) < AX && (4 * (T2 * AX - xSqr - AX * xSqr)) / (T2 - xSqr) * (T2 - xSqr) < aSqr))) || (aSqr > (1 + AX) * (1 + AX) / T2 && ((T < 0 && ((AX < xSqr / (T2 - xSqr) && (T2 + xSqr) / (T2 - xSqr) < AX) || AX < (T2 + xSqr) / (T2 - xSqr) || (1 + AX < 0 && xSqr / (T2 - xSqr) <= AX))) || (T > 0 && 1 + AX > 0)))))) {
+					t2 = (-2 * T * (1 + AX) + T * aSqr * (T2 - xSqr) + (Math.Abs(1 + AX) * (T2 * aSqr - (1 + AX) * (1 + AX)) * Math.Sqrt(aSqr * (T2 - xSqr) * (T2 - xSqr) + 4 * (xSqr + AX * (-T2 + xSqr)))) / Math.Abs((-T2) * aSqr + (1 + AX) * (1 + AX))) / (2 * T2 * aSqr - 2 * (1 + AX) * (1 + AX));
+					localObject = new Vector4d(t2, A * (Math.Sqrt(1 + t2 * t2 * aSqr) - 1) / aSqr);
+					Vector4d objInObserver = observerToObjectBoost.Inverse() * localObject;
+					Debug.DrawLine(localObserver.Draw(), objInObserver.Draw(), Color.green);
+					Debug.Log(t2);
+				}
+				Debug.Log(A.x + " " + X.x + " " + T + " " + ((T2 == xSqr && ((aSqr > 0 && T != 0 && aSqr < (1 + AX) * (1 + AX) / T2 && 1 + AX != 0) || (aSqr > (1 + AX) * (1 + AX) / T2 && ((1 + AX > 0 && T < 0) || (T > 0 && 1 + AX < 0))))) || (AX == (T2 + xSqr) / (T2 - xSqr) && aSqr + (4 * ((-T2) * AX + xSqr + AX * xSqr)) / (T2 - xSqr) * (T2 - xSqr) > 0 && ((xSqr > 0 && T < 0 && xSqr < T2) || (T > 0 && xSqr > T2))) || (aSqr + (4 * ((-T2) * AX + xSqr + AX * xSqr)) / (T2 - xSqr) * (T2 - xSqr) == 0 && T != 0 && ((xSqr > 0 && xSqr < T2 && T2 * AX < T2 + xSqr + AX * xSqr && (1 + AX) * xSqr < T2 * AX) || (xSqr > T2 && AX < xSqr / (T2 - xSqr) && (T2 + xSqr) / (T2 - xSqr) < AX))) || (xSqr > 0 && xSqr < T2 && ((aSqr < (1 + AX) * (1 + AX) / T2 && ((aSqr > 0 && T != 0 && (1 + AX < 0 || (1 + AX > 0 && AX <= xSqr / (T2 - xSqr)))) || (AX < (T2 + xSqr) / (T2 - xSqr) && xSqr / (T2 - xSqr) < AX && (4 * (T2 * AX - xSqr - AX * xSqr)) / (T2 - xSqr) * (T2 - xSqr) < aSqr && T != 0))) || (aSqr > (1 + AX) * (1 + AX) / T2 && ((T < 0 && ((AX < (T2 + xSqr) / (T2 - xSqr) && xSqr / (T2 - xSqr) < AX) || (1 + AX > 0 && AX <= xSqr / (T2 - xSqr)) || AX > (T2 + xSqr) / (T2 - xSqr))) || (T > 0 && 1 + AX < 0))))) || (xSqr > T2 && ((aSqr < (1 + AX) * (1 + AX) / T2 && T != 0 && ((aSqr > 0 && (1 + AX > 0 || xSqr / (T2 - xSqr) <= AX) && 1 + AX != 0) || (AX < xSqr / (T2 - xSqr) && (T2 + xSqr) / (T2 - xSqr) < AX && (4 * (T2 * AX - xSqr - AX * xSqr)) / (T2 - xSqr) * (T2 - xSqr) < aSqr))) || (aSqr > (1 + AX) * (1 + AX) / T2 && ((T < 0 && 1 + AX > 0) || (T > 0 && ((AX < xSqr / (T2 - xSqr) && (T2 + xSqr) / (T2 - xSqr) < AX) || AX < (T2 + xSqr) / (T2 - xSqr) || (1 + AX < 0 && xSqr / (T2 - xSqr) <= AX)))))))));
+				break;
+
+
+
+
+
+
+
+
+
+				double t2a = (-2 * T * (1 + AX) + aSqr * (T3 - T * xSqr) + Math.Abs(1 + AX) * Math.Sqrt(-4 * T2 * AX + aSqr * (T2 - xSqr) * (T2 - xSqr) + 4 * (1 + AX) * xSqr)) / (2 * T2 * aSqr - 2 * (1 + AX) * (1 + AX));
+				double t2b = (-2 * T * (1 + AX) + aSqr * (T3 - T * xSqr) - Math.Abs(1 + AX) * Math.Sqrt(-4 * T2 * AX + aSqr * (T2 - xSqr) * (T2 - xSqr) + 4 * (1 + AX) * xSqr)) / (2 * T2 * aSqr - 2 * (1 + AX) * (1 + AX));
+
+				double dSa = (A * (Math.Sqrt(1 + t2a * t2a * aSqr) - 1) / aSqr - X).SqrMagnitude() - (T - t2a) * (T - t2a);
+				double dSb = (A * (Math.Sqrt(1 + t2b * t2b * aSqr) - 1) / aSqr - X).SqrMagnitude() - (T - t2b) * (T - t2b);
+
+				
+				
+				//Debug.Log(dSa + " " + dSb);
+				t2 = dSa;
+
+
+
 				double accel = Math.Sqrt(aSqr);
 				double properTime = ASinh(t2 * accel) / accel;
 				if (properTime < 0) break;
@@ -827,28 +1163,20 @@ public class Relativity_Controller : MonoBehaviour {
 				simulPlane = prevBoost.InvTransposePlaneMultiplication(simulPlane);
 				offset += Vector3.up * 2;
 			}
-			//Debug.DrawRay(Vector3.zero, simulPlane.Normal.Draw().normalized * (float)simulPlane.Distance);
+			/*
 			Vector4d objObserver = observerToObjectBoost * localObserver;
-			//Debug.DrawRay(objObserver.Draw(), Vector3.up, Color.HSVToRGB((float)(observerTime / maxT + 0 / 3.0) % 1f, 1, 1));
 
 			Vector4d right = observerToObjectBoost.Inverse().MultiplyDirection(new Vector4d { x = 1 });
 			Vector4d up = observerToObjectBoost.Inverse().MultiplyDirection(new Vector4d { y = 1 });
 			Vector4d forward = observerToObjectBoost.Inverse().MultiplyDirection(new Vector4d { t = 1 });
 			Vector4d origin = observerToObjectBoost * localObserver;
 
-			/*
-			Debug.DrawRay(offset + origin.Draw(), right.Draw() / (float)a, Color.red);
-			Debug.DrawRay(offset + origin.Draw(), up.Draw() * (float)deltaT, Color.green);
-			Debug.DrawRay(offset + origin.Draw(), forward.Draw() * (float)deltaT, Color.blue);
-			Debug.DrawRay(offset + origin.Draw(), -right.Draw()/ (float)a, Color.red);
-			Debug.DrawRay(offset + origin.Draw(), -up.Draw() * (float)deltaT, Color.green);
-			Debug.DrawRay(offset + origin.Draw(), -forward.Draw() * (float)deltaT, Color.blue);
-			*/
-			
-			//Debug.DrawRay(offset + localObject.Draw(), Vector3.up*0.3f, Color.HSVToRGB((float)(observerTime / maxT + i / 3.0) % 1f, 1, 1));
-
 			Vector4d objInObserverFrame = observerToObjectBoost.Inverse() * localObject;
-			Debug.DrawRay(objInObserverFrame.Draw(), Vector3.up*2, Color.HSVToRGB((float)(observerTime / maxT + i / 3.0) % 1f, 1, 1));
+			Vector3 draw = objInObserverFrame.Draw();
+			Debug.DrawLine(draw, localObserver.Draw(), Color.HSVToRGB((float)(observerTime / maxT + i / 3.0) % 1f, 1, 1));
+			draw.z = (float)observerTime;
+			Debug.DrawRay(draw, Vector3.up * 2, Color.HSVToRGB((float)(observerTime / maxT + i / 3.0) % 1f, 1, 1));
+			*/
 		}
 	}
 
